@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "target": "es2022",
+    "paths": {
+      "*": ["node_modules/*"],
+      "@/*": ["./src/*"]
+    }
+  }
+}

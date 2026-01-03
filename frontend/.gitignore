@@ -1,0 +1,4 @@
+node_modules/
+auto-imports.d.ts
+docs/
+yarn-error.log
