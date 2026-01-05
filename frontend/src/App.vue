@@ -8,5 +8,3 @@ import { ElConfigProvider } from 'element-plus'
     <RouterView />
   </el-config-provider>
 </template>
-
-<style scoped lang="scss"></style>
