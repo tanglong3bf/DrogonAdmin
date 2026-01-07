@@ -13,4 +13,24 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
 
 message(STATUS "use c++23")
 
-target_sources(${PROJECT_NAME} PRIVATE ${SRC_DIR})
+aux_source_directory(adapter/driving/restful CTL_SRC)
+aux_source_directory(application SERVICE_SRC)
+aux_source_directory(common/exception EXCEPTION_SRC)
+aux_source_directory(common/framework/domain COMMON_DOMAIN_SRC)
+aux_source_directory(common/util/plugins/DrogonJwtUtil/src JWT_SRC)
+aux_source_directory(common/util/plugins/SqlGenerator/src SQL_GENERATOR_SRC)
+
+include_directories("./")
+include_directories("./common/util/plugins")
+
+target_sources(
+  ${PROJECT_NAME}
+  PRIVATE ${SRC_DIR}
+          ${CTL_SRC}
+          ${SERVICE_SRC}
+          ${EXCEPTION_SRC}
+          ${COMMON_DOMAIN_SRC}
+          ${JWT_SRC}
+          ${SQL_GENERATOR_SRC})
+
+file(COPY config.json DESTINATION ${CMAKE_BINARY_DIR})

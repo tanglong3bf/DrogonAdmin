@@ -296,13 +296,104 @@
         "log_file": "access.log",
         "log_size_limit": 0,
         "use_local_time": true,
-        "log_index": 0
-        // "show_microseconds": true,
+        "log_index": 0,
+        "show_microseconds": true
         // "custom_time_format": "",
         // "use_real_ip": false
+      }
+    },
+    {
+      "name": "tl::jwt::JwtUtil",
+      "config": {
+        // iat is MUST NOT set. It will be set in code automatically.
+        "payload": {
+          // exp: expired time in seconds, if it is negative, means always
+          // not expired. 1800 by default.
+          "exp": 86400,
+          // jti: JWT ID, if it is false, means not set this field to
+          // payload. If it is true, the UUID will be used to generate the
+          // jti field. False by default.
+          "jti": true
+        }
+      }
+    },
+    {
+      "name": "tl::sql::SqlGenerator",
+      "config": {
+        "sqls": {}
       }
     }
   ],
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
-  "custom_config": {}
+  "custom_config": {
+    "menu_list": [
+      {
+        "path": "/home",
+        "name": "首页",
+        "icon": "ion:home-sharp"
+      },
+      {
+        "path": "/sys",
+        "redirect": "/sys/dept_user",
+        "icon": "ion:settings-sharp",
+        "name": "系统管理",
+        "children": [
+          {
+            "path": "/sys/dept_user",
+            "redirect": "/sys/dept_user/dept",
+            "icon": "ion:settings-sharp",
+            "name": "部门用户",
+            "children": [
+              {
+                "path": "/sys/dept_user/dept",
+                "icon": "mingcute:department-fill",
+                "name": "部门管理"
+              },
+              {
+                "path": "/sys/dept_user/user",
+                "icon": "ri:user-fill",
+                "name": "用户管理"
+              }
+            ]
+          },
+          {
+            "path": "/sys/module_menu",
+            "redirect": "/sys/module_menu/menu",
+            "icon": "ion:settings-sharp",
+            "name": "模块菜单",
+            "children": [
+              {
+                "path": "/sys/module_menu/menu",
+                "icon": "tdesign:module-filled",
+                "name": "模块管理"
+              },
+              {
+                "path": "/sys/module_menu/module",
+                "icon": "fluent-mdl2:context-menu",
+                "name": "菜单管理"
+              }
+            ]
+          },
+          {
+            "path": "/sys/role_auth",
+            "redirect": "/sys/role_auth/role",
+            "icon": "ion:settings-sharp",
+            "name": "角色权限",
+            "children": [
+              {
+                "path": "/sys/role_auth/role",
+                "icon": "fa7-solid:user-cog",
+                "name": "角色管理"
+              },
+              {
+                "path": "/sys/role_auth/auth",
+                "icon": "ix:user-key",
+                "name": "权限管理"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

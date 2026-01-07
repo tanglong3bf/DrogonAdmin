@@ -1,0 +1,6 @@
+[submodule "backend/common/util/plugins/DrogonJwtUtil"]
+	path = backend/common/util/plugins/DrogonJwtUtil
+	url = https://github.com/tanglong3bf/DrogonJwtUtil.git
+[submodule "backend/common/util/plugins/SqlGenerator"]
+	path = backend/common/util/plugins/SqlGenerator
+	url = https://github.com/tanglong3bf/SqlGenerator.git
