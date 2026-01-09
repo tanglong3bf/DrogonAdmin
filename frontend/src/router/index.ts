@@ -1,78 +1,27 @@
-import { useCommonStore } from '@/stores/common'
-import type { PageItem } from '@/types/common'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useCommonStore } from '@/stores/common'
+import { useAuthStore } from '@/stores/auth'
+import { SidebarMenu } from '@/types/menu'
+import { PageItem } from '@/types/common'
 
-// TODO: 登录时设置，临时写的测试用
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('@/layouts/AdminLayout.vue'),
     redirect: '/home',
+    name: 'root',
     children: [
       {
         path: '/home',
         component: () => import('@/views/Home.vue'),
         name: '首页'
-      },
-      {
-        path: '/sys',
-        redirect: '/sys/dept_user',
-        name: '系统管理',
-        children: [
-          {
-            path: '/sys/dept_user',
-            redirect: '/sys/dept_user/dept',
-            name: '部门用户',
-            children: [
-              {
-                path: '/sys/dept_user/dept',
-                component: () => import('@/views/sys/dept_user/Dept.vue'),
-                name: '部门管理'
-              },
-              {
-                path: '/sys/dept_user/user',
-                component: () => import('@/views/sys/dept_user/User.vue'),
-                name: '用户管理'
-              }
-            ]
-          },
-          {
-            path: '/sys/module_menu',
-            redirect: '/sys/module_menu/menu',
-            name: '模块菜单',
-            children: [
-              {
-                path: '/sys/module_menu/menu',
-                component: () => import('@/views/sys/module_menu/Menu.vue'),
-                name: '模块管理'
-              },
-              {
-                path: '/sys/module_menu/module',
-                component: () => import('@/views/sys/module_menu/Module.vue'),
-                name: '菜单管理'
-              }
-            ]
-          },
-          {
-            path: '/sys/role_auth',
-            redirect: '/sys/role_auth/role',
-            name: '角色权限',
-            children: [
-              {
-                path: '/sys/role_auth/role',
-                component: () => import('@/views/sys/role_auth/Role.vue'),
-                name: '角色管理'
-              },
-              {
-                path: '/sys/role_auth/auth',
-                component: () => import('@/views/sys/role_auth/Auth.vue'),
-                name: '权限管理'
-              }
-            ]
-          }
-        ]
       }
     ]
+  },
+  {
+    path: '/login',
+    component: () => import('@/views/Login.vue'),
+    name: '登录页'
   }
 ]
 
@@ -82,52 +31,73 @@ const router = createRouter({
 })
 
 /**
+ * 非法页面和登录检查
+ */
+router.beforeEach(to => {
+  const authStore = useAuthStore()
+  // 访问了不存在的页面
+  if (to.matched.length === 0) {
+    // 跳首页
+    return '/home'
+  }
+  // 没登录
+  if (to.path !== '/login' && authStore.token === undefined) {
+    // 跳登录页
+    return '/login'
+  }
+  return true
+})
+
+/**
  * 计算并设置当前激活的路径
  * 同时修改页面标题
  */
 router.beforeEach(to => {
+  const commonStore = useCommonStore()
+  const menuList = commonStore.menuList
+
   /**
    * 根据欲跳转的路径计算activePath
-   * @param path
+   * @param items
+   * @param toPath
    * @returns
    */
-  const calActivePath = (path: string): PageItem[] => {
-    // 分割路径为各个部分
-    const pathSegments = path.split('/').filter(segment => segment !== '')
-
-    // 构建路径数组
-    const result: PageItem[] = pathSegments.reduce(
-      (acc: PageItem[], segment: string) => {
-        const currentPath =
-          acc.length > 0
-            ? `${acc[acc.length - 1].path}/${segment}`
-            : `/${segment}`
-        return [...acc, { name: '', path: currentPath }]
-      },
-      []
-    )
-
-    // 查找每个路径对应的名称
-    const findRouteName = (routes: RouteRecordRaw[], path: string): string =>
-      routes.reduce((name: string, route: RouteRecordRaw): string => {
-        if (name) return name
-        if (route.path === path) return (route.name as string) || ''
-        return route.children ? findRouteName(route.children, path) : ''
-      }, '')
-
-    // 更新每个路径的名称
-    const updateRouteNames = (routes: RouteRecordRaw[], result: PageItem[]) =>
-      result.map(item => ({ ...item, name: findRouteName(routes, item.path) }))
-
-    return updateRouteNames(routes, result)
+  const calActivePath = (items: SidebarMenu[], toPath: string): PageItem[] => {
+    if (toPath === '/login') {
+      return [{ name: '登录页', path: '/login' }]
+    }
+    // 获取节点的路径，无路径，递归查询第一个子节点
+    const getEffectivePath = (item: SidebarMenu): string | undefined => {
+      if (item.path) return item.path
+      if (item.children && item.children.length > 0) {
+        return getEffectivePath(item.children[0])
+      }
+      return undefined
+    }
+    for (const item of items) {
+      if (item.path && item.path === toPath) {
+        return [{ name: item.name, path: item.path }]
+      }
+      if (item.children && item.children.length > 0) {
+        const childPathResult = calActivePath(item.children, toPath)
+        if (childPathResult.length > 0) {
+          const parentPageItem: PageItem = {
+            name: item.name,
+            path: getEffectivePath(item) || ''
+          }
+          return [parentPageItem].concat(childPathResult)
+        }
+      }
+    }
+    return []
   }
-  const activePath = calActivePath(to.path)
+  const activePath = calActivePath(menuList, to.path)
 
   // 设置当前激活的路径
-  const commonStore = useCommonStore()
   commonStore.setActivePath(activePath)
   // 修改页面标题
   document.title = `${activePath[activePath.length - 1].name} - Drogon Admin`
+  return true
 })
 
 export default router

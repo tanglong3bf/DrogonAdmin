@@ -10,7 +10,7 @@ import router from './router'
 // 引入element-plus的图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-import '@/mock'
+import '@/api/mock'
 
 const app = createApp(App)
 

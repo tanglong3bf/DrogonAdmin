@@ -6,90 +6,23 @@ import { SidebarMenu } from '@/types/menu'
 export const useCommonStore = defineStore(
   'common',
   () => {
-    // TODO: 登录时设置，临时写的测试用
-    const menuList = ref<SidebarMenu[]>([
-      {
-        path: '/home',
-        index: 'home',
-        icon: 'ion:home-sharp',
-        name: '首页'
-      },
-      {
-        path: '/sys',
-        index: 'sys',
-        icon: 'ion:settings-sharp',
-        name: '系统管理',
-        sub_menu: [
-          {
-            path: '/sys/dept_user',
-            index: 'dept_user',
-            icon: 'ion:settings-sharp',
-            name: '部门用户',
-            sub_menu: [
-              {
-                path: '/sys/dept_user/dept',
-                index: 'dept',
-                icon: 'mingcute:department-fill',
-                name: '部门管理'
-              },
-              {
-                path: '/sys/dept_user/user',
-                index: 'user',
-                icon: 'ri:user-fill',
-                name: '用户管理'
-              }
-            ]
-          },
-          {
-            path: '/sys/module_menu',
-            index: 'module_menu',
-            icon: 'ion:settings-sharp',
-            name: '模块菜单',
-            sub_menu: [
-              {
-                path: '/sys/module_menu/module',
-                index: 'module',
-                icon: 'tdesign:module-filled',
-                name: '模块管理'
-              },
-              {
-                path: '/sys/module_menu/menu',
-                index: 'menu',
-                icon: 'fluent-mdl2:context-menu',
-                name: '菜单管理'
-              }
-            ]
-          },
-          {
-            path: '/sys/role_auth',
-            index: 'role_auth',
-            icon: 'ion:settings-sharp',
-            name: '角色权限',
-            sub_menu: [
-              {
-                path: '/sys/role_auth/role',
-                index: 'role',
-                icon: 'fa7-solid:user-cog',
-                name: '角色管理'
-              },
-              {
-                path: '/sys/role_auth/auth',
-                index: 'auth',
-                icon: 'ix:user-key',
-                name: '权限管理'
-              }
-            ]
-          }
-        ]
-      }
-    ])
+    const menuList = ref<SidebarMenu[]>([])
 
     /**
      * 设置侧边栏菜单
      * @param newMenuList
      */
     const setMenuList = (newMenuList: SidebarMenu[]) => {
-      menuList.value = newMenuList
+      menuList.value = [
+        {
+          path: '/home',
+          index: '0',
+          icon: 'ion:home-sharp',
+          name: '首页',
+          component: '/Home'
+        },
+        ...newMenuList
+      ]
     }
 
     /**

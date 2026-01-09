@@ -26,6 +26,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@types/mockjs": "^1.0.10",
     "@types/ramda": "^0.31.1",
     "@types/sortablejs": "^1.15.0",
     "@vitejs/plugin-vue": "^6.0.3",

@@ -8,6 +8,16 @@ const route = useRoute()
 const commonStore = useCommonStore()
 
 defineProps<{ menuExpand: boolean }>()
+
+/**
+ * 选中某一个菜单
+ */
+const menuSelect = (to: string) => {
+  const isOutLink = to.startsWith('http://') || to.startsWith('https://')
+
+  // 外链直接跳转
+  isOutLink ? window.open(to, '_blank') : router.push(to)
+}
 </script>
 
 <template>
@@ -21,7 +31,7 @@ defineProps<{ menuExpand: boolean }>()
     <el-menu
       :default-active="route.path"
       unique-opened
-      @select="router.push"
+      @select="menuSelect"
       :collapse="!menuExpand"
     >
       <MenuItem :list="commonStore.menuList" />

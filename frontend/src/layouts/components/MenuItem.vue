@@ -8,7 +8,7 @@ defineProps<{ list: SidebarMenu[] }>()
 <template>
   <template v-for="item in list">
     <el-menu-item
-      v-if="!item.sub_menu || item.sub_menu.length === 0"
+      v-if="!item.children || item.children.length === 0"
       :index="item.path"
     >
       <el-icon v-if="item.icon"><Icon :icon="item.icon" /></el-icon>
@@ -16,14 +16,14 @@ defineProps<{ list: SidebarMenu[] }>()
         item.name
       }}</span>
     </el-menu-item>
-    <el-sub-menu v-else :index="item.path">
+    <el-sub-menu v-else :index="item.index">
       <template #title>
         <el-icon v-if="item.icon"><Icon :icon="item.icon" /></el-icon>
         <span :style="{ marginLeft: item.icon ? 0 : '29px' }">{{
           item.name
         }}</span>
       </template>
-      <MenuItem :list="item.sub_menu" />
+      <MenuItem :list="item.children" />
     </el-sub-menu>
   </template>
 </template>

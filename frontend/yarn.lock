@@ -517,6 +517,11 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.21.tgz#b806831543d696b14f8112db600ea9d3a1df6ea4"
   integrity sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==
 
+"@types/mockjs@^1.0.10":
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/@types/mockjs/-/mockjs-1.0.10.tgz#535e4bdc7c0e4658fc4b3696029d45ee6b053c8a"
+  integrity sha512-SXgrhajHG7boLv6oU93CcmdDm0HYRiceuz6b+7z+/2lCJPTWDv0V5YiwFHT2ejE4bQqgSXQiVPQYPWv7LGsK1g==
+
 "@types/ramda@^0.31.1":
   version "0.31.1"
   resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.31.1.tgz#da637f3110b0677521dbc13d8a86ec7cbbf8e3fe"

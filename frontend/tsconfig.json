@@ -5,6 +5,7 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
     "strictBindCallApply": true,
+    "resolveJsonModule": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
