@@ -320,12 +320,22 @@
     {
       "name": "tl::sql::SqlGenerator",
       "config": {
-        "sqls": {}
+        "sqls": {
+          // 获取部门树
+          "get_dept_tree": {
+            "main": "WITH RECURSIVE dept_ancestor AS ( @current() UNION @sub() ) SELECT * FROM dept_ancestor @order()",
+            "current": "SELECT *, 0 AS \"level\" FROM sys_dept WHERE parent_id IS NULL AND deleted_by IS NULL",
+            "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_dept s @inner_join()",
+            "inner_join": "INNER JOIN dept_ancestor d ON d.dept_id = s.parent_id AND s.deleted_by IS NULL",
+            "order": "ORDER BY \"level\", parent_id, \"order\", dept_id"
+          }
+        }
       }
     }
   ],
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
+    "allowOrigin": "http:\/\/localhost:5173",
     "menu_list": [
       {
         "menu_id": 1,

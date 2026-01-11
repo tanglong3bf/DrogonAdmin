@@ -6,10 +6,10 @@
         field##_ = field;                                        \
     }
 
-#define OPT_GETTER(field, Field) \
-    auto get##Field() const      \
-    {                            \
-        return field##_;         \
+#define OPT_GETTER(field, Field)   \
+    const auto &get##Field() const \
+    {                              \
+        return field##_;           \
     }
 
 #define SETTER(field, Field)                         \
@@ -18,8 +18,8 @@
         field##_ = field;                            \
     }
 
-#define GETTER(field, Field) \
-    auto get##Field() const  \
-    {                        \
-        return field##_;     \
+#define GETTER(field, Field)       \
+    const auto &get##Field() const \
+    {                              \
+        return field##_;           \
     }

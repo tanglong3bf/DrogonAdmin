@@ -1,10 +1,10 @@
 #include "AuditableEntity.h"
 
-AuditableEntity::AuditableEntity(std::optional<std::uint64_t> createdBy,
+AuditableEntity::AuditableEntity(std::optional<std::uint32_t> createdBy,
                                  std::optional<trantor::Date> createdTime,
-                                 std::optional<std::uint64_t> updatedBy,
+                                 std::optional<std::uint32_t> updatedBy,
                                  std::optional<trantor::Date> updatedTime,
-                                 std::optional<std::uint64_t> deletedBy,
+                                 std::optional<std::uint32_t> deletedBy,
                                  std::optional<trantor::Date> deletedTime)
     : createdBy_(createdBy),
       createdTime_(createdTime),
@@ -15,13 +15,13 @@ AuditableEntity::AuditableEntity(std::optional<std::uint64_t> createdBy,
 {
 }
 
-void AuditableEntity::setUpdatedBy(std::uint64_t updatedBy)
+void AuditableEntity::setUpdatedBy(std::uint32_t updatedBy)
 {
     updatedBy_ = updatedBy;
     updatedTime_ = trantor::Date::now();
 }
 
-void AuditableEntity::setDeletedBy(std::uint64_t deletedBy)
+void AuditableEntity::setDeletedBy(std::uint32_t deletedBy)
 {
     deletedBy_ = deletedBy;
     deletedTime_ = trantor::Date::now();

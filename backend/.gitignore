@@ -1,2 +1,4 @@
 build/
 compile_flags.txt
+domain/models/*.cc
+domain/models/*.h

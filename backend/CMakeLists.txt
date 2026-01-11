@@ -13,8 +13,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
 
 message(STATUS "use c++23")
 
+aux_source_directory(adapter/driven/persistence REPO_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application SERVICE_SRC)
+aux_source_directory(domain DOMAIN_SRC)
+aux_source_directory(domain/models MODEL_SRC)
 aux_source_directory(common/exception EXCEPTION_SRC)
 aux_source_directory(common/framework/domain COMMON_DOMAIN_SRC)
 aux_source_directory(common/util/plugins/DrogonJwtUtil/src JWT_SRC)
@@ -26,8 +29,11 @@ include_directories("./common/util/plugins")
 target_sources(
   ${PROJECT_NAME}
   PRIVATE ${SRC_DIR}
+          ${REPO_SRC}
           ${CTL_SRC}
           ${SERVICE_SRC}
+          ${DOMAIN_SRC}
+          ${MODEL_SRC}
           ${EXCEPTION_SRC}
           ${COMMON_DOMAIN_SRC}
           ${JWT_SRC}
