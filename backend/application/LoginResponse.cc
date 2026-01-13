@@ -21,5 +21,6 @@ Json::Value LoginResponse::toJson() const
     // TODO: 后续改为AuthService查询并传入
     const auto config = app().getCustomConfig();
     json["menu_list"] = config["menu_list"];
+    json["user_info"] = config["user_info"];
     return json;
 }

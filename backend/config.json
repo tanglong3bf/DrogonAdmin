@@ -336,6 +336,18 @@
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
     "allowOrigin": "http:\/\/localhost:5173",
+    "user_info": {
+      "user_id": 1,
+      "username": "admin123",
+      "nickname": "超级管理员",
+      "avatar": "http://dummyimage.com/150x150/888/FFF&text=avatar",
+      "sex": "male",
+      "deparemnt_id": 1,
+      "roles_id": [1],
+      "phone_number": "13388886666",
+      "email": "admin123@dr-admin.com",
+      "status": "normal"
+    },
     "menu_list": [
       {
         "menu_id": 1,
