@@ -31,11 +31,17 @@ onMounted(() => {
       return [...currentRoute, ...childRoutes]
     })
   }
+  // 过滤掉静态路由
   const routes = generateRoutes(
-    commonStore.menuList.filter(item => item.path !== '/home')
+    commonStore.menuList.filter(
+      item => item.path !== '/home' && item.path !== '/user-center'
+    )
   )
 
-  routes.forEach(route => router.addRoute('root', route))
+  // 避免重复添加
+  routes
+    .filter(route => router.hasRoute(route.name!) === false)
+    .forEach(route => router.addRoute('root', route))
 })
 </script>
 

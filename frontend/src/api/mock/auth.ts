@@ -1,4 +1,4 @@
-import { mock } from 'mockjs'
+import { mock, Random } from 'mockjs'
 import type { ResponseBody } from '@/types/common'
 import type { LoginResponse } from '@/types/auth'
 import mockConfig from './mock.config.json'
@@ -16,6 +16,18 @@ if (mockConfig.auth.login) {
         data: {
           // 前端处理只在乎有没有token，不在意token内容
           token: 'abcdefghijklmn',
+          user_info: {
+            user_id: 1,
+            username: 'admin123',
+            nickname: '超级管理员',
+            avatar: Random.image('150x150', '#888', '#FFF', 'avatar'),
+            sex: 'male',
+            deparemnt_id: 1,
+            roles_id: [1],
+            phone_number: '13388886666',
+            email: 'admin123@dr-admin.com',
+            status: 'normal'
+          },
           menu_list: [
             {
               menu_id: 1,

@@ -15,6 +15,11 @@ const routes: RouteRecordRaw[] = [
         path: '/home',
         component: () => import('@/views/Home.vue'),
         name: '首页'
+      },
+      {
+        path: '/user-center',
+        component: () => import('@/views/user-center/index.vue'),
+        name: '个人中心'
       }
     ]
   },
@@ -63,8 +68,14 @@ router.beforeEach(to => {
    * @returns
    */
   const calActivePath = (items: SidebarMenu[], toPath: string): PageItem[] => {
+    // 处理特殊页面
     if (toPath === '/login') {
       return [{ name: '登录页', path: '/login' }]
+    } else if (toPath === '/user-center') {
+      return [
+        { name: '首页', path: '/home' },
+        { name: '个人中心', path: '/user-center' }
+      ]
     }
     // 获取节点的路径，无路径，递归查询第一个子节点
     const getEffectivePath = (item: SidebarMenu): string | undefined => {

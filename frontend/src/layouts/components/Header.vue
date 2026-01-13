@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useCommonStore } from '@/stores/common'
 import DgTabs from './DgTabs.vue'
+import UserDropdown from './UserDropdown.vue'
 
 const commonStore = useCommonStore()
 
@@ -39,7 +40,9 @@ function handleScroll(e: any) {
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <div id="right"></div>
+    <div id="right">
+      <UserDropdown />
+    </div>
   </div>
 
   <div id="worktab">

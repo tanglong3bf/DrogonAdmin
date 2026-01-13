@@ -90,6 +90,7 @@ const onLogin = async (formEl?: FormInstance) => {
       })
     }
 
+    authStore.setUserInfo(result.user_info)
     authStore.setToken(result.token)
     commonStore.setMenuList(toSidebarMenu(result.menu_list))
     ElMessage({ message: '登录成功', type: 'success' })
