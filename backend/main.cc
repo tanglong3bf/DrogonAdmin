@@ -103,6 +103,14 @@ int main()
                          "XdvcmxkIQ=="));
     });
 
+    // TODO: 等完成用户管理时，修改此处逻辑，临时用
+    app().registerPreHandlingAdvice([](const HttpRequestPtr &req,
+                                       AdviceCallback && /*ignore*/,
+                                       AdviceChainCallback &&acc) {
+        req->setParameter("userId", "1");
+        acc();
+    });
+
     app().loadConfigFile("./config.json");
     app().run();
     return 0;

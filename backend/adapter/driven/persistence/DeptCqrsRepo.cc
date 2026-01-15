@@ -1,7 +1,6 @@
 #include "application/DeptCqrsRepo.h"
+
 #include <drogon/HttpAppFramework.h>
-#include "domain/Dept.h"
-#include "domain/models/SysDept.h"
 
 using namespace std;
 using namespace drogon;

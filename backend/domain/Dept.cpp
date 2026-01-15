@@ -1,12 +1,25 @@
 #include "Dept.h"
 
 using namespace std;
+using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
+
+Dept::Dept(const string &name, const uint32_t order)
+    : name_{name}, order_{order}
+{
+}
+
+Dept::Dept(const string &name, const uint32_t order, const uint32_t createdBy)
+    : name_{name},
+      order_{order},
+      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+{
+}
 
 Dept::Dept(const SysDept &sysDept)
     : deptId_(sysDept.getValueOfDeptId()),
       name_(sysDept.getValueOfName()),
-      order_(sysDept.getValueOfOrder()),
+      order_(sysDept.getValueOfOrderNo()),
       parentId_(sysDept.getParentId() != nullptr
                     ? make_optional(sysDept.getValueOfParentId())
                     : nullopt),
@@ -31,7 +44,7 @@ Dept::operator drogon_model::drogon_admin_db::SysDept() const
         sysDept.setDeptId(*deptId_);
     }
     sysDept.setName(name_);
-    sysDept.setOrder(order_);
+    sysDept.setOrderNo(order_);
     if (parentId_)
     {
         sysDept.setParentId(*parentId_);

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <trantor/utils/Date.h>
 #include <cstdint>
 #include <optional>
-
+#include <trantor/utils/Date.h>
 #include "common/util/Utilities.hpp"
 
 /**

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <jsoncpp/json/value.h>
 #include <string>
+#include <jsoncpp/json/value.h>
 
 /**
  * @brief 用户登录响应数据封装类

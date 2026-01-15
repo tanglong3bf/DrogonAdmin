@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <json/value.h>
 #include <trantor/utils/Logger.h>
-#include <optional>
 #include "common/exception/BusinessException.h"
 
 namespace drogon_admin::util
@@ -24,12 +24,11 @@ class ParamGetter
         {
             if constexpr (is_necessary)
             {
-                throw BusinessException{"缺少必备参数：" + key,
-                                        drogon::k400BadRequest};
+                throw BusinessException{"缺少必备参数：" + key};
             }
             else
             {
-                return std::nullopt;
+                return std::optional<T>(std::nullopt);
             }
         }
 
@@ -41,13 +40,16 @@ class ParamGetter
         {
             return result;
         }
-        // 必填参数检查是否有值
-        if (!result)
+        else
         {
-            throw BusinessException{"必备参数" + key + "存在，但是类型错误",
-                                    drogon::k400BadRequest};
+            // 必填参数检查是否有值
+            if (!result)
+            {
+                throw BusinessException{"必备参数" + key +
+                                        "存在，但是类型错误"};
+            }
+            return *result;
         }
-        return *result;
     }
 
   private:
@@ -64,8 +66,7 @@ class ParamGetter
         {
             if constexpr (is_necessary)
             {
-                throw BusinessException{key + "必须是一个字符串",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "必须是一个字符串"};
             }
             else
             {
@@ -87,13 +88,11 @@ class ParamGetter
         {
             if (isTooShort)
             {
-                throw BusinessException{key + "参数长度过短",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "参数长度过短"};
             }
             else if (isTooLong)
             {
-                throw BusinessException{key + "参数长度过长",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "参数长度过长"};
             }
         }
         else
@@ -129,8 +128,7 @@ class ParamGetter
         {
             if constexpr (is_necessary)
             {
-                throw BusinessException{key + "必须是一个整数",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "必须是一个整数"};
             }
             else
             {
@@ -146,8 +144,7 @@ class ParamGetter
         {
             if (jsonValue < 0)
             {
-                throw BusinessException{key + "必须是一个非负整数",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "必须是一个非负整数"};
             }
         }
 
@@ -166,25 +163,21 @@ class ParamGetter
         {
             if (isOutOfRange)
             {
-                throw BusinessException{key + "的值超出了指定类型的表示范围",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "的值超出了指定类型的表示范围"};
             }
             else if (isTooLow || isTooHigh)
             {
-                throw BusinessException{key + "的值超出期望范围",
-                                        drogon::k400BadRequest};
+                throw BusinessException{key + "的值超出期望范围"};
             }
         }
-        else
+        else if (isOutOfRange)
         {
-            if (isOutOfRange)
-            {
-                LOG_WARN << key + "的值超出了指定类型的表示范围，已忽略";
-            }
-            else if (isTooLow || isTooHigh)
-            {
-                LOG_WARN << key + "的值超出期望范围，已忽略";
-            }
+            LOG_WARN << key + "的值超出了指定类型的表示范围，已忽略";
+            return std::nullopt;
+        }
+        else if (isTooLow || isTooHigh)
+        {
+            LOG_WARN << key + "的值超出期望范围，已忽略";
             return std::nullopt;
         }
         return static_cast<D>(jsonValue);

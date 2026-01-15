@@ -1,8 +1,8 @@
 #pragma once
 
-#include <drogon/HttpTypes.h>
-#include <exception>
 #include <string>
+#include <exception>
+#include <drogon/HttpTypes.h>
 
 /**
  * @brief 业务异常
@@ -14,7 +14,7 @@ class BusinessException : public std::exception
   public:
     BusinessException(
         const std::string &message,
-        const drogon::HttpStatusCode code = drogon::k500InternalServerError);
+        const drogon::HttpStatusCode code = drogon::k400BadRequest);
 
     const char *what() const noexcept override;
     drogon::HttpStatusCode getCode() const;

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <jsoncpp/json/value.h>
 #include <string>
-
+#include <jsoncpp/json/value.h>
 #include "common/util/Utilities.hpp"
 
 /**

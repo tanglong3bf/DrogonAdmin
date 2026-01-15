@@ -1,11 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <drogon/HttpAppFramework.h>
 #include <drogon/utils/coroutine.h>
-#include <memory>
-#include "application/LoginRequest.h"
-#include "application/LoginResponse.h"
 #include "common/framework/DrAdminObject.hpp"
+#include "LoginRequest.h"
+#include "LoginResponse.h"
 
 class AuthService : public DrAdminObject<AuthService>
 {

@@ -1,29 +1,27 @@
-#include "LoginRequest.h"
-
 #include <drogon/HttpRequest.h>
-#include "common/exception/BusinessException.h"
 #include "common/util/ParamGetter.hpp"
+#include "DeptUpdateRequest.h"
 
+using namespace std;
 using namespace drogon_admin::util;
 
 namespace drogon
 {
 template <>
-LoginRequest fromRequest(const HttpRequest &req)
+DeptUpdateRequest fromRequest(const HttpRequest &req)
 {
     auto jsonPtr = req.getJsonObject();
     if (jsonPtr == nullptr)
     {
         throw BusinessException("请求体格式错误，请使用application/json");
     }
-    LoginRequest request;
+    DeptUpdateRequest request;
     request.setByJson(*jsonPtr);
     return request;
 }
 };  // namespace drogon
 
-void LoginRequest::setByJson(const Json::Value &json)
+void DeptUpdateRequest::setByJson(const Json::Value &json)
 {
-    username_ = getParam<std::string, true>(json, "username", {6, 20});
-    password_ = getParam<std::string, true>(json, "password", {6, 20});
+    name_ = getParam<string, true>(json, "name", {1, -1});
 }

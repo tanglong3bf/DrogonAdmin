@@ -1,5 +1,7 @@
 #include "DeptResponse.h"
+
 #include <drogon/HttpResponse.h>
+
 using namespace std;
 
 Json::Value toJsonArray(const vector<DeptResponse> &data)

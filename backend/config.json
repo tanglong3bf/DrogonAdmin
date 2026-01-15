@@ -327,7 +327,12 @@
             "current": "SELECT *, 0 AS \"level\" FROM sys_dept WHERE parent_id IS NULL AND deleted_by IS NULL",
             "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_dept s @inner_join()",
             "inner_join": "INNER JOIN dept_ancestor d ON d.dept_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY \"level\", parent_id, \"order\", dept_id"
+            "order": "ORDER BY \"level\", parent_id, order_no, dept_id"
+          },
+          // 指定父部门id，获取最大的order_no
+          "get_max_sub_dept_order": {
+            "main": "SELECT MAX(order_no) FROM sys_dept @condition(parent_id)",
+            "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           }
         }
       }

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <drogon/orm/DbClient.h>
 #include <drogon/utils/coroutine.h>
-#include <memory>
-#include "DeptResponse.h"
-#include "SqlGenerator/src/SqlGenerator.h"
 #include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include "DeptResponse.h"
 
 class DeptCqrsRepo : public DrAdminObject<DeptCqrsRepo>
 {

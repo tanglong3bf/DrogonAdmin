@@ -1,9 +1,9 @@
 #pragma once
 
-#include <jsoncpp/json/value.h>
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <jsoncpp/json/value.h>
 #include "domain/Dept.h"
 
 /**

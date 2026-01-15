@@ -10,8 +10,6 @@ enum class ChangingStatus
 
 /**
  * @brief 实体类修改状态
- *
- * @note 大多数实体类不需要，典型应用场景：聚合修改
  */
 class ChangeableEntity
 {
@@ -19,9 +17,9 @@ class ChangeableEntity
     ChangeableEntity();
 
     ChangingStatus getChangingStatus() const;
+    void toNew();
     void toUpdate();
     void toDelete();
-    void toUnChang();
 
   private:
     ChangingStatus changingStatus_;
