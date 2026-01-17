@@ -1,4 +1,5 @@
 import type { LoginResponse, MenuResponse } from './auth'
+import { UploadAvatarResponse } from './user'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isContainKey = (data: object, key: string) => key in data
@@ -65,4 +66,9 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
         !isContainKey(menuData, 'children')
       )
   }
+}
+export function isUploadAvatarResponse(
+  data: unknown
+): data is UploadAvatarResponse {
+  return isObject(data) && isNotEmptyString(data, 'file_path')
 }

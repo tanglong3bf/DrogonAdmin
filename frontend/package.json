@@ -14,6 +14,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@iconify/vue": "^5.0.0",
     "axios": "^1.13.2",
+    "axios-mock-adapter": "^2.1.0",
     "echarts": "^6.0.0",
     "element-plus": "^2.13.0",
     "iconify-icon": "^3.0.2",
@@ -26,6 +27,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@types/axios-mock-adapter": "^1.10.4",
     "@types/mockjs": "^1.0.10",
     "@types/ramda": "^0.31.1",
     "@types/sortablejs": "^1.15.0",

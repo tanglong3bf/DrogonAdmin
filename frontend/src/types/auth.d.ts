@@ -23,7 +23,7 @@ export interface UserInfo {
   username: string
   nickname: string
   avatar: string
-  sex: 'male' | 'female' | 'unknown'
+  sex: 'male' | 'female' | 'secrecy'
   deparemnt_id: number
   roles_id: number[]
   phone_number: string

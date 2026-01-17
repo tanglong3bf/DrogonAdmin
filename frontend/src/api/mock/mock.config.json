@@ -4,6 +4,7 @@
   },
   "user": {
     "update_basic_info": true,
-    "update_password": true
+    "update_password": true,
+    "upload_avatar": true
   }
 }

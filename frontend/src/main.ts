@@ -10,8 +10,6 @@ import router from './router'
 // 引入element-plus的图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-import '@/api/mock'
-
 const app = createApp(App)
 
 // 注册所有的element-plus的图标
@@ -24,6 +22,9 @@ const pinia = createPinia()
 // pinia持久化存储
 pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
+
+// 内部用到pinia
+import '@/api/mock'
 
 // 路由
 app.use(router)

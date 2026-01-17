@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { FormInstance, FormRules } from 'element-plus/es'
+import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive } from 'vue'
 import { updateUserInfo } from '@/api/user'
 import { UserInfoUpdateRequest } from '@/types/user'
@@ -13,7 +13,7 @@ const authStore = useAuthStore()
  */
 interface UserUpdatableInfo {
   nickname: string
-  sex: 'male' | 'female' | 'unknown'
+  sex: 'male' | 'female' | 'secrecy'
   phoneNumber?: string
   email?: string
 }
@@ -28,7 +28,7 @@ const formRef = ref<FormInstance>()
  */
 const formData = reactive<UserUpdatableInfo>({
   nickname: '',
-  sex: 'unknown',
+  sex: 'secrecy',
   phoneNumber: undefined,
   email: undefined
 })
@@ -43,19 +43,6 @@ onMounted(() => {
   formData.sex = userInfo.sex
   formData.phoneNumber = userInfo.phone_number
   formData.email = userInfo.email
-})
-
-/**
- * 有字段发生了修改
- */
-const someFieldChanged = computed(() => {
-  const userInfo = authStore.userInfo!
-  return (
-    formData.email !== userInfo.email ||
-    formData.nickname !== userInfo.nickname ||
-    formData.sex !== userInfo.sex ||
-    formData.phoneNumber !== userInfo.phone_number
-  )
 })
 
 /**
@@ -78,6 +65,36 @@ const rules = reactive<FormRules<UserUpdatableInfo>>({
 })
 
 /**
+ * 提交按钮可用
+ */
+const isBtnAvailable = ref(false)
+watch(
+  [() => formData, () => authStore.userInfo],
+  async ([currentForm, userInfo]) => {
+    if (!userInfo || !formRef.value) {
+      isBtnAvailable.value = false
+      return
+    }
+
+    // 字段是否发生修改
+    const someFieldChanged =
+      currentForm.nickname !== userInfo.nickname ||
+      currentForm.sex !== userInfo.sex ||
+      currentForm.phoneNumber !== userInfo.phone_number ||
+      currentForm.email !== userInfo.email
+
+    // 表单校验
+    const allFieldAvailable = await formRef.value.validate()
+
+    isBtnAvailable.value = someFieldChanged && allFieldAvailable
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
+
+/**
  * 按钮验证并提交表单
  */
 const updateBasicInfo = async (formEl?: FormInstance) => {
@@ -95,9 +112,20 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
     const emailIsEmpty =
       formData.email === undefined || formData.email.length === 0
 
+    if (
+      !nicknameChanged &&
+      !sexChanged &&
+      !phoneNumberChanged &&
+      !emailChanged
+    ) {
+      ElMessage('所有信息未发生修改，无需提交')
+      // 正常这按钮不会亮的
+      console.warn('请检查isBtnAvailable的watch逻辑')
+      return
+    }
+
     // 梭哈
     const request: UserInfoUpdateRequest = {
-      user_id: userInfo.user_id,
       nickname: nicknameChanged ? formData.nickname : undefined,
       sex: sexChanged ? formData.sex : undefined,
       phone_number: phoneNumberChanged
@@ -127,7 +155,7 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
       <el-select v-model="formData.sex" placeholder="请选择你的性别">
         <el-option label="男" value="male" />
         <el-option label="女" value="female" />
-        <el-option label="保密" value="unknown" />
+        <el-option label="保密" value="secrecy" />
       </el-select>
     </el-form-item>
     <el-form-item
@@ -141,7 +169,7 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
       <el-input v-model="formData.email" />
     </el-form-item>
     <div class="update-btn">
-      <el-button :disabled="!someFieldChanged" @click="updateBasicInfo(formRef)"
+      <el-button :disabled="!isBtnAvailable" @click="updateBasicInfo(formRef)"
         >更新</el-button
       >
     </div>

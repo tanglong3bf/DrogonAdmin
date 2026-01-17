@@ -2,8 +2,7 @@ import axios, { type AxiosResponse, type AxiosError } from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 import { ResponseBody } from '@/types/common'
-
-const authStore = useAuthStore()
+import MockAdapter from 'axios-mock-adapter'
 
 const instance = axios.create({
   baseURL: 'http://localhost:8000',
@@ -34,6 +33,7 @@ const ElMessageList = (
  */
 instance.interceptors.request.use(
   config => {
+    const authStore = useAuthStore()
     const token = authStore.token
     if (token !== undefined) {
       config.headers['Authorization'] = `Bearer ${token}`
@@ -100,6 +100,7 @@ instance.interceptors.response.use(
     }
   },
   (error: AxiosError<ResponseBody<unknown>>) => {
+    const authStore = useAuthStore()
     const response = error.response
     // 4xx/5xx
     if (response && response.status >= 400 && response.status < 600) {
@@ -159,5 +160,7 @@ export async function validateResponse<T>(
   }
   return response
 }
+
+export const mock = new MockAdapter(instance)
 
 export default instance

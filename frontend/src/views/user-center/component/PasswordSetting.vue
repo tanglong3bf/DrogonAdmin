@@ -6,10 +6,7 @@ import type {
   Value
 } from 'async-validator/dist-types/interface.d.ts'
 import { UserPasswordUpdateRequest } from '@/types/user'
-import { useAuthStore } from '@/stores/auth'
 import { updatePassword } from '@/api/user'
-
-const authStore = useAuthStore()
 
 /**
  * 更新密码表单数据
@@ -123,10 +120,7 @@ const checkUpdatable = (): boolean => {
 const updatePasswordBtn = async (formEl?: FormInstance) => {
   const isValid = formEl?.validate()
   if (isValid) {
-    const userInfo = authStore.userInfo!
-
     const request: UserPasswordUpdateRequest = {
-      user_id: userInfo.user_id,
       oldPassword: formData.oldPassword,
       newPassword: formData.newPassword
     }
