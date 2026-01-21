@@ -1,11 +1,11 @@
 #pragma once
 
-#include <drogon/utils/coroutine.h>
 #include <drogon/DrClassMap.h>
+#include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
-#include "domain/Dept.h"
-#include "domain/DeptRepository.h"
-#include "domain/DeptVerifier.h"
+#include "domain/organization/Dept.h"
+#include "domain/organization/DeptRepository.h"
+#include "domain/organization/DeptVerifier.h"
 #include "DeptCreateRequest.h"
 
 /**
@@ -18,7 +18,7 @@ class DeptAssembler : public DrAdminObject<DeptAssembler>
      * @brief 用DeptCreateRequest构建Dept对象
      */
     drogon::Task<Dept> fromCreateRequest(DeptCreateRequest request,
-                                         std::uint32_t createdBy);
+                                         std::int32_t createdBy);
 
   private:
     DeptRepositoryPtr deptRepository_{

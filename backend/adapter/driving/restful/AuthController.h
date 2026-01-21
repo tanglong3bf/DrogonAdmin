@@ -1,8 +1,8 @@
 #pragma once
 
 #include <drogon/HttpController.h>
-#include "application/AuthService.h"
-#include "application/LoginRequest.h"
+#include "application/auth/AuthService.h"
+#include "application/auth/LoginRequest.h"
 
 using namespace drogon;
 

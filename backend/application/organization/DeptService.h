@@ -1,7 +1,8 @@
 #pragma once
 
 #include <drogon/utils/coroutine.h>
-#include "domain/DeptHandler.h"
+#include "domain/organization/DeptHandler.h"
+#include "application/authorization/RoleService.h"
 #include "DeptCqrsRepo.h"
 #include "DeptAssembler.h"
 #include "DeptCreateRequest.h"
@@ -13,7 +14,6 @@ class DeptService : public DrAdminObject<DeptService>
   public:
     DeptService() = default;
 
-  public:
     /**
      * @brief 获取部门树
      */
@@ -23,14 +23,20 @@ class DeptService : public DrAdminObject<DeptService>
      * @brief 创建部门
      */
     drogon::Task<> createDept(const DeptCreateRequest &request,
-                              const std::uint32_t createdBy);
+                              const std::int32_t createdBy) const;
 
     /**
      * @brief 更新部门名称
      */
-    drogon::Task<> updateDept(const std::uint32_t deptId,
+    drogon::Task<> updateDept(const std::int32_t deptId,
                               const DeptUpdateRequest &request,
-                              const std::uint32_t updatedBy);
+                              const std::int32_t updatedBy) const;
+
+    /**
+     * @brief 删除指定部门
+     */
+    drogon::Task<> deleteDept(const std::int32_t deptId,
+                              const std::int32_t deletedBy) const;
 
   private:
     DeptCqrsRepoPtr deptCqrsRepo_{
@@ -41,6 +47,9 @@ class DeptService : public DrAdminObject<DeptService>
         drogon::DrClassMap::getSingleInstance<DeptAssembler>()};
     DeptHandlerPtr deptHandler_{
         drogon::DrClassMap::getSingleInstance<DeptHandler>()};
+    // 耦合
+    RoleServicePtr roleService_{
+        drogon::DrClassMap::getSingleInstance<RoleService>()};
 };
 
 using DeptServicePtr = std::shared_ptr<DeptService>;

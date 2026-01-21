@@ -15,9 +15,12 @@ message(STATUS "use c++23")
 
 aux_source_directory(adapter/driven/persistence REPO_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
-aux_source_directory(application SERVICE_SRC)
-aux_source_directory(domain DOMAIN_SRC)
+aux_source_directory(application/auth AUTH_SERVICE_SRC)
+aux_source_directory(application/authorization AUTHORIZATION_SERVICE_SRC)
+aux_source_directory(application/organization ORG_SERVICE_SRC)
 aux_source_directory(domain/models MODEL_SRC)
+aux_source_directory(domain/authorization AUTHORIZATION_DOMAIN_SRC)
+aux_source_directory(domain/organization ORG_DOMAIN_SRC)
 aux_source_directory(common/exception EXCEPTION_SRC)
 aux_source_directory(common/framework/domain COMMON_DOMAIN_SRC)
 aux_source_directory(common/util/plugins/DrogonJwtUtil/src JWT_SRC)
@@ -31,9 +34,12 @@ target_sources(
   PRIVATE ${SRC_DIR}
           ${REPO_SRC}
           ${CTL_SRC}
-          ${SERVICE_SRC}
-          ${DOMAIN_SRC}
+          ${AUTH_SERVICE_SRC}
+          ${AUTHORIZATION_SERVICE_SRC}
+          ${ORG_SERVICE_SRC}
           ${MODEL_SRC}
+          ${AUTHORIZATION_DOMAIN_SRC}
+          ${ORG_DOMAIN_SRC}
           ${EXCEPTION_SRC}
           ${COMMON_DOMAIN_SRC}
           ${JWT_SRC}

@@ -11,8 +11,8 @@
  */
 class DeptCreateRequest
 {
-    std::string name_;                       ///< 部门名称
-    std::optional<std::uint32_t> parentId_;  ///< 父部门ID
+    std::string name_;                      ///< 部门名称
+    std::optional<std::int32_t> parentId_;  ///< 父部门ID
 
   public:
     void setByJson(const Json::Value &json);

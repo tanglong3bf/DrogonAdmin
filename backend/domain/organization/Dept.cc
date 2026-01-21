@@ -4,12 +4,11 @@ using namespace std;
 using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
 
-Dept::Dept(const string &name, const uint32_t order)
-    : name_{name}, order_{order}
+Dept::Dept(const string &name, const int32_t order) : name_{name}, order_{order}
 {
 }
 
-Dept::Dept(const string &name, const uint32_t order, const uint32_t createdBy)
+Dept::Dept(const string &name, const int32_t order, const int32_t createdBy)
     : name_{name},
       order_{order},
       AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}

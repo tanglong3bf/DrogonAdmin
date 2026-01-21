@@ -25,5 +25,5 @@ DeptCreateRequest fromRequest(const HttpRequest &req)
 void DeptCreateRequest::setByJson(const Json::Value &json)
 {
     name_ = getParam<std::string, true>(json, "name");
-    parentId_ = getParam<std::uint32_t>(json, "parent_id");
+    parentId_ = getParam<std::int32_t>(json, "parent_id");
 }

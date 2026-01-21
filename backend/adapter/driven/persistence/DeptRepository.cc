@@ -1,4 +1,4 @@
-#include "domain/DeptRepository.h"
+#include "domain/organization/DeptRepository.h"
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/CoroMapper.h>
@@ -10,8 +10,8 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<uint32_t> DeptRepository::getMaxSubDeptOrder(
-    const optional<uint32_t> parentId) const
+Task<int32_t> DeptRepository::getMaxSubDeptOrder(
+    const optional<int32_t> parentId) const
 {
     ParamList paramList;
     if (parentId)
@@ -23,7 +23,7 @@ Task<uint32_t> DeptRepository::getMaxSubDeptOrder(
         sqlGenerator()->getSql("get_max_sub_dept_order", paramList);
 
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
-    co_return dbResult[0][0].as<uint32_t>();
+    co_return dbResult[0][0].as<int32_t>();
 }
 
 Task<> DeptRepository::save(const Dept &dept) const
@@ -47,7 +47,7 @@ Task<> DeptRepository::save(const Dept &dept) const
     }
 }
 
-Task<Dept> DeptRepository::getById(const uint32_t deptId) const
+Task<Dept> DeptRepository::getById(const int32_t deptId) const
 {
     auto mapper = deptMapper();
 
@@ -58,9 +58,9 @@ Task<Dept> DeptRepository::getById(const uint32_t deptId) const
     co_return static_cast<Dept>(sysDept);
 }
 
-Task<uint32_t> DeptRepository::countNameByParentId(
+Task<int32_t> DeptRepository::countNameByParentId(
     const string &name,
-    const optional<uint32_t> &parentId) const
+    const optional<int32_t> &parentId) const
 {
     auto mapper = deptMapper();
 
@@ -77,6 +77,14 @@ Task<uint32_t> DeptRepository::countNameByParentId(
     }
 
     co_return co_await mapper.count(criteria);
+}
+
+Task<size_t> DeptRepository::countSubDept(const int32_t deptId) const
+{
+    Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysDept::Cols::_parent_id, deptId};
+
+    co_return co_await deptMapper().count(criteria);
 }
 
 inline SqlGenerator *DeptRepository::sqlGenerator()

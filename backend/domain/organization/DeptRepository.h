@@ -5,8 +5,8 @@
 #include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
-#include "domain/Dept.h"
 #include "domain/models/SysDept.h"
+#include "Dept.h"
 
 /**
  * @brief 部门仓库
@@ -22,8 +22,8 @@ class DeptRepository : public DrAdminObject<DeptRepository>
     /**
      * @brief 指定父部门id，获取最大的order_no，传空表示根
      */
-    drogon::Task<std::uint32_t> getMaxSubDeptOrder(
-        const std::optional<std::uint32_t> parentId) const;
+    drogon::Task<std::int32_t> getMaxSubDeptOrder(
+        const std::optional<std::int32_t> parentId) const;
 
     /**
      * @brief 存储部门数据
@@ -33,16 +33,21 @@ class DeptRepository : public DrAdminObject<DeptRepository>
     /**
      * @brief 根据部门id获取数据
      */
-    drogon::Task<Dept> getById(const std::uint32_t deptId) const;
+    drogon::Task<Dept> getById(const std::int32_t deptId) const;
 
     /**
      * @brief 统计指定父部门id下指定名称的数量
      */
-    drogon::Task<std::uint32_t> countNameByParentId(
+    drogon::Task<std::int32_t> countNameByParentId(
         const std::string &name,
-        const std::optional<std::uint32_t> &parentId) const;
+        const std::optional<std::int32_t> &parentId) const;
 
-  protected:
+    /**
+     * @brief 统计指定部门有多少个子部门
+     */
+    drogon::Task<std::size_t> countSubDept(const std::int32_t deptId) const;
+
+  private:
     static SqlGenerator *sqlGenerator();
     static DbClientPtr dbClient();
     SysDeptMapper deptMapper() const;

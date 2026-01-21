@@ -4,19 +4,19 @@
 #include <string>
 #include <vector>
 #include <jsoncpp/json/value.h>
-#include "domain/Dept.h"
+#include "domain/organization/Dept.h"
 
 /**
  * @brief 部门响应数据封装
  */
 class DeptResponse
 {
-    std::uint32_t deptId_;                   ///< 部门id
-    std::string name_;                       ///< 部门名称
-    std::uint32_t order_;                    ///< 排序
-    std::optional<std::uint32_t> parentId_;  ///< 父部门id
-    DeptResponse *parent_;                   ///< 父部门
-    std::vector<DeptResponse> children_;     ///< 子部门列表
+    std::int32_t deptId_;                   ///< 部门id
+    std::string name_;                      ///< 部门名称
+    std::int32_t order_;                    ///< 排序
+    std::optional<std::int32_t> parentId_;  ///< 父部门id
+    DeptResponse *parent_;                  ///< 父部门
+    std::vector<DeptResponse> children_;    ///< 子部门列表
 
   public:
     /**
@@ -45,5 +45,5 @@ class DeptResponse
     GETTER(children, Children)
 
   private:
-    bool isChildIdExist(const std::uint32_t id) noexcept;
+    bool isChildIdExist(const std::int32_t id) noexcept;
 };

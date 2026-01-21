@@ -13,16 +13,16 @@ Task<vector<DeptResponse>> DeptService::getDeptTree() const
 }
 
 Task<> DeptService::createDept(const DeptCreateRequest &request,
-                               const uint32_t createdBy)
+                               const int32_t createdBy) const
 {
     auto dept = co_await deptAssembler_->fromCreateRequest(request, createdBy);
     dept.toNew();
     co_await deptRepository_->save(dept);
 }
 
-Task<> DeptService::updateDept(const uint32_t deptId,
+Task<> DeptService::updateDept(const int32_t deptId,
                                const DeptUpdateRequest &request,
-                               const uint32_t updatedBy)
+                               const int32_t updatedBy) const
 {
     try
     {
@@ -32,6 +32,28 @@ Task<> DeptService::updateDept(const uint32_t deptId,
 
         dept.toUpdate();
         co_await deptRepository_->save(dept);
+    }
+    catch (const orm::UnexpectedRows &e)
+    {
+        LOG_ERROR << e.what();
+        throw BusinessException{"指定id的部门不存在"};
+    }
+}
+
+drogon::Task<> DeptService::deleteDept(const std::int32_t deptId,
+                                       const std::int32_t deletedBy) const
+{
+    try
+    {
+        auto dept = co_await deptRepository_->getById(deptId);
+
+        co_await deptHandler_->deleteDept(dept, deletedBy);
+
+        dept.toDelete();
+
+        // TODO: 事务
+        co_await deptRepository_->save(dept);
+        co_await roleService_->deleteExcludingDept(deptId, deletedBy);
     }
     catch (const orm::UnexpectedRows &e)
     {

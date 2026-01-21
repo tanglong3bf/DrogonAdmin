@@ -2,9 +2,9 @@
 
 #include <drogon/HttpController.h>
 #include <drogon/DrClassMap.h>
-#include "application/DeptService.h"
-#include "application/DeptCreateRequest.h"
-#include "application/DeptUpdateRequest.h"
+#include "application/organization/DeptService.h"
+#include "application/organization/DeptCreateRequest.h"
+#include "application/organization/DeptUpdateRequest.h"
 
 class DeptController : public drogon::HttpController<DeptController>
 {
@@ -21,6 +21,10 @@ class DeptController : public drogon::HttpController<DeptController>
     ADD_METHOD_VIA_REGEX(DeptController::updateDept,
                          "/dept/([1-9]\\d*)",
                          drogon::Put,
+                         drogon::Options);
+    ADD_METHOD_VIA_REGEX(DeptController::deleteDept,
+                         "/dept/([1-9]\\d*)",
+                         drogon::Delete,
                          drogon::Options);
     METHOD_LIST_END
 
@@ -42,8 +46,15 @@ class DeptController : public drogon::HttpController<DeptController>
      */
     drogon::Task<drogon::HttpResponsePtr> updateDept(
         const drogon::HttpRequestPtr req,
-        const std::uint32_t deptId,
+        const std::int32_t deptId,
         const DeptUpdateRequest request) const;
+
+    /**
+     * @brief 删除部门
+     */
+    drogon::Task<drogon::HttpResponsePtr> deleteDept(
+        const drogon::HttpRequestPtr req,
+        const std::int32_t deptId) const;
 
   private:
     DeptServicePtr deptService_{

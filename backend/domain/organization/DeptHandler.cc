@@ -8,10 +8,9 @@ using namespace drogon::orm;
 
 Task<> DeptHandler::updateDept(Dept &dept,
                                const string &newName,
-                               const uint32_t updatedBy) const
+                               const int32_t updatedBy) const
 {
     validateNameNotSame(dept.getName(), newName);
-    // 验证新名称不和其他部门冲突
     co_await deptVerifier_->verifyDeptNameNotDuplicated(newName,
                                                         dept.getParentId());
 
@@ -26,4 +25,14 @@ void DeptHandler::validateNameNotSame(const string &oldName,
     {
         throw BusinessException{"部门新名称和旧名称相同"};
     }
+}
+
+drogon::Task<> DeptHandler::deleteDept(Dept &dept,
+                                       const int32_t deletedBy) const
+{
+    co_await deptVerifier_->verifyNoSubDept(*dept.getDeptId());
+    co_await userVerifier_->verifyNoUserInDept(*dept.getDeptId());
+    co_await roleVerifier_->ensureNoRolesBelongToDept(*dept.getDeptId());
+
+    dept.setDeletedBy(deletedBy);
 }

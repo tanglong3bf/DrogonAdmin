@@ -6,7 +6,7 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 
-Task<> DeptVerifier::verifyDepartmentExists(const uint32_t deptId) const
+Task<> DeptVerifier::verifyDepartmentExists(const int32_t deptId) const
 {
     try
     {
@@ -20,12 +20,21 @@ Task<> DeptVerifier::verifyDepartmentExists(const uint32_t deptId) const
 
 Task<> DeptVerifier::verifyDeptNameNotDuplicated(
     const string &name,
-    const optional<uint32_t> &parentId) const
+    const optional<int32_t> &parentId) const
 {
     const auto count =
         co_await deptRepository_->countNameByParentId(name, parentId);
     if (count > 0)
     {
         throw BusinessException("部门名称冲突");
+    }
+}
+
+drogon::Task<> DeptVerifier::verifyNoSubDept(const std::int32_t deptId) const
+{
+    const auto count = co_await deptRepository_->countSubDept(deptId);
+    if (count > 0)
+    {
+        throw BusinessException("指定部门包含子部门");
     }
 }

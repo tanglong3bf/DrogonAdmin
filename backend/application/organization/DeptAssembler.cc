@@ -5,7 +5,7 @@ using namespace drogon;
 using namespace drogon::orm;
 
 Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
-                                            uint32_t createdBy)
+                                            int32_t createdBy)
 {
     // 验证
     if (request.getParentId())

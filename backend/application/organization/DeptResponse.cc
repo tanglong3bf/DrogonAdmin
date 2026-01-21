@@ -60,7 +60,7 @@ void DeptResponse::addChild(DeptResponse &child)
     }
 }
 
-bool DeptResponse::isChildIdExist(const std::uint32_t id) noexcept
+bool DeptResponse::isChildIdExist(const std::int32_t id) noexcept
 {
     for (const auto &child : children_)
     {

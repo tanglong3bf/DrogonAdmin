@@ -13,23 +13,23 @@ class Dept : public AuditableEntity, public ChangeableEntity
     using SysDept = drogon_model::drogon_admin_db::SysDept;
 
     // 新增时没有id
-    std::optional<std::uint32_t> deptId_;    ///< 部门id
-    std::string name_;                       ///< 部门名称
-    std::uint32_t order_;                    ///< 排序
-    std::optional<std::uint32_t> parentId_;  ///< 父部门id
+    std::optional<std::int32_t> deptId_;    ///< 部门id
+    std::string name_;                      ///< 部门名称
+    std::int32_t order_;                    ///< 排序
+    std::optional<std::int32_t> parentId_;  ///< 父部门id
 
   public:
     /**
      * @brief 准备必备参数的构造
      */
-    Dept(const std::string &name, const std::uint32_t order);
+    Dept(const std::string &name, const std::int32_t order);
 
     /**
      * @brief 准备必备参数以及创建者id的构造
      */
     Dept(const std::string &name,
-         const std::uint32_t order,
-         const std::uint32_t createdBy);
+         const std::int32_t order,
+         const std::int32_t createdBy);
 
     // 和model类互转
     explicit Dept(const SysDept &sysDept);

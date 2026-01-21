@@ -1,4 +1,4 @@
-#include "application/DeptCqrsRepo.h"
+#include "application/organization/DeptCqrsRepo.h"
 
 #include <drogon/HttpAppFramework.h>
 
@@ -29,7 +29,7 @@ Task<vector<DeptResponse>> DeptCqrsRepo::getDeptTree() const
 }
 
 DeptResponse *DeptCqrsRepo::findById(const vector<DeptResponse> &tree,
-                                     const uint32_t deptId) const
+                                     const int32_t deptId) const
 {
     for (auto &item : tree)
     {
