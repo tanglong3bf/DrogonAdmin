@@ -102,18 +102,18 @@ if (mockConfig.auth.login) {
                       children: [
                         {
                           menu_id: 9,
-                          path: '/sys/role_auth/role',
+                          path: '/sys/authorization/role',
                           icon: 'fa7-solid:user-cog',
                           name: '角色管理',
-                          component: '/sys/role_auth/Role',
+                          component: '/sys/authorization/Role',
                           type: 'page'
                         },
                         {
                           menu_id: 10,
-                          path: '/sys/role_auth/auth',
+                          path: '/sys/authorization/auth',
                           icon: 'ix:user-key',
                           name: '权限管理',
-                          component: '/sys/role_auth/Auth',
+                          component: '/sys/authorization/Auth',
                           type: 'page'
                         }
                       ]

@@ -13,7 +13,7 @@ if (mockConfig.user.update_basic_info) {
     .onPut(/^http:\/\/localhost:8000\/user$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
-      if (config.data === undefined || config.data.empty()) {
+      if (config.data === undefined || config.data.length === 0) {
         return [400, { code: -1, error: '请求体缺少要修改的数据' }]
       }
       const { nickname, sex, phone_number, email } = JSON.parse(config.data)
@@ -37,7 +37,7 @@ if (mockConfig.user.update_password) {
     .onPut(/^http:\/\/localhost:8000\/user\/password$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
-      if (config.data === undefined || config.data.empty()) {
+      if (config.data === undefined || config.data.length === 0) {
         return [400, { code: -1, error: '请求体缺少参数' }]
       }
       const { oldPassword, newPassword } = JSON.parse(config.data)

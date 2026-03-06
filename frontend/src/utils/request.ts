@@ -102,8 +102,13 @@ instance.interceptors.response.use(
   (error: AxiosError<ResponseBody<unknown>>) => {
     const authStore = useAuthStore()
     const response = error.response
+    // 404
+    if (response && response.status === 404) {
+      console.error(`${response.request['responseURL']} 路径不存在`)
+      ElMessage.error('接口或资源不存在')
+    }
     // 4xx/5xx
-    if (response && response.status >= 400 && response.status < 600) {
+    else if (response && response.status >= 400 && response.status < 600) {
       const responseData = response.data || {}
       const { error: resError, code, message, warning } = responseData
 
