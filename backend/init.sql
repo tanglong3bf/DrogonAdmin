@@ -15,6 +15,20 @@
  Date: 21/01/2026 21:39:27
 */
 
+-- ----------------------------
+-- Table structure for sys_dept
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."sys_dept";
+
+-- ----------------------------
+-- Table structure for sys_role_dept
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."sys_role_dept";
+
+-- ----------------------------
+-- Table structure for sys_user
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."sys_user";
 
 -- ----------------------------
 -- Sequence structure for sys_dept_dept_id_seq
@@ -41,7 +55,6 @@ CACHE 1;
 -- ----------------------------
 -- Table structure for sys_dept
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_dept";
 CREATE TABLE "public"."sys_dept" (
   "dept_id" int4 NOT NULL DEFAULT nextval('sys_dept_dept_id_seq'::regclass),
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
@@ -76,12 +89,11 @@ INSERT INTO "public"."sys_dept" VALUES (5, 'xx项目开发组', 1, 4, 1, '2026-0
 INSERT INTO "public"."sys_dept" VALUES (6, 'yy项目开发组', 2, 4, 1, '2026-01-10 21:49:34', 1, '2026-01-10 21:49:34', NULL, NULL);
 INSERT INTO "public"."sys_dept" VALUES (7, '分公司', 2, NULL, 1, '2026-01-10 21:49:55', 1, '2026-01-10 21:49:55', NULL, NULL);
 INSERT INTO "public"."sys_dept" VALUES (8, '财务部', 1, 8, 1, '2026-01-10 21:50:15', 1, '2026-01-10 21:50:15', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (15, '宣传部', 4, 1, 1, '2026-01-15 22:34:35.377476', 0, '2026-01-15 22:35:05.84148', 1, '2026-01-21 17:07:02.365522');
+INSERT INTO "public"."sys_dept" VALUES (15, '宣传部', 4, 1, 1, '2026-01-15 22:34:35.377476', 1, '2026-01-15 22:35:05.84148', 1, '2026-01-21 17:07:02.365522');
 
 -- ----------------------------
 -- Table structure for sys_role_dept
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_role_dept";
 CREATE TABLE "public"."sys_role_dept" (
   "id" int4 NOT NULL DEFAULT nextval('sys_role_dept_id_seq'::regclass),
   "role_id" int4 NOT NULL,
@@ -112,7 +124,6 @@ COMMENT ON COLUMN "public"."sys_role_dept"."deleted_time" IS '删除时间';
 -- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sys_user";
 CREATE TABLE "public"."sys_user" (
   "user_id" int4 NOT NULL,
   "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
@@ -157,14 +168,7 @@ COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 9, true);
-
--- ----------------------------
--- Alter sequences owned by
--- ----------------------------
-ALTER SEQUENCE "public"."sys_role_dept_id_seq"
-OWNED BY "public"."sys_role_dept"."id";
-SELECT setval('"public"."sys_role_dept_id_seq"', 2, false);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 15, true);
 
 -- ----------------------------
 -- Primary Key structure for table sys_dept

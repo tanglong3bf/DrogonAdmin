@@ -162,21 +162,21 @@ const cancel = () => {
  * 根据部门id查找到原始数据
  */
 const findOriginal = (
-  dept_list: Department[],
-  dept_id?: number
+  deptList: Department[],
+  deptId?: number
 ): Department | undefined => {
-  if (dept_id === undefined || dept_list.length === 0) {
+  if (deptId === undefined || typeof deptId !== 'number') {
     return undefined
   }
-  return dept_list.find(item => {
-    if (item.dept_id === dept_id) {
-      return true
-    }
-    if (item.children && item.children.length > 0) {
-      return !!findOriginal(item.children, dept_id)
-    }
-    return false
-  })
+
+  const deepFind = (list: Department[]): Department | undefined =>
+    list.reduce<Department | undefined>((found, dept) => {
+      if (found) return found
+      if (dept.dept_id === deptId) return dept
+      return deepFind(dept.children ?? [])
+    }, undefined)
+
+  return deepFind(deptList)
 }
 
 /**
@@ -342,8 +342,8 @@ const updateDeptBtn = (row: Department) => {
 /**
  * 表格内删除部门按钮
  */
-const deleteDeptBtn = async (dept_id: number) => {
-  const deptToDelete = findOriginal(deptShow.value, dept_id)
+const deleteDeptBtn = async (deptId: number) => {
+  const deptToDelete = findOriginal(deptShow.value, deptId)
   if (deptToDelete === undefined) {
     ElMessage.warning('部门不存在，无法删除')
     return
@@ -352,7 +352,7 @@ const deleteDeptBtn = async (dept_id: number) => {
     ElMessage.warning('存在子部门，无法删除')
     return
   }
-  ElMessageBox.confirm(`请确认是否要删除${deptToDelete.name}部门`).then(
+  ElMessageBox.confirm(`请确认是否要删除 ${deptToDelete.name} 部门`).then(
     async () => {
       await deleteDept(deptToDelete.dept_id)
 

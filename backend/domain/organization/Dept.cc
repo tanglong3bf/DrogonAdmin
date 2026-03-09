@@ -4,13 +4,14 @@ using namespace std;
 using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
 
-Dept::Dept(const string &name, const int32_t order) : name_{name}, order_{order}
+Dept::Dept(const string &name, const int32_t orderNo)
+    : name_{name}, orderNo_{orderNo}
 {
 }
 
-Dept::Dept(const string &name, const int32_t order, const int32_t createdBy)
+Dept::Dept(const string &name, const int32_t orderNo, const int32_t createdBy)
     : name_{name},
-      order_{order},
+      orderNo_{orderNo},
       AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
 {
 }
@@ -18,13 +19,13 @@ Dept::Dept(const string &name, const int32_t order, const int32_t createdBy)
 Dept::Dept(const SysDept &sysDept)
     : deptId_(sysDept.getValueOfDeptId()),
       name_(sysDept.getValueOfName()),
-      order_(sysDept.getValueOfOrderNo()),
+      orderNo_(sysDept.getValueOfOrderNo()),
       parentId_(sysDept.getParentId() != nullptr
                     ? make_optional(sysDept.getValueOfParentId())
                     : nullopt),
       AuditableEntity(sysDept.getValueOfCreatedBy(),
                       sysDept.getValueOfCreatedTime(),
-                      sysDept.getValueOfDeletedBy(),
+                      sysDept.getValueOfUpdatedBy(),
                       sysDept.getValueOfUpdatedTime(),
                       sysDept.getDeletedBy() != nullptr
                           ? make_optional(sysDept.getValueOfDeletedBy())
@@ -43,7 +44,7 @@ Dept::operator drogon_model::drogon_admin_db::SysDept() const
         sysDept.setDeptId(*deptId_);
     }
     sysDept.setName(name_);
-    sysDept.setOrderNo(order_);
+    sysDept.setOrderNo(orderNo_);
     if (parentId_)
     {
         sysDept.setParentId(*parentId_);

@@ -37,7 +37,7 @@ int main()
         LOG_TRACE << "为" << req->getPath() << "处理OPTIONS请求";
 
         auto resp = HttpResponse::newHttpResponse();
-        resp->addHeader("access-control-allow-methods", "Get,Post,Put,Delete");
+        resp->addHeader("access-control-allow-methods", "GET,POST,PUT,DELETE");
         resp->addHeader("access-control-allow-headers",
                         "Authorization,content-type");
         resp->addHeader("access-control-allow-origin", allowOrigin);

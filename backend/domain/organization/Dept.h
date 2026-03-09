@@ -15,20 +15,20 @@ class Dept : public AuditableEntity, public ChangeableEntity
     // 新增时没有id
     std::optional<std::int32_t> deptId_;    ///< 部门id
     std::string name_;                      ///< 部门名称
-    std::int32_t order_;                    ///< 排序
+    std::int32_t orderNo_;                  ///< 排序
     std::optional<std::int32_t> parentId_;  ///< 父部门id
 
   public:
     /**
      * @brief 准备必备参数的构造
      */
-    Dept(const std::string &name, const std::int32_t order);
+    Dept(const std::string &name, const std::int32_t orderNo);
 
     /**
      * @brief 准备必备参数以及创建者id的构造
      */
     Dept(const std::string &name,
-         const std::int32_t order,
+         const std::int32_t orderNo,
          const std::int32_t createdBy);
 
     // 和model类互转
@@ -42,6 +42,6 @@ class Dept : public AuditableEntity, public ChangeableEntity
     // getters
     OPT_GETTER(deptId, DeptId)
     GETTER(name, Name)
-    GETTER(order, Order)
+    GETTER(orderNo, OrderNo)
     OPT_GETTER(parentId, ParentId)
 };
