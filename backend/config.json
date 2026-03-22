@@ -327,11 +327,11 @@
             "current": "SELECT *, 0 AS \"level\" FROM sys_dept WHERE parent_id IS NULL AND deleted_by IS NULL",
             "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_dept s @inner_join()",
             "inner_join": "INNER JOIN dept_ancestor d ON d.dept_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY \"level\", parent_id, order_no, dept_id"
+            "order": "ORDER BY \"level\", parent_id, sort_num, dept_id"
           },
-          // 指定父部门id，获取最大的order_no
-          "get_max_sub_dept_order": {
-            "main": "SELECT MAX(order_no) FROM sys_dept @condition(parent_id)",
+          // 指定父部门id，获取最大的sort_num
+          "get_max_sub_dept_sort_num": {
+            "main": "SELECT MAX(sort_num) FROM sys_dept @condition(parent_id)",
             "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           },
           // 角色部门中间表的批量删除
@@ -340,6 +340,31 @@
             "sets": "deleted_by = s.deleted_by, deleted_time = s.deleted_time",
             "values": "@for(item in data_list, separator='), (') ${item.id}, ${item.deleted_by}, ${item.deleted_time} @endfor",
             "fields": "id, deleted_by, deleted_time"
+          },
+          // 批量更新部门数据、包括批量删除
+          "multi_update_dept": {
+            "main": {
+              "sql": "UPDATE sys_dept d SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE d.dept_id = s.dept_id",
+              "params": {
+                "fields_list": [
+                  "dept_id",
+                  "parent_id",
+                  "name",
+                  "sort_num",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.dept_id}, @int_value(value = item.parent_id), '${item.name}', ${item.sort_num}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           }
         }
       }

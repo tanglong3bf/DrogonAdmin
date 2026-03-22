@@ -20,13 +20,13 @@ if (mockConfig.dept.get_dept_tree) {
                 {
                   dept_id: 2,
                   name: '人事部',
-                  order_no: 1,
+                  sort_num: 1,
                   parent_id: 1
                 },
                 {
                   dept_id: 3,
                   name: '财务部',
-                  order_no: 2,
+                  sort_num: 2,
                   parent_id: 1
                 },
                 {
@@ -34,30 +34,30 @@ if (mockConfig.dept.get_dept_tree) {
                     {
                       dept_id: 5,
                       name: 'xx项目开发组',
-                      order_no: 1,
+                      sort_num: 1,
                       parent_id: 4
                     },
                     {
                       dept_id: 6,
                       name: 'yy项目开发组',
-                      order_no: 2,
+                      sort_num: 2,
                       parent_id: 4
                     }
                   ],
                   dept_id: 4,
                   name: '技术部',
-                  order_no: 3,
+                  sort_num: 3,
                   parent_id: 1
                 }
               ],
               dept_id: 1,
               name: '钱途无量有限公司',
-              order_no: 1
+              sort_num: 1
             },
             {
               dept_id: 7,
               name: '分公司',
-              order_no: 2
+              sort_num: 2
             }
           ]
         }

@@ -4,14 +4,14 @@ using namespace std;
 using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
 
-Dept::Dept(const string &name, const int32_t orderNo)
-    : name_{name}, orderNo_{orderNo}
+Dept::Dept(const string &name, const int32_t sortNum)
+    : name_{name}, sortNum_{sortNum}
 {
 }
 
-Dept::Dept(const string &name, const int32_t orderNo, const int32_t createdBy)
+Dept::Dept(const string &name, const int32_t sortNum, const int32_t createdBy)
     : name_{name},
-      orderNo_{orderNo},
+      sortNum_{sortNum},
       AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
 {
 }
@@ -19,7 +19,7 @@ Dept::Dept(const string &name, const int32_t orderNo, const int32_t createdBy)
 Dept::Dept(const SysDept &sysDept)
     : deptId_(sysDept.getValueOfDeptId()),
       name_(sysDept.getValueOfName()),
-      orderNo_(sysDept.getValueOfOrderNo()),
+      sortNum_(sysDept.getValueOfSortNum()),
       parentId_(sysDept.getParentId() != nullptr
                     ? make_optional(sysDept.getValueOfParentId())
                     : nullopt),
@@ -44,7 +44,7 @@ Dept::operator drogon_model::drogon_admin_db::SysDept() const
         sysDept.setDeptId(*deptId_);
     }
     sysDept.setName(name_);
-    sysDept.setOrderNo(orderNo_);
+    sysDept.setSortNum(sortNum_);
     if (parentId_)
     {
         sysDept.setParentId(*parentId_);

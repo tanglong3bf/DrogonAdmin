@@ -1,12 +1,33 @@
 #pragma once
 
+#include <algorithm>
 #include <optional>
 #include <json/value.h>
 #include <trantor/utils/Logger.h>
 #include "common/exception/BusinessException.h"
+#include <type_traits>
 
 namespace drogon_admin::util
 {
+
+/// 辅助类型 trait，判断是否是整数类型的vector
+/// @{
+template <typename T>
+struct is_vector_of_integral : std::false_type
+{
+};
+
+template <typename IntegralType>
+struct is_vector_of_integral<std::vector<IntegralType>>
+    : std::conjunction<std::is_integral<IntegralType>,
+                       std::negation<std::is_same<IntegralType, bool>>>
+{
+};
+
+template <typename T>
+inline constexpr bool is_vector_of_integral_v = is_vector_of_integral<T>::value;
+
+/// @}
 
 template <typename T, bool is_necessary>
 class ParamGetter
@@ -181,6 +202,123 @@ class ParamGetter
             return std::nullopt;
         }
         return static_cast<D>(jsonValue);
+    }
+
+    template <typename D>
+    std::enable_if_t<is_vector_of_integral_v<D>, std::optional<D>> getParam(
+        const Json::Value &json,
+        const std::string &key,
+        const std::pair<int32_t, int32_t> &value_range)
+    {
+        // 类型检查
+        if (!json[key].isArray())
+        {
+            if constexpr (is_necessary)
+            {
+                throw BusinessException{key + "必须是一个数组"};
+            }
+            else
+            {
+                LOG_WARN << key + "类型错误，已忽略";
+                return std::nullopt;
+            }
+        }
+
+        const Json::Value array = json[key];
+
+        if (array.empty())
+        {
+            if constexpr (is_necessary)
+            {
+                throw BusinessException{key + "数组不能为空"};
+            }
+            else
+            {
+                LOG_WARN << key + "数组为空，已忽略";
+                return std::nullopt;
+            }
+        }
+
+        for (const auto &element : array)
+        {
+            if (!element.isInt64())
+            {
+                throw BusinessException{"数组元素必须是整数"};
+            }
+        }
+
+        // 符号检查
+        if constexpr (std::is_unsigned_v<typename D::value_type>)
+        {
+            bool hasNegative = false;
+            for (const auto &element : array)
+            {
+                if (element.asInt64() < 0)
+                {
+                    hasNegative = true;
+                    break;
+                }
+            }
+            if (hasNegative)
+            {
+                throw BusinessException{key + "必须是一个非负整数数组"};
+            }
+        }
+
+        std::vector<int64_t> temp;
+        for (const auto &element : array)
+        {
+            temp.push_back(element.asInt64());
+        }
+
+        // 大小检查
+        // 部分值超出了指定类型的表达范围
+        const bool hasOutOfRange =
+            std::ranges::any_of(temp, [](int64_t jsonValue) {
+                const auto tooLow =
+                    jsonValue <
+                    std::numeric_limits<typename D::value_type>::lowest();
+                const auto tooHigh =
+                    jsonValue >
+                    std::numeric_limits<typename D::value_type>::max();
+                return tooLow || tooHigh;
+            });
+        // 部分值比期望的最小值更低
+        const bool hasTooLow = std::ranges::any_of(temp, [&](int jsonValue) {
+            return value_range.first >= 0 && jsonValue >= value_range.first;
+        });
+        // 部分值比期望的最大值更高
+        const bool hasTooHigh = std::ranges::any_of(temp, [&](int jsonValue) {
+            return value_range.second >= 0 && jsonValue <= value_range.second;
+        });
+        if constexpr (is_necessary)
+        {
+            if (hasOutOfRange)
+            {
+                throw BusinessException{key +
+                                        "的部分值超出了指定类型的表示范围"};
+            }
+            else if (hasTooLow || hasTooHigh)
+            {
+                throw BusinessException{key + "的部分值超出期望范围"};
+            }
+        }
+        else if (hasOutOfRange)
+        {
+            LOG_WARN << key + "的部分值超出了指定类型的表示范围，已忽略";
+            return std::nullopt;
+        }
+        else if (hasTooLow || hasTooHigh)
+        {
+            LOG_WARN << key + "的部分值超出期望范围，已忽略";
+            return std::nullopt;
+        }
+        D result;
+        for (const auto &element : temp)
+        {
+            result.push_back(static_cast<typename D::value_type>(element));
+        }
+        return result;
     }
 };
 

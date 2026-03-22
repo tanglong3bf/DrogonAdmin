@@ -2,7 +2,9 @@
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/CoroMapper.h>
+#include <drogon/orm/Criteria.h>
 #include "SqlGenerator/src/SqlGenerator.h"
+#include "domain/models/SysDept.h"
 
 using namespace std;
 using namespace drogon;
@@ -10,7 +12,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<int32_t> DeptRepository::getMaxSubDeptOrder(
+Task<int32_t> DeptRepository::getMaxSubDeptSortNum(
     const optional<int32_t> parentId) const
 {
     ParamList paramList;
@@ -20,7 +22,7 @@ Task<int32_t> DeptRepository::getMaxSubDeptOrder(
     }
 
     const auto sql =
-        sqlGenerator()->getSql("get_max_sub_dept_order", paramList);
+        sqlGenerator()->getSql("get_max_sub_dept_sort_num", paramList);
 
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
     co_return dbResult[0][0].as<int32_t>();
@@ -49,12 +51,10 @@ Task<> DeptRepository::save(const Dept &dept) const
 
 Task<Dept> DeptRepository::getById(const int32_t deptId) const
 {
-    auto mapper = deptMapper();
-
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_dept_id, deptId};
 
-    const auto sysDept = co_await mapper.findOne(criteria);
+    const auto sysDept = co_await deptMapper().findOne(criteria);
     co_return static_cast<Dept>(sysDept);
 }
 
@@ -62,8 +62,6 @@ Task<int32_t> DeptRepository::countNameByParentId(
     const string &name,
     const optional<int32_t> &parentId) const
 {
-    auto mapper = deptMapper();
-
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_name, name};
     if (parentId)
@@ -76,7 +74,7 @@ Task<int32_t> DeptRepository::countNameByParentId(
                    Criteria{SysDept::Cols::_parent_id, CompareOperator::IsNull};
     }
 
-    co_return co_await mapper.count(criteria);
+    co_return co_await deptMapper().count(criteria);
 }
 
 Task<size_t> DeptRepository::countSubDept(const int32_t deptId) const
@@ -85,6 +83,75 @@ Task<size_t> DeptRepository::countSubDept(const int32_t deptId) const
     criteria = criteria && Criteria{SysDept::Cols::_parent_id, deptId};
 
     co_return co_await deptMapper().count(criteria);
+}
+
+Task<vector<Dept>> DeptRepository::getByIds(
+    const vector<int32_t> &idsVector) const
+{
+    Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria =
+        criteria &&
+        Criteria{SysDept::Cols::_dept_id, CompareOperator::In, idsVector};
+    const auto deptInDb = co_await deptMapper().findBy(criteria);
+    const auto deptView = deptInDb | views::transform([](const auto &data) {
+                              return Dept{data};
+                          });
+    co_return {deptView.begin(), deptView.end()};
+}
+
+Task<vector<Dept>> DeptRepository::getByParentId(
+    const optional<int32_t> &parentId) const
+{
+    Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria =
+        criteria && (parentId ? Criteria{SysDept::Cols::_parent_id, *parentId}
+                              : Criteria{SysDept::Cols::_parent_id,
+                                         CompareOperator::IsNull});
+    const auto deptInDb = co_await deptMapper().findBy(criteria);
+    const auto deptView = deptInDb | views::transform([](const auto &data) {
+                              return Dept{data};
+                          });
+    co_return {deptView.begin(), deptView.end()};
+}
+
+Task<> DeptRepository::multiSave(const vector<Dept> &depts) const
+{
+    // 暂只考虑批量更新
+    vector<SysDept> toUpdate;
+    toUpdate.reserve(depts.size());
+    for (const auto &dept : depts)
+    {
+        if (dept.getChangingStatus() == ChangingStatus::UPDATED)
+        {
+            toUpdate.push_back(static_cast<SysDept>(dept));
+        }
+    }
+    if (toUpdate.size() == 0)
+    {
+        LOG_WARN << "multiSave被调用，但没有需要更新的数据，请检查代码逻辑";
+        co_return;
+    }
+    Json::Value dataList;
+
+    for (const auto &dept : toUpdate)
+    {
+        Json::Value item;
+        item = dept.toJson();
+        // SqlGenerator 太垃圾了
+        for (const auto &key : item.getMemberNames())
+        {
+            if (item[key].isNull())
+            {
+                item.removeMember(key);
+            }
+        }
+        dataList.append(item);
+    }
+
+    const auto sql = sqlGenerator()->getSql("multi_update_dept",
+                                            ParamList{{"data_list", dataList}});
+
+    co_await dbClient()->execSqlCoro(sql);
 }
 
 inline SqlGenerator *DeptRepository::sqlGenerator()

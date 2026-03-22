@@ -39,3 +39,13 @@ drogon::Task<drogon::HttpResponsePtr> DeptController::deleteDept(
     co_await deptService_->deleteDept(deptId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
+
+drogon::Task<drogon::HttpResponsePtr> DeptController::sortDept(
+    const drogon::HttpRequestPtr req,
+    const DeptSortRequest request) const
+{
+    const auto updatedBy =
+        utils::fromString<int32_t>(req->getParameter("userId"));
+    co_await deptService_->sortDept(request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

@@ -13,7 +13,7 @@ class DeptResponse
 {
     std::int32_t deptId_;                   ///< 部门id
     std::string name_;                      ///< 部门名称
-    std::int32_t orderNo_;                  ///< 排序
+    std::int32_t sortNum_;                  ///< 排序
     std::optional<std::int32_t> parentId_;  ///< 父部门id
     DeptResponse *parent_;                  ///< 父部门
     std::vector<DeptResponse> children_;    ///< 子部门列表

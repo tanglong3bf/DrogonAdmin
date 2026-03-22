@@ -20,9 +20,9 @@ class DeptRepository : public DrAdminObject<DeptRepository>
 
   public:
     /**
-     * @brief 指定父部门id，获取最大的order_no，传空表示根
+     * @brief 指定父部门id，获取最大的sort_num，传空表示根
      */
-    drogon::Task<std::int32_t> getMaxSubDeptOrder(
+    drogon::Task<std::int32_t> getMaxSubDeptSortNum(
         const std::optional<std::int32_t> parentId) const;
 
     /**
@@ -46,6 +46,23 @@ class DeptRepository : public DrAdminObject<DeptRepository>
      * @brief 统计指定部门有多少个子部门
      */
     drogon::Task<std::size_t> countSubDept(const std::int32_t deptId) const;
+
+    /**
+     * @brief 批量获取部门
+     */
+    drogon::Task<std::vector<Dept>> getByIds(
+        const std::vector<int32_t> &idsVector) const;
+
+    /**
+     * @brief 获取指定部门下的所有子部门
+     */
+    drogon::Task<std::vector<Dept>> getByParentId(
+        const std::optional<std::int32_t> &parentId) const;
+
+    /**
+     * @brief 批量存储部门（新增、更新、删除）
+     */
+    drogon::Task<> multiSave(const std::vector<Dept> &depts) const;
 
   private:
     static SqlGenerator *sqlGenerator();

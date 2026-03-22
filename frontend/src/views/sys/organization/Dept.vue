@@ -235,6 +235,11 @@ const submit = async (formEl?: FormInstance) => {
 }
 
 /**
+ * 当前正在排序的父部门ID（undefined表示正在排序顶级部门）
+ */
+const currentParentId = ref<number | undefined>(undefined)
+
+/**
  * 排序数据
  */
 const sortableData = ref<DeptSortItem[]>([])
@@ -279,7 +284,7 @@ const getSortSubDeptData = (
     const data = deptData.map(item => ({
       dept_id: item.dept_id,
       name: item.name,
-      order_no: item.order_no
+      sort_num: item.sort_num
     }))
     return { data, visible: true }
   }
@@ -290,7 +295,7 @@ const getSortSubDeptData = (
     ? targetDept.children.map(item => ({
         dept_id: item.dept_id,
         name: item.name,
-        order_no: item.order_no
+        sort_num: item.sort_num
       }))
     : []
 
@@ -302,6 +307,7 @@ const getSortSubDeptData = (
  */
 const sortSubDeptBtn = (parentId?: number) => {
   const { data, visible } = getSortSubDeptData(parentId, deptTree.value)
+  currentParentId.value = parentId
   sortableData.value = data
   sortDialogVisible.value = visible
 }
@@ -317,10 +323,10 @@ const sortCancel = () => {
  * 提交排序
  */
 const sortSubmit = async () => {
-  const result = sortableData.value.map((item, index) => {
-    return { dept_id: item.dept_id, order_no: index + 1 }
+  const deptIds = sortableData.value.map(item => {
+    return item.dept_id
   })
-  await sortDept(result)
+  await sortDept(currentParentId.value, deptIds)
 
   deptTree.value = await getDeptTree()
   deptTree.value.forEach(node => addChildCount(node))

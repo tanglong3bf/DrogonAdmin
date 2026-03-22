@@ -33,8 +33,6 @@ export const deleteDept = (dept_id: number) => {
 /**
  * 排序部门
  */
-export const sortDept = (
-  sortParam: { dept_id: number; order_no: number }[]
-) => {
-  return request.put('/dept/sort', sortParam)
+export const sortDept = (parent_id: number | undefined, dept_ids: number[]) => {
+  return request.put('/dept/sort', { parent_id, dept_ids })
 }

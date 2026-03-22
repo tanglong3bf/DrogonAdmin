@@ -26,9 +26,20 @@ class DeptHandler : public DrAdminObject<DeptHandler>
      */
     drogon::Task<> deleteDept(Dept &dept, const int32_t deletedBy) const;
 
+    /**
+     * @brief 排序部门
+     */
+    drogon::Task<std::vector<Dept>> sortDept(
+        const std::vector<int32_t> &deptIds,
+        const std::vector<Dept> &allDepts,
+        const int32_t updatedBy) const;
+
   private:
     void validateNameNotSame(const std::string &oldName,
                              const std::string &newName) const;
+
+    void validateDeptIdsInAllDepts(const std::vector<int32_t> &deptIds,
+                                   const std::vector<Dept> &allDepts) const;
 
   private:
     DeptVerifierPtr deptVerifier_{

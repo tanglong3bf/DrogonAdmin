@@ -1,6 +1,7 @@
 #pragma once
 
 #include <drogon/utils/coroutine.h>
+#include "application/organization/DeptSortRequest.h"
 #include "domain/organization/DeptHandler.h"
 #include "application/authorization/RoleService.h"
 #include "DeptCqrsRepo.h"
@@ -37,6 +38,12 @@ class DeptService : public DrAdminObject<DeptService>
      */
     drogon::Task<> deleteDept(const std::int32_t deptId,
                               const std::int32_t deletedBy) const;
+
+    /**
+     * @brief 排序指定部门
+     */
+    drogon::Task<> sortDept(const DeptSortRequest &request,
+                            const std::int32_t updatedBy) const;
 
   private:
     DeptCqrsRepoPtr deptCqrsRepo_{

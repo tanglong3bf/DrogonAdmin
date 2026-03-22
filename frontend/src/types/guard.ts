@@ -85,7 +85,7 @@ export function isDepartment(data: unknown): data is Department {
     isNumberField(data, 'dept_id') &&
     isStringField(data, 'name') &&
     isNumberOrUndefinedField(data, 'parent_id') &&
-    isNumberField(data, 'order_no') &&
+    isNumberField(data, 'sort_num') &&
     isArrayOrUndefinedField(data, 'children', isDepartment)
   )
 }

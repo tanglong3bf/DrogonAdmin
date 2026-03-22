@@ -5,7 +5,7 @@ export interface Department {
   dept_id: number // 部门ID
   name: string // 部门名称
   parent_id?: number // 父部门ID
-  order_no: number // 排序（数值小的靠前）
+  sort_num: number // 排序（数值小的靠前）
   children?: Department[] // 子部门
   child_count?: number // 子部门数量
 }
@@ -25,5 +25,5 @@ export interface DeptFormData {
 export interface DeptSortItem {
   dept_id: number // 部门ID
   name: string // 部门名称
-  order_no: number // 排序（数值小的靠前）
+  sort_num: number // 排序（数值小的靠前）
 }

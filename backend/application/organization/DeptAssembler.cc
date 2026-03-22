@@ -16,10 +16,10 @@ Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
                                                         request.getParentId());
 
     // 准备必备参数
-    const auto maxOrder =
-        co_await deptRepository_->getMaxSubDeptOrder(request.getParentId());
+    const auto maxSortNum =
+        co_await deptRepository_->getMaxSubDeptSortNum(request.getParentId());
 
-    Dept dept{request.getName(), maxOrder + 1, createdBy};
+    Dept dept{request.getName(), maxSortNum + 1, createdBy};
 
     // 可选参数
     if (request.getParentId())

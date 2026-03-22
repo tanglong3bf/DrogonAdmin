@@ -30,7 +30,7 @@ Json::Value DeptResponse::toJson() const
     Json::Value result;
     result["dept_id"] = deptId_;
     result["name"] = name_;
-    result["order_no"] = orderNo_;
+    result["sort_num"] = sortNum_;
     if (parentId_)
     {
         result["parent_id"] = *parentId_;
@@ -45,7 +45,7 @@ Json::Value DeptResponse::toJson() const
 DeptResponse::DeptResponse(const Dept &dept)
     : deptId_{*dept.getDeptId()},
       name_{dept.getName()},
-      orderNo_{dept.getOrderNo()},
+      sortNum_{dept.getSortNum()},
       parentId_{dept.getParentId()}
 {
 }

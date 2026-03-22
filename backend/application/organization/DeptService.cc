@@ -1,6 +1,8 @@
 #include "DeptService.h"
 
 #include <drogon/HttpAppFramework.h>
+#include <drogon/utils/coroutine.h>
+#include "application/organization/DeptSortRequest.h"
 #include "common/exception/BusinessException.h"
 
 using namespace std;
@@ -40,8 +42,8 @@ Task<> DeptService::updateDept(const int32_t deptId,
     }
 }
 
-drogon::Task<> DeptService::deleteDept(const std::int32_t deptId,
-                                       const std::int32_t deletedBy) const
+Task<> DeptService::deleteDept(const int32_t deptId,
+                               const int32_t deletedBy) const
 {
     try
     {
@@ -60,4 +62,21 @@ drogon::Task<> DeptService::deleteDept(const std::int32_t deptId,
         LOG_ERROR << e.what();
         throw BusinessException{"指定id的部门不存在"};
     }
+}
+
+Task<> DeptService::sortDept(const DeptSortRequest &request,
+                             const int32_t updatedBy) const
+{
+    const auto parentId = request.getParentId();
+    const auto allDepts = co_await deptRepository_->getByParentId(parentId);
+    const auto deptIds = request.getDeptIds();
+
+    auto sortResult =
+        co_await deptHandler_->sortDept(deptIds, allDepts, updatedBy);
+    for (auto &dept : sortResult)
+    {
+        dept.toUpdate();
+    }
+
+    co_await deptRepository_->multiSave(sortResult);
 }
