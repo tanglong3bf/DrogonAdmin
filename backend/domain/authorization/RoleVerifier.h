@@ -14,7 +14,7 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
     /**
      * @brief 验证指定部门不存在belong关系的角色
      */
-    drogon::Task<> ensureNoRolesBelongToDept(const std::int32_t deptId) const;
+    drogon::Task<> verifyNoRolesBelongToDept(const std::int32_t deptId) const;
 
   private:
     RoleRepositoryPtr roleRepository_{

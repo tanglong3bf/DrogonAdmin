@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #define OPT_SETTER(field, Field)                                 \
     void set##Field(const decltype(field##_)::value_type &field) \
     {                                                            \
@@ -23,3 +25,6 @@
     {                              \
         return field##_;           \
     }
+
+template <typename T>
+std::string toString(const T &);

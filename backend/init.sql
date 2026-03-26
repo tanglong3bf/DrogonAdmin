@@ -12,13 +12,18 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 21/01/2026 21:39:27
+ Date: 24/03/2026 22:46:50
 */
 
 -- ----------------------------
 -- Table structure for sys_dept
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_dept";
+
+-- ----------------------------
+-- Table structure for sys_role
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."sys_role";
 
 -- ----------------------------
 -- Table structure for sys_role_dept
@@ -92,6 +97,41 @@ INSERT INTO "public"."sys_dept" VALUES (8, '财务部', 0, 7, 1, '2026-01-10 21:
 INSERT INTO "public"."sys_dept" VALUES (9, '宣传部', 3, 1, 1, '2026-01-15 22:34:35.377476', 1, '2026-01-15 22:35:05.84148', 1, '2026-01-21 17:07:02.365522');
 
 -- ----------------------------
+-- Table structure for sys_role
+-- ----------------------------
+CREATE TABLE "public"."sys_role" (
+  "role_id" int4 NOT NULL,
+  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "code" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "description" varchar(255) COLLATE "pg_catalog"."default",
+  "user_quota" int4,
+  "quota_type" int2 NOT NULL,
+  "created_by" int4 NOT NULL,
+  "created_time" date NOT NULL,
+  "updated_by" int4 NOT NULL,
+  "updated_time" date NOT NULL,
+  "deleted_by" int4,
+  "deleted_time" date
+)
+;
+COMMENT ON COLUMN "public"."sys_role"."role_id" IS '角色id';
+COMMENT ON COLUMN "public"."sys_role"."name" IS '角色名字';
+COMMENT ON COLUMN "public"."sys_role"."code" IS '角色代码';
+COMMENT ON COLUMN "public"."sys_role"."description" IS '角色描述';
+COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
+COMMENT ON COLUMN "public"."sys_role"."quota_type" IS '用户数量限制类型 0-不限制 1-总数量限制 2-每个部门用户数量限制';
+COMMENT ON COLUMN "public"."sys_role"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_role"."created_time" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_role"."updated_by" IS '更新者';
+COMMENT ON COLUMN "public"."sys_role"."updated_time" IS '更新时间';
+COMMENT ON COLUMN "public"."sys_role"."deleted_by" IS '删除者';
+COMMENT ON COLUMN "public"."sys_role"."deleted_time" IS '删除时间';
+
+-- ----------------------------
+-- Records of sys_role
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for sys_role_dept
 -- ----------------------------
 CREATE TABLE "public"."sys_role_dept" (
@@ -109,7 +149,7 @@ CREATE TABLE "public"."sys_role_dept" (
 ;
 COMMENT ON COLUMN "public"."sys_role_dept"."role_id" IS '角色id';
 COMMENT ON COLUMN "public"."sys_role_dept"."dept_id" IS '部门id';
-COMMENT ON COLUMN "public"."sys_role_dept"."relation_type" IS '关联关系 1-所属部门 2-排除部门';
+COMMENT ON COLUMN "public"."sys_role_dept"."relation_type" IS '关联关系 0-排除部门 1-所属部门';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role_dept"."updated_by" IS '最新一次更新者';
@@ -174,6 +214,11 @@ SELECT setval('"public"."sys_dept_dept_id_seq"', 9, true);
 -- Primary Key structure for table sys_dept
 -- ----------------------------
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");
+
+-- ----------------------------
+-- Primary Key structure for table sys_role
+-- ----------------------------
+ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
 
 -- ----------------------------
 -- Indexes structure for table sys_role_dept

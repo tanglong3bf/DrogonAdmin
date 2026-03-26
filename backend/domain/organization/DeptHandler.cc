@@ -24,7 +24,7 @@ drogon::Task<> DeptHandler::deleteDept(Dept &dept,
 {
     co_await deptVerifier_->verifyNoSubDept(*dept.getDeptId());
     co_await userVerifier_->verifyNoUserInDept(*dept.getDeptId());
-    co_await roleVerifier_->ensureNoRolesBelongToDept(*dept.getDeptId());
+    co_await roleVerifier_->verifyNoRolesBelongToDept(*dept.getDeptId());
 
     dept.setDeletedBy(deletedBy);
 }

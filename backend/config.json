@@ -365,6 +365,26 @@
             "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
             "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          "count_role_by_name_and_dept_id": {
+            "main": "@if(dept_id) SELECT COUNT(*) FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name, dept_id)) @else @allRoles(name) @endif",
+            "allRoles": "SELECT COUNT(*) FROM sys_role r @condition(name)",
+            "includedRoles": "@baseQuery(name, dept_id, type='1')",
+            "excludedRoles": "@baseQuery(name, dept_id, type='0')",
+            "normalRoles": "SELECT * FROM sys_role WHERE role_id NOT IN (SELECT role_id FROM sys_role_dept)",
+            "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
+            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.deleted_by IS NULL @if(type) AND rd.relation_type = ${type} @endif",
+            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
+          },
+          "get_role_list": {
+            "main": "@if(dept_id) SELECT * FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name, dept_id)) @else @allRoles(name) @endif LIMIT ${limit} OFFSET ${offset}",
+            "allRoles": "SELECT COUNT(*) FROM sys_role r @condition(name)",
+            "includedRoles": "@baseQuery(name, dept_id, type='1')",
+            "excludedRoles": "@baseQuery(name, dept_id, type='0')",
+            "normalRoles": "SELECT * FROM sys_role WHERE role_id NOT IN (SELECT role_id FROM sys_role_dept)",
+            "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
+            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.deleted_by IS NULL @if(type) AND rd.relation_type = ${type} @endif",
+            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
           }
         }
       }

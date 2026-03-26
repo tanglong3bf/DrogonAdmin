@@ -1,6 +1,8 @@
 import type { LoginResponse, MenuResponse } from './auth'
 import type { UploadAvatarResponse } from './user'
 import type { Department } from './department'
+import { Role } from './role'
+import { PaginatedResponse } from './common'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isArray = (data: unknown, callback: any) =>
@@ -92,4 +94,32 @@ export function isDepartment(data: unknown): data is Department {
 
 export function isDeptTree(data: unknown): data is Department[] {
   return isArray(data, isDepartment)
+}
+
+export function isRole(data: unknown): data is Role {
+  return (
+    isObject(data) &&
+    isNumberField(data, 'role_id') &&
+    isStringField(data, 'name') &&
+    isStringField(data, 'code') &&
+    isStringField(data, 'description') &&
+    ['Unlimited', 'TotalLimit', 'PerDeptLimit'].includes(
+      (data as any).quota_type
+    ) &&
+    isNumberOrUndefinedField(data, 'user_quota')
+  )
+}
+
+export function isPaginatedResponse<T>(
+  isItemValid: (item: unknown) => item is T
+) {
+  return (data: unknown): data is PaginatedResponse<T> => {
+    return (
+      isObject(data) &&
+      isNumberField(data, 'total') &&
+      isNumberField(data, 'page') &&
+      isNumberField(data, 'page_size') &&
+      isArrayField(data, 'list', isItemValid)
+    )
+  }
 }

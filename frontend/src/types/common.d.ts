@@ -13,3 +13,13 @@ export interface PageItem {
   name: string
   path: string
 }
+
+/**
+ * 分页查询结果
+ */
+export interface PaginatedResponse<T> {
+  page: number
+  page_size: number
+  total: number
+  list: T[]
+}
