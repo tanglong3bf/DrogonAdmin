@@ -12,7 +12,7 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 24/03/2026 22:46:50
+ Date: 29/03/2026 17:40:52
 */
 
 -- ----------------------------
@@ -51,6 +51,17 @@ CACHE 1;
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "public"."sys_role_dept_id_seq";
 CREATE SEQUENCE "public"."sys_role_dept_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for sys_role_role_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
+CREATE SEQUENCE "public"."sys_role_role_id_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -100,12 +111,13 @@ INSERT INTO "public"."sys_dept" VALUES (9, '宣传部', 3, 1, 1, '2026-01-15 22:
 -- Table structure for sys_role
 -- ----------------------------
 CREATE TABLE "public"."sys_role" (
-  "role_id" int4 NOT NULL,
+  "role_id" int4 NOT NULL DEFAULT nextval('sys_role_role_id_seq'::regclass),
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "code" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
-  "user_quota" int4,
   "quota_type" int2 NOT NULL,
+  "user_quota" int4,
+  "relation_type" int2 NOT NULL,
   "created_by" int4 NOT NULL,
   "created_time" date NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -118,8 +130,9 @@ COMMENT ON COLUMN "public"."sys_role"."role_id" IS '角色id';
 COMMENT ON COLUMN "public"."sys_role"."name" IS '角色名字';
 COMMENT ON COLUMN "public"."sys_role"."code" IS '角色代码';
 COMMENT ON COLUMN "public"."sys_role"."description" IS '角色描述';
-COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."quota_type" IS '用户数量限制类型 0-不限制 1-总数量限制 2-每个部门用户数量限制';
+COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
+COMMENT ON COLUMN "public"."sys_role"."relation_type" IS '和部门的关联关系 0-所有部门可用 1-指定部门可用 2-指定部门不可用';
 COMMENT ON COLUMN "public"."sys_role"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role"."updated_by" IS '更新者';
@@ -138,7 +151,6 @@ CREATE TABLE "public"."sys_role_dept" (
   "id" int4 NOT NULL DEFAULT nextval('sys_role_dept_id_seq'::regclass),
   "role_id" int4 NOT NULL,
   "dept_id" int4 NOT NULL,
-  "relation_type" int2 NOT NULL,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -149,7 +161,6 @@ CREATE TABLE "public"."sys_role_dept" (
 ;
 COMMENT ON COLUMN "public"."sys_role_dept"."role_id" IS '角色id';
 COMMENT ON COLUMN "public"."sys_role_dept"."dept_id" IS '部门id';
-COMMENT ON COLUMN "public"."sys_role_dept"."relation_type" IS '关联关系 0-排除部门 1-所属部门';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role_dept"."updated_by" IS '最新一次更新者';

@@ -5,10 +5,15 @@
 #include "GetRoleListRequest.h"
 #include "RoleCqrsRepo.h"
 #include "RoleResponse.h"
+#include "application/authorization/RoleAssembler.h"
+#include "application/authorization/RoleCreateRequest.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/RoleRepository.h"
 #include "common/util/PaginatedResponse.hpp"
 
+/**
+ * @brief 角色服务
+ */
 class RoleService : public DrAdminObject<RoleService>
 {
   public:
@@ -20,17 +25,23 @@ class RoleService : public DrAdminObject<RoleService>
 
     /**
      * @brief 带条件分页查询角色列表
-     *
-     * request.page可能会被修改
      */
     drogon::Task<PaginatedResponse<RoleResponse>> getRoleList(
         const GetRoleListRequest &request) const;
+
+    /**
+     * @brief 创建角色
+     */
+    drogon::Task<> createRole(const RoleCreateRequest &request,
+                              const std::int32_t createdBy) const;
 
   private:
     RoleRepositoryPtr roleRepository_{
         drogon::DrClassMap::getSingleInstance<RoleRepository>()};
     RoleCqrsRepoPtr roleCqrsRepo_{
         drogon::DrClassMap::getSingleInstance<RoleCqrsRepo>()};
+    RoleAssemblerPtr roleAssembler_{
+        drogon::DrClassMap::getSingleInstance<RoleAssembler>()};
 };
 
 using RoleServicePtr = std::shared_ptr<RoleService>;

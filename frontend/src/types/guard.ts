@@ -102,11 +102,11 @@ export function isRole(data: unknown): data is Role {
     isNumberField(data, 'role_id') &&
     isStringField(data, 'name') &&
     isStringField(data, 'code') &&
-    isStringField(data, 'description') &&
-    ['Unlimited', 'TotalLimit', 'PerDeptLimit'].includes(
-      (data as any).quota_type
-    ) &&
-    isNumberOrUndefinedField(data, 'user_quota')
+    isStringOrUndefinedField(data, 'description') &&
+    [0, 1, 2].includes((data as any).quota_type) &&
+    isNumberOrUndefinedField(data, 'user_quota') &&
+    [0, 1, 2].includes((data as any).relation_type) &&
+    isArrayOrUndefinedField(data, 'depts', isDepartment)
   )
 }
 

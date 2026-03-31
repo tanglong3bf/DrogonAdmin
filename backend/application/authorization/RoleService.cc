@@ -39,3 +39,11 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
                                               count,
                                               list};
 }
+
+drogon::Task<> RoleService::createRole(const RoleCreateRequest &request,
+                                       const int32_t createdBy) const
+{
+    auto role = co_await roleAssembler_->fromCreateRequest(request, createdBy);
+    role.toNew();
+    co_await roleRepository_->save(role);
+}

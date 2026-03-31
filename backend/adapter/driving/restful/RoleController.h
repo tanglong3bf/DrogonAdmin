@@ -1,14 +1,17 @@
 #pragma once
 
 #include <drogon/HttpController.h>
-#include "application/authorization/GetRoleListRequest.h"
 #include "application/authorization/RoleService.h"
+#include "application/authorization/RoleCreateRequest.h"
 
 class RoleController : public drogon::HttpController<RoleController>
 {
   public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(RoleController::list, "/role", drogon::Get, drogon::Options);
+    ADD_METHOD_TO(RoleController::list,
+                  "/role?name={}&dept_id={}&page={}&page_size={}",
+                  drogon::Get,
+                  drogon::Options);
     ADD_METHOD_TO(RoleController::createRole,
                   "/role",
                   drogon::Post,
@@ -24,17 +27,28 @@ class RoleController : public drogon::HttpController<RoleController>
     METHOD_LIST_END
 
     /**
-     * 带条件分页查询角色列表
+     * @brief 带条件分页查询角色列表
+     *
+     * @param name 角色名称（模糊查询、可选）
+     * @param deptId 部门id（可选）
+     * @param page 页码（默认为1）
+     * @param pageSize 每页数量（默认为10）
      */
     drogon::Task<drogon::HttpResponsePtr> list(
         const drogon::HttpRequestPtr req,
-        const GetRoleListRequest request) const;
+        const std::string name,
+        const std::string deptId,
+        const std::string page,
+        const std::string pageSize) const;
 
     /**
-     * 新增角色
+     * @brief 新增角色
+     *
+     * @see RoleCreateRequest
      */
     drogon::Task<drogon::HttpResponsePtr> createRole(
-        const drogon::HttpRequestPtr req) const;
+        const drogon::HttpRequestPtr req,
+        const RoleCreateRequest request) const;
 
     /**
      * 更新角色

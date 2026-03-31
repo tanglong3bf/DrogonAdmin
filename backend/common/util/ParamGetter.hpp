@@ -285,11 +285,11 @@ class ParamGetter
             });
         // 部分值比期望的最小值更低
         const bool hasTooLow = std::ranges::any_of(temp, [&](int jsonValue) {
-            return value_range.first >= 0 && jsonValue >= value_range.first;
+            return value_range.first >= 0 && jsonValue < value_range.first;
         });
         // 部分值比期望的最大值更高
         const bool hasTooHigh = std::ranges::any_of(temp, [&](int jsonValue) {
-            return value_range.second >= 0 && jsonValue <= value_range.second;
+            return value_range.second >= 0 && jsonValue > value_range.second;
         });
         if constexpr (is_necessary)
         {

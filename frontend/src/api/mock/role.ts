@@ -24,19 +24,31 @@ if (mockConfig.role.get_role_list) {
               total: 2,
               list: [
                 {
-                  role_id: 1,
-                  name: '管理员',
                   code: 'admin',
-                  description: '拥有系统的最高权限',
-                  user_quota: 1,
-                  quota_type: 'TotalLimit'
+                  description: 'aaa',
+                  name: '系统管理员',
+                  quota_type: 1,
+                  role_id: 1,
+                  user_quota: 3,
+                  relation_type: 0
                 },
                 {
+                  code: 'test_role',
+                  description: 'testtesttest',
+                  name: '测试角色',
+                  quota_type: 2,
                   role_id: 2,
-                  name: '普通用户',
-                  code: 'user',
-                  description: '拥有系统的基本权限',
-                  quota_type: 'Unlimited'
+                  user_quota: 3,
+                  relation_type: 0
+                },
+                {
+                  code: 'test_role222',
+                  description: 'testtesttest222',
+                  name: '测试角色222',
+                  quota_type: 2,
+                  role_id: 3,
+                  user_quota: 3,
+                  relation_type: 0
                 }
               ]
             }
@@ -44,4 +56,11 @@ if (mockConfig.role.get_role_list) {
         ]
       }
     )
+}
+
+if (mockConfig.role.new_role) {
+  mock.onPost('/role').reply((config: AxiosRequestConfig): [number] => {
+    console.log(config)
+    return [201]
+  })
 }

@@ -76,6 +76,7 @@ int main()
             if (businessException == nullptr)
             {
                 Json::Value json;
+                json["code"] = -1;
                 json["error"] = "未知错误";
                 auto resp = HttpResponse::newHttpJsonResponse(json);
                 resp->setStatusCode(k500InternalServerError);
@@ -83,6 +84,7 @@ int main()
                 return;
             }
             Json::Value json;
+            json["code"] = -1;
             json["error"] = businessException->what();
             auto resp = HttpResponse::newHttpJsonResponse(json);
             resp->setStatusCode(businessException->getCode());

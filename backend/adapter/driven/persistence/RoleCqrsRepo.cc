@@ -35,7 +35,8 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     const int32_t maxPage) const
 {
     ParamList params;
-    const int32_t page = maxPage > 0 ? maxPage : request.getPage();
+    const int32_t page =
+        maxPage < request.getPage() ? maxPage : request.getPage();
     params["offset"] = request.getPageSize() * (page - 1);
     params["limit"] = request.getPageSize();
     if (request.getDeptId())

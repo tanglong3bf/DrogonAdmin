@@ -13,3 +13,23 @@ Task<> RoleVerifier::verifyNoRolesBelongToDept(const int32_t deptId) const
         throw BusinessException("指定部门包含角色");
     }
 }
+
+drogon::Task<> RoleVerifier::verifyRoleNameNotDuplicated(
+    const std::string &name) const
+{
+    const auto count = co_await roleRepository_->countByName(name);
+    if (count > 0)
+    {
+        throw BusinessException("指定角色名称已被使用");
+    }
+}
+
+drogon::Task<> RoleVerifier::verifyRoleCodeNotDuplicated(
+    const std::string &code) const
+{
+    const auto count = co_await roleRepository_->countByCode(code);
+    if (count > 0)
+    {
+        throw BusinessException("指定角色代码已被使用");
+    }
+}

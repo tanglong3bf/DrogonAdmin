@@ -19,7 +19,8 @@ RoleResponse::RoleResponse(const Role &role)
       code_{role.getCode()},
       description_{role.getDescription()},
       userQuota_{role.getUserQuota()},
-      quotaType_{role.getQuotaType()}
+      quotaType_{role.getQuotaType()},
+      relationType_{role.getRelationType()}
 {
 }
 
@@ -37,7 +38,7 @@ Json::Value RoleResponse::toJson() const
     {
         json["user_quota"] = *userQuota_;
     }
-    json["quota_type"] = toString(quotaType_);
-
+    json["quota_type"] = static_cast<int8_t>(quotaType_);
+    json["relation_type"] = static_cast<int8_t>(relationType_);
     return json;
 }

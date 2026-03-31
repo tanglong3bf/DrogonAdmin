@@ -1,3 +1,6 @@
+/**
+ * 响应体
+ */
 export interface ResponseBody<T> {
   data?: T
   message?: string | string[]
@@ -12,6 +15,14 @@ export interface ResponseBody<T> {
 export interface PageItem {
   name: string
   path: string
+}
+
+/**
+ * 分页查询参数
+ */
+export interface Pagination {
+  page: number
+  page_size: number
 }
 
 /**

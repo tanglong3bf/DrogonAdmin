@@ -5,6 +5,7 @@
 #include <drogon/utils/coroutine.h>
 #include "SqlGenerator/src/SqlGenerator.h"
 #include "common/framework/DrAdminObject.hpp"
+#include "Role.h"
 #include "domain/models/SysRoleDept.h"
 #include "RoleDept.h"
 
@@ -15,6 +16,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
 {
     using DbClientPtr = drogon::orm::DbClientPtr;
     using SqlGenerator = tl::sql::SqlGenerator;
+    using RoleMapper =
+        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRole>;
     using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
     using RoleDeptMapper = drogon::orm::CoroMapper<SysRoleDept>;
 
@@ -36,6 +39,21 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     drogon::Task<> saveRoleDepts(
         const std::vector<RoleDept> &roleDeptList) const;
 
+    /**
+     * @brief 按照名称统计角色数量
+     */
+    drogon::Task<std::size_t> countByName(const std::string &name) const;
+
+    /**
+     * @brief 按照角色代码统计角色数量
+     */
+    drogon::Task<std::size_t> countByCode(const std::string &code) const;
+
+    /**
+     * @brief 存储角色
+     */
+    drogon::Task<> save(const Role &role) const;
+
   protected:
     std::vector<RoleDept> buildRoleDeptList(
         const std::vector<SysRoleDept> &sysRoleDeptList) const;
@@ -43,6 +61,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
   private:
     static SqlGenerator *sqlGenerator();
     static DbClientPtr dbClient();
+    static RoleMapper roleMapper(
+        const std::shared_ptr<drogon::orm::Transaction> &trans = nullptr);
     static RoleDeptMapper roleDeptMapper();
 };
 
