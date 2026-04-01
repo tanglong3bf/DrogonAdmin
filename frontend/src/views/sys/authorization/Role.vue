@@ -5,7 +5,7 @@ import { Search, Refresh } from '@element-plus/icons-vue'
 import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
 import { getDeptTree } from '@/api/department'
-import { getRoleList, newRole } from '@/api/role'
+import { getRoleList, newRole, updateRole } from '@/api/role'
 import {
   type Role,
   type RoleFormData,
@@ -186,6 +186,11 @@ const cancel = () => {
 }
 
 /**
+ * 更新角色id，用于在更新后查找原始数据
+ */
+const roleOriginalId = ref(0)
+
+/**
  * 提交新增\更新角色表单
  */
 const submit = async (form?: FormInstance) => {
@@ -193,10 +198,43 @@ const submit = async (form?: FormInstance) => {
   if (!isValid) {
     return
   }
-  await newRole(role)
-  await handleQuery()
-  dialogVisible.value = false
-  resetRoleForm()
+  if (dialogType.value === DialogType.ADD) {
+    await newRole(role)
+    await handleQuery()
+    dialogVisible.value = false
+    resetRoleForm()
+  }
+  // UPDATE
+  else {
+    const oldRole = roleList.value.find(
+      item => item.role_id === roleOriginalId.value
+    )
+    // 比较 role 与 oldRole
+    if (role.name === oldRole?.name) {
+      role.name = undefined
+    }
+    if (role.code === oldRole?.code) {
+      role.code = undefined
+    }
+    if (role.description === oldRole?.description) {
+      role.description = undefined
+    }
+    if (role.quota_type === oldRole?.quota_type) {
+      role.quota_type = undefined
+    }
+    if (role.user_quota === oldRole?.user_quota) {
+      role.user_quota = undefined
+    }
+    if (role.relation_type === oldRole?.relation_type) {
+      role.relation_type = undefined
+    }
+    if (role.dept_ids?.length === oldRole?.depts?.length) {
+      role.dept_ids = undefined
+    }
+    await updateRole(role.role_id!, role)
+    await handleQuery()
+    dialogVisible.value = false
+  }
 }
 
 /**
@@ -216,8 +254,21 @@ const handleCurrentChange = (page: number) => {
 }
 
 const updateRoleBtn = (row: Role) => {
-  console.log('更新角色', row)
-  ElMessage.error('还没做噢')
+  roleOriginalId.value = row.role_id
+
+  const rowCopied = { ...row }
+
+  role.role_id = rowCopied.role_id
+  role.name = rowCopied.name
+  role.code = rowCopied.code
+  role.description = rowCopied.description
+  role.quota_type = rowCopied.quota_type
+  role.user_quota = rowCopied.user_quota
+  role.relation_type = rowCopied.relation_type
+  role.dept_ids = rowCopied.depts?.map(item => item.dept_id)
+
+  dialogType.value = DialogType.UPDATE
+  dialogVisible.value = true
 }
 
 const deleteRoleBtn = (role_id: number) => {
@@ -281,6 +332,7 @@ const deleteRoleBtn = (role_id: number) => {
     </el-row>
     <!-- 表格 -->
     <el-table :data="roleList" row-key="name" default-expand-all>
+      <el-table-column prop="role_id" label="ID" min-width="40px" />
       <el-table-column prop="name" label="角色名称" min-width="120px" />
       <el-table-column prop="code" label="角色代码" min-width="120px" />
       <el-table-column prop="description" label="角色描述" min-width="120px">

@@ -18,6 +18,12 @@ enum RelationType {
   Blacklist = 2
 }
 
+export interface RoleDept {
+  id: number
+  role_id: number
+  dept_id: number
+}
+
 /**
  * 角色
  */
@@ -29,7 +35,7 @@ export interface Role {
   quota_type: QuotaType
   user_quota?: number
   relation_type: RelationType
-  depts?: Department[]
+  depts?: RoleDept[]
 }
 
 /**
@@ -45,11 +51,11 @@ export interface RoleQueryParams {
  */
 export interface RoleFormData {
   role_id?: number
-  name: string
-  code: string
-  description: string
-  quota_type: QuotaType
+  name?: string
+  code?: string
+  description?: string
+  quota_type?: QuotaType
   user_quota?: number
-  relation_type: RelationType
+  relation_type?: RelationType
   dept_ids?: number[]
 }

@@ -51,8 +51,15 @@ class RoleRepository : public DrAdminObject<RoleRepository>
 
     /**
      * @brief 存储角色
+     *
+     * TODO: 增删改都需要，但是暂时只处理了新增
      */
     drogon::Task<> save(const Role &role) const;
+
+    /**
+     * @brief 根据id获取角色
+     */
+    drogon::Task<Role> getById(const std::int32_t roleId) const;
 
   protected:
     std::vector<RoleDept> buildRoleDeptList(

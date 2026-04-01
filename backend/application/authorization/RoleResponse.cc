@@ -1,5 +1,6 @@
 #include "RoleResponse.h"
 #include <drogon/HttpResponse.h>
+#include <jsoncpp/json/value.h>
 
 using namespace std;
 
@@ -9,6 +10,16 @@ Json::Value toJsonArray(const vector<RoleResponse> &data)
     for (const auto &item : data)
     {
         array.append(item.toJson());
+    }
+    return array;
+}
+
+Json::Value toJsonArray(const vector<RoleDeptResponse> &depts)
+{
+    Json::Value array{Json::arrayValue};
+    for (const auto &dept : depts)
+    {
+        array.append(dept.toJson());
     }
     return array;
 }
@@ -34,11 +45,18 @@ Json::Value RoleResponse::toJson() const
     {
         json["description"] = *description_;
     }
+    json["quota_type"] = static_cast<int8_t>(quotaType_);
     if (userQuota_)
     {
         json["user_quota"] = *userQuota_;
     }
-    json["quota_type"] = static_cast<int8_t>(quotaType_);
     json["relation_type"] = static_cast<int8_t>(relationType_);
+    json["depts"] = toJsonArray(depts);
+
     return json;
+}
+
+void RoleResponse::addRoleDept(const RoleDeptResponse &roleDept)
+{
+    depts.push_back(roleDept);
 }

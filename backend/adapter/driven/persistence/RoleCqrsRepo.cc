@@ -49,7 +49,31 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     }
     const auto sql = sqlGenerator()->getSql("get_role_list", params);
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
-    co_return buildList(dbResult);
+    auto roleList = buildList(dbResult);
+
+    vector<int32_t> roleIds{};
+    for (const auto &role : roleList)
+    {
+        roleIds.push_back(role.getRoleId());
+    }
+
+    auto roleDeptList = co_await roleDeptMapper().findBy(
+        Criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull} &&
+        Criteria{SysRoleDept::Cols::_role_id, CompareOperator::In, roleIds});
+
+    // TODO:
+    for (const auto &roleDept : roleDeptList)
+    {
+        for (auto &role : roleList)
+        {
+            if (role.getRoleId() == roleDept.getValueOfRoleId())
+            {
+                role.addRoleDept(RoleDept{roleDept});
+            }
+        }
+    }
+
+    co_return roleList;
 }
 
 vector<RoleResponse> RoleCqrsRepo::buildList(const Result &dbResult) const
@@ -75,7 +99,12 @@ DbClientPtr RoleCqrsRepo::dbClient()
     return dbClient;
 }
 
-inline CoroMapper<SysRole> RoleCqrsRepo::roleMapper() const
+inline CoroMapper<SysRole> RoleCqrsRepo::roleMapper()
 {
     return CoroMapper<SysRole>{dbClient()};
+}
+
+inline CoroMapper<SysRoleDept> RoleCqrsRepo::roleDeptMapper()
+{
+    return CoroMapper<SysRoleDept>{dbClient()};
 }

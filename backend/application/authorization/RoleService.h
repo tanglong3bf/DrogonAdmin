@@ -8,6 +8,7 @@
 #include "application/authorization/RoleAssembler.h"
 #include "application/authorization/RoleCreateRequest.h"
 #include "common/framework/DrAdminObject.hpp"
+#include "domain/authorization/RoleHandler.h"
 #include "domain/authorization/RoleRepository.h"
 #include "common/util/PaginatedResponse.hpp"
 
@@ -35,6 +36,12 @@ class RoleService : public DrAdminObject<RoleService>
     drogon::Task<> createRole(const RoleCreateRequest &request,
                               const std::int32_t createdBy) const;
 
+    /**
+     * @brief 删除角色
+     */
+    drogon::Task<> deleteRole(const std::int32_t roleId,
+                              const std::int32_t deletedBy) const;
+
   private:
     RoleRepositoryPtr roleRepository_{
         drogon::DrClassMap::getSingleInstance<RoleRepository>()};
@@ -42,6 +49,8 @@ class RoleService : public DrAdminObject<RoleService>
         drogon::DrClassMap::getSingleInstance<RoleCqrsRepo>()};
     RoleAssemblerPtr roleAssembler_{
         drogon::DrClassMap::getSingleInstance<RoleAssembler>()};
+    RoleHandlerPtr roleHandler_{
+        drogon::DrClassMap::getSingleInstance<RoleHandler>()};
 };
 
 using RoleServicePtr = std::shared_ptr<RoleService>;

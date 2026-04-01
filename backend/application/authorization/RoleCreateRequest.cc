@@ -1,6 +1,6 @@
 #include "RoleCreateRequest.h"
-#include <drogon/HttpRequest.h>
 
+#include <drogon/HttpRequest.h>
 #include "common/util/ParamGetter.hpp"
 
 using namespace drogon_admin::util;

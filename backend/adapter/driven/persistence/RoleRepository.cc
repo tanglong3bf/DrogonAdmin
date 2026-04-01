@@ -1,6 +1,9 @@
 #include "domain/authorization/RoleRepository.h"
 
 #include <drogon/HttpAppFramework.h>
+#include <trantor/utils/Date.h>
+#include "common/framework/domain/ChangeableEntity.h"
+#include "domain/models/SysRoleDept.h"
 
 using namespace std;
 using namespace drogon;
@@ -88,36 +91,92 @@ drogon::Task<std::size_t> RoleRepository::countByCode(
 
 drogon::Task<> RoleRepository::save(const Role &role) const
 {
-    const auto sysRole = static_cast<SysRole>(role);
-
     const auto trans = co_await dbClient()->newTransactionCoro();
-    // 插入本体
-    const auto sysRoleInDb = co_await roleMapper(trans).insert(sysRole);
-    // 获取id
-    const auto roleId = sysRoleInDb.getValueOfRoleId();
-
-    // 处理关联数据
-    auto roleDepts = role.getDepts();
-    if (roleDepts.size() == 0)
+    switch (role.getChangingStatus())
     {
-        co_return;
-    }
-    for (auto &dept : roleDepts)
-    {
-        dept.setRoleId(roleId);
-    }
+        case ChangingStatus::NEW:
+        {
+            const auto sysRole = static_cast<SysRole>(role);
+            // 插入本体
+            const auto sysRoleInDb = co_await roleMapper(trans).insert(sysRole);
+            // 获取id
+            const auto roleId = sysRoleInDb.getValueOfRoleId();
 
-    // 关联数据转json
-    Json::Value data{Json::arrayValue};
-    for (const auto &dept : roleDepts)
-    {
-        const auto sysRoleDept = static_cast<SysRoleDept>(dept);
-        data.append(sysRoleDept.toJson());
-    }
+            // 处理关联数据
+            auto roleDepts = role.getDepts();
+            if (roleDepts.size() == 0)
+            {
+                co_return;
+            }
+            for (auto &dept : roleDepts)
+            {
+                dept.setRoleId(roleId);
+            }
 
-    auto sql =
-        sqlGenerator()->getSql("multi_insert_role_dept", {{"data", data}});
-    co_await trans->execSqlCoro(sql);
+            // 关联数据转json
+            Json::Value data{Json::arrayValue};
+            for (const auto &dept : roleDepts)
+            {
+                const auto sysRoleDept = static_cast<SysRoleDept>(dept);
+                data.append(sysRoleDept.toJson());
+            }
+
+            auto sql = sqlGenerator()->getSql("multi_insert_role_dept",
+                                              {{"data", data}});
+            co_await trans->execSqlCoro(sql);
+            co_return;
+        }
+        case ChangingStatus::DELETED:
+        {
+            // 删除本体
+            co_await roleMapper(trans).updateBy({SysRole::Cols::_deleted_by,
+                                                 SysRole::Cols::_deleted_time},
+                                                {SysRole::Cols::_role_id,
+                                                 role.getRoleId()},
+                                                role.getDeletedBy(),
+                                                role.getDeletedTime());
+            // 处理关联数据
+            auto roleDepts = role.getDepts();
+            if (roleDepts.size() == 0)
+            {
+                co_return;
+            }
+            // 关联数据转json
+            Json::Value data{Json::arrayValue};
+            for (const auto &dept : roleDepts)
+            {
+                Json::Value json{Json::objectValue};
+                json["id"] = *dept.getId();
+                json["deleted_by"] = *dept.getDeletedBy();
+                json["deleted_time"] = dept.getDeletedTime()->toDbStringLocal();
+                data.append(json);
+            }
+            auto sql = sqlGenerator()->getSql("multi_delete_role_dept",
+                                              {{"data", data}});
+            co_await trans->execSqlCoro(sql);
+            co_return;
+        }
+        case ChangingStatus::UPDATED:
+            throw runtime_error("update not supported");
+        case ChangingStatus::UNCHANGED:
+            co_return;
+    }
+}
+
+drogon::Task<Role> RoleRepository::getById(const std::int32_t roleId) const
+{
+    const auto sysRole = co_await roleMapper().findByPrimaryKey(roleId);
+    Role role{sysRole};
+
+    Criteria criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysRoleDept::Cols::_role_id, roleId};
+
+    const auto sysRoleDepts = co_await roleDeptMapper().findBy(criteria);
+
+    auto roleDepts = buildRoleDeptList(sysRoleDepts);
+
+    role.setRoleDepts(roleDepts);
+    co_return role;
 }
 
 vector<RoleDept> RoleRepository::buildRoleDeptList(

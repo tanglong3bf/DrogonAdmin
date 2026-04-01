@@ -1,7 +1,7 @@
 import type { LoginResponse, MenuResponse } from './auth'
 import type { UploadAvatarResponse } from './user'
 import type { Department } from './department'
-import { Role } from './role'
+import { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
@@ -96,6 +96,15 @@ export function isDeptTree(data: unknown): data is Department[] {
   return isArray(data, isDepartment)
 }
 
+export function isRoleDept(data: unknown): data is RoleDept {
+  return (
+    isObject(data) &&
+    isNumberField(data, 'id') &&
+    isNumberField(data, 'role_id') &&
+    isNumberField(data, 'dept_id')
+  )
+}
+
 export function isRole(data: unknown): data is Role {
   return (
     isObject(data) &&
@@ -106,7 +115,7 @@ export function isRole(data: unknown): data is Role {
     [0, 1, 2].includes((data as any).quota_type) &&
     isNumberOrUndefinedField(data, 'user_quota') &&
     [0, 1, 2].includes((data as any).relation_type) &&
-    isArrayOrUndefinedField(data, 'depts', isDepartment)
+    isArrayOrUndefinedField(data, 'depts', isRoleDept)
   )
 }
 

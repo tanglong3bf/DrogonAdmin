@@ -16,6 +16,14 @@ Task<size_t> UserRepository::countByDept(const int32_t deptId) const
     co_return co_await userMapper().count(criteria);
 }
 
+Task<size_t> UserRepository::countByRole(const int32_t roleId) const
+{
+    Criteria criteria{SysUserRole::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysUserRole::Cols::_role_id, roleId};
+
+    co_return co_await userRoleMapper().count(criteria);
+}
+
 inline SqlGenerator *UserRepository::sqlGenerator()
 {
     static const auto sqlGenerator_ = app().getPlugin<SqlGenerator>();
@@ -31,4 +39,9 @@ inline DbClientPtr UserRepository::dbClient()
 inline CoroMapper<SysUser> UserRepository::userMapper()
 {
     return CoroMapper<SysUser>{dbClient()};
+}
+
+inline CoroMapper<SysUserRole> UserRepository::userRoleMapper()
+{
+    return CoroMapper<SysUserRole>{dbClient()};
 }

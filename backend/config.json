@@ -409,6 +409,17 @@
               }
             },
             "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp @endfor)"
+          },
+          "multi_delete_role_dept": {
+            "main": {
+              "sql": "UPDATE sys_role_dept t SET @sets() FROM ( VALUES @values(data) ) AS s @fields() WHERE t.id = s.id",
+              "params": {
+                "fields_list": ["id", "deleted_by", "deleted_time"]
+              }
+            },
+            "sets": "deleted_by = s.deleted_by, deleted_time = s.deleted_time",
+            "fields": "id, deleted_by, deleted_time",
+            "values": "@for(item in data_list, separator='), (') ${item.id}, ${item.deleted_by}, ${item.deleted_time} @endfor"
           }
         }
       }

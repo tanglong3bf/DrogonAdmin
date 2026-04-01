@@ -27,3 +27,7 @@ export const newRole = (data: RoleFormData) => {
     dept_ids: data.relation_type !== 0 ? data.dept_ids : undefined
   })
 }
+
+export const updateRole = (role_id: number, role: RoleFormData) => {
+  return request.put(`/role/${role_id}`, { ...role, role_id: undefined })
+}

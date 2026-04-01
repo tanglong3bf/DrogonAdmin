@@ -16,6 +16,11 @@ class UserVerifier : public DrAdminObject<UserVerifier>
      */
     drogon::Task<> verifyNoUserInDept(const std::int32_t deptId) const;
 
+    /**
+     * @brief 验证角色未被用户使用
+     */
+    drogon::Task<> verifyRoleNotUsed(const std::int32_t roleId) const;
+
   private:
     UserRepositoryPtr userRepository_{
         drogon::DrClassMap::getSingleInstance<UserRepository>()};

@@ -15,8 +15,8 @@
     "sort_dept": true
   },
   "role": {
-    "get_role_list": true,
-    "new_role": true,
+    "get_role_list": false,
+    "new_role": false,
     "update_role": true,
     "delete_role": true
   }

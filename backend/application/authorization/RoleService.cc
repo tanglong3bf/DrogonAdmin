@@ -47,3 +47,16 @@ drogon::Task<> RoleService::createRole(const RoleCreateRequest &request,
     role.toNew();
     co_await roleRepository_->save(role);
 }
+
+drogon::Task<> RoleService::deleteRole(const std::int32_t roleId,
+                                       const std::int32_t deletedBy) const
+{
+    auto role = co_await roleRepository_->getById(roleId);
+    co_await roleHandler_->deleteRole(role, deletedBy);
+    role.toDelete();
+    for (auto &roleDept : role.getDepts())
+    {
+        const_cast<RoleDept &>(roleDept).toDelete();
+    }
+    co_await roleRepository_->save(role);
+}

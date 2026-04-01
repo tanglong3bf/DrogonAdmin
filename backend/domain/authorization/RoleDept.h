@@ -24,4 +24,7 @@ class RoleDept : public AuditableEntity, public ChangeableEntity
     explicit operator SysRoleDept() const;
 
     OPT_SETTER(roleId, RoleId);
+    OPT_GETTER(id, Id);
+    OPT_GETTER(roleId, RoleId);
+    OPT_GETTER(deptId, DeptId);
 };

@@ -3,6 +3,7 @@
 #include <drogon/HttpController.h>
 #include "application/authorization/RoleService.h"
 #include "application/authorization/RoleCreateRequest.h"
+#include "application/authorization/RoleUpdateRequest.h"
 
 class RoleController : public drogon::HttpController<RoleController>
 {
@@ -54,13 +55,18 @@ class RoleController : public drogon::HttpController<RoleController>
      * 更新角色
      */
     drogon::Task<drogon::HttpResponsePtr> updateRole(
-        const drogon::HttpRequestPtr req) const;
+        const drogon::HttpRequestPtr req,
+        const std::int32_t roleId,
+        const RoleUpdateRequest request) const;
 
     /**
-     * 删除角色
+     * @brief 删除角色
+     *
+     * @param roleId 待删除角色id
      */
     drogon::Task<drogon::HttpResponsePtr> deleteRole(
-        const drogon::HttpRequestPtr req) const;
+        const drogon::HttpRequestPtr req,
+        const int32_t roleId) const;
 
   private:
     RoleServicePtr roleService_{

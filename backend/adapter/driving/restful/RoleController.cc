@@ -66,12 +66,19 @@ Task<HttpResponsePtr> RoleController::createRole(
     co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
 
-Task<HttpResponsePtr> RoleController::updateRole(const HttpRequestPtr req) const
+Task<HttpResponsePtr> RoleController::updateRole(
+    const HttpRequestPtr req,
+    const int32_t roleId,
+    const RoleUpdateRequest request) const
 {
     throw BusinessException("接口未实现");
 }
 
-Task<HttpResponsePtr> RoleController::deleteRole(const HttpRequestPtr req) const
+Task<HttpResponsePtr> RoleController::deleteRole(const HttpRequestPtr req,
+                                                 const int32_t roleId) const
 {
-    throw BusinessException("接口未实现");
+    const auto deletedBy =
+        utils::fromString<int32_t>(req->getParameter("userId"));
+    co_await roleService_->deleteRole(roleId, deletedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

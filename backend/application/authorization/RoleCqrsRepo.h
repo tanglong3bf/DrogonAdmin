@@ -10,6 +10,11 @@
 
 class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
 {
+    using RoleMapper =
+        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRole>;
+    using RoleDeptMapper =
+        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRoleDept>;
+
   public:
     /**
      * @brief 统计指定部门可用的指定名称的角色数量
@@ -34,8 +39,8 @@ class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
   private:
     static tl::sql::SqlGenerator *sqlGenerator();
     static drogon::orm::DbClientPtr dbClient();
-    drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRole> roleMapper()
-        const;
+    static RoleMapper roleMapper();
+    static RoleDeptMapper roleDeptMapper();
 };
 
 using RoleCqrsRepoPtr = std::shared_ptr<RoleCqrsRepo>;
