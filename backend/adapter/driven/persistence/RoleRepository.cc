@@ -128,9 +128,9 @@ Task<> RoleRepository::save(Role &role) const
             co_await roleMapper(trans).updateBy({SysRole::Cols::_deleted_by,
                                                  SysRole::Cols::_deleted_time},
                                                 {SysRole::Cols::_role_id,
-                                                 role.getRoleId()},
-                                                role.getDeletedBy(),
-                                                role.getDeletedTime());
+                                                 *role.getRoleId()},
+                                                *role.getDeletedBy(),
+                                                *role.getDeletedTime());
             // 处理关联数据
             auto roleDepts = role.getDepts();
             if (roleDepts.size() == 0)

@@ -8,7 +8,7 @@
 class RoleHandler : public DrAdminObject<RoleHandler>
 {
   public:
-    drogon::Task<> deleteRole(Role role, int32_t deletedBy) const;
+    drogon::Task<> deleteRole(Role &role, int32_t deletedBy) const;
 
   private:
     RoleRepositoryPtr roleRepository_{

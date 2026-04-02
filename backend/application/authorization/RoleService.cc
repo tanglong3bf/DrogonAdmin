@@ -9,7 +9,6 @@ Task<> RoleService::deleteExcludingDept(const int32_t deptId,
     auto roleDepts = co_await roleRepository_->getExcludingDeptByDeptId(deptId);
     for (auto &roleDept : roleDepts)
     {
-        roleDept.setDeletedBy(deletedBy);
         roleDept.toDelete();
     }
     co_await roleRepository_->saveRoleDepts(roleDepts);
@@ -64,9 +63,5 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
     auto role = co_await roleRepository_->getById(roleId);
     co_await roleHandler_->deleteRole(role, deletedBy);
     role.toDelete();
-    for (auto &roleDept : role.getDepts())
-    {
-        const_cast<RoleDept &>(roleDept).toDelete();
-    }
     co_await roleRepository_->save(role);
 }

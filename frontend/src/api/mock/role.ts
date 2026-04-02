@@ -73,3 +73,12 @@ if (mockConfig.role.update_role) {
       return [204]
     })
 }
+
+if (mockConfig.role.delete_role) {
+  mock
+    .onDelete(/^\/role\/[1-9]\d*$/)
+    .reply((config: AxiosRequestConfig): [number] => {
+      console.log(config)
+      return [204]
+    })
+}

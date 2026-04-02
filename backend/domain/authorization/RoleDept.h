@@ -1,18 +1,20 @@
 #pragma once
 
-#include "common/framework/domain/AuditableEntity.h"
+#include "common/util/Utilities.hpp"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "domain/models/SysRoleDept.h"
 
 /**
  * @brief 角色部门关联实体
  */
-class RoleDept : public AuditableEntity, public ChangeableEntity
+class RoleDept : public ChangeableEntity
 {
     using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
 
     std::optional<std::int32_t> roleId_;  ///< 角色id
     std::int32_t deptId_;                 ///< 部门id
+    std::optional<std::int32_t> createdBy_;
+    std::optional<trantor::Date> createdTime_;
 
   public:
     RoleDept(const std::int32_t deptId);
@@ -23,6 +25,11 @@ class RoleDept : public AuditableEntity, public ChangeableEntity
     explicit operator SysRoleDept() const;
 
     OPT_SETTER(roleId, RoleId);
+    OPT_SETTER(createdBy, CreatedBy);
+    OPT_SETTER(createdTime, CreatedTime);
+
     OPT_GETTER(roleId, RoleId);
     OPT_GETTER(deptId, DeptId);
+    OPT_GETTER(createdBy, CreatedBy);
+    OPT_GETTER(createdTime, CreatedTime);
 };

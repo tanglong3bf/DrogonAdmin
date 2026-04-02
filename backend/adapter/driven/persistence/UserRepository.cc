@@ -18,8 +18,7 @@ Task<size_t> UserRepository::countByDept(const int32_t deptId) const
 
 Task<size_t> UserRepository::countByRole(const int32_t roleId) const
 {
-    Criteria criteria{SysUserRole::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysUserRole::Cols::_role_id, roleId};
+    Criteria criteria{SysUserRole::Cols::_role_id, roleId};
 
     co_return co_await userRoleMapper().count(criteria);
 }

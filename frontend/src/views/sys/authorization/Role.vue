@@ -2,10 +2,10 @@
 import dgCard from '@/components/dg-card.vue'
 import { Department } from '@/types/department'
 import { Search, Refresh } from '@element-plus/icons-vue'
-import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
+import { ElMessageBox, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
 import { getDeptTree } from '@/api/department'
-import { getRoleList, newRole, updateRole } from '@/api/role'
+import { deleteRole, getRoleList, newRole, updateRole } from '@/api/role'
 import {
   type Role,
   type RoleFormData,
@@ -159,7 +159,7 @@ const rules = reactive<FormRules<RoleFormData>>({
 })
 
 /**
- * 重置新增\更新角色表单
+ * 重置新增/更新角色表单
  */
 const resetRoleForm = () => {
   role.name = ''
@@ -191,7 +191,7 @@ const cancel = () => {
 const roleOriginalId = ref(0)
 
 /**
- * 提交新增\更新角色表单
+ * 提交新增/更新角色表单
  */
 const submit = async (form?: FormInstance) => {
   const isValid = await form?.validate()
@@ -251,6 +251,9 @@ const handleCurrentChange = (page: number) => {
   handleQuery()
 }
 
+/**
+ * 更新角色按钮
+ */
 const updateRoleBtn = (row: Role) => {
   roleOriginalId.value = row.role_id
 
@@ -269,9 +272,25 @@ const updateRoleBtn = (row: Role) => {
   dialogVisible.value = true
 }
 
-const deleteRoleBtn = (role_id: number) => {
-  console.log('删除角色', role_id)
-  ElMessage.error('还没做噢')
+/**
+ * 删除角色按钮
+ */
+const deleteRoleBtn = async (role_id: number) => {
+  try {
+    await ElMessageBox.confirm(
+      `请确认是否要删除 ${roleList.value.find(item => item.role_id === role_id)?.name} 角色`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    await deleteRole(role_id)
+    queryParams.page = 1
+    resetQuery()
+    await handleQuery()
+  } catch (_ignore) {}
 }
 </script>
 

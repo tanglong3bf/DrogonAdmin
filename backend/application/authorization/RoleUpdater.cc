@@ -78,7 +78,6 @@ void RoleUpdater::updateRoleDepts(vector<RoleDept> &roleDepts,
         if (newDeptSet.find(rd.getDeptId()) == newDeptSet.end())
         {
             rd.toDelete();
-            rd.setDeletedBy(updatedBy);
         }
     }
 

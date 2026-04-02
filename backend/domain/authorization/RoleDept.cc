@@ -10,8 +10,7 @@ RoleDept::RoleDept(const int32_t deptId) : deptId_{deptId}
 }
 
 RoleDept::RoleDept(const int32_t deptId, int32_t createdBy)
-    : deptId_{deptId},
-      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+    : deptId_{deptId}, createdBy_{createdBy}, createdTime_{Date::now()}
 {
 }
 

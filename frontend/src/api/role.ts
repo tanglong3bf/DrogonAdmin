@@ -28,6 +28,16 @@ export const newRole = (data: RoleFormData) => {
   })
 }
 
+/**
+ * 更新角色
+ */
 export const updateRole = (role_id: number, role: RoleFormData) => {
   return request.put(`/role/${role_id}`, { ...role, role_id: undefined })
+}
+
+/**
+ * 删除角色
+ */
+export const deleteRole = (role_id: number) => {
+  return request.delete(`/role/${role_id}`)
 }
