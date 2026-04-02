@@ -51,10 +51,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
 
     /**
      * @brief 存储角色
-     *
-     * TODO: 增删改都需要，但是暂时只处理了新增
      */
-    drogon::Task<> save(const Role &role) const;
+    drogon::Task<> save(Role &role) const;
 
     /**
      * @brief 根据id获取角色

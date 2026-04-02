@@ -99,7 +99,6 @@ export function isDeptTree(data: unknown): data is Department[] {
 export function isRoleDept(data: unknown): data is RoleDept {
   return (
     isObject(data) &&
-    isNumberField(data, 'id') &&
     isNumberField(data, 'role_id') &&
     isNumberField(data, 'dept_id')
   )

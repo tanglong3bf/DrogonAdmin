@@ -385,7 +385,7 @@
             "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
           },
           "get_role_list": {
-            "main": "@if(dept_id) SELECT * FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name)) @else @allRoles(name) @endif LIMIT ${limit} OFFSET ${offset}",
+            "main": "@if(dept_id) SELECT * FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name)) @else @allRoles(name) @endif ORDER BY role_id ASC LIMIT ${limit} OFFSET ${offset}",
             "allRoles": "SELECT * FROM sys_role r @condition(name)",
             "includedRoles": "@baseQuery(name, dept_id, type='1')",
             "excludedRoles": "@baseQuery(name, dept_id, type='0')",
@@ -398,28 +398,14 @@
             "main": {
               "sql": "INSERT INTO sys_role_dept (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
               "params": {
-                "fields": [
-                  "role_id",
-                  "dept_id",
-                  "created_by",
-                  "created_time",
-                  "updated_by",
-                  "updated_time"
-                ]
+                "fields": ["role_id", "dept_id", "created_by", "created_time"]
               }
             },
-            "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp @endfor)"
+            "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id}, ${item.created_by}, '${item.created_time}'::timestamp @endfor)"
           },
           "multi_delete_role_dept": {
-            "main": {
-              "sql": "UPDATE sys_role_dept t SET @sets() FROM ( VALUES @values(data) ) AS s @fields() WHERE t.id = s.id",
-              "params": {
-                "fields_list": ["id", "deleted_by", "deleted_time"]
-              }
-            },
-            "sets": "deleted_by = s.deleted_by, deleted_time = s.deleted_time",
-            "fields": "id, deleted_by, deleted_time",
-            "values": "@for(item in data_list, separator='), (') ${item.id}, ${item.deleted_by}, ${item.deleted_time} @endfor"
+            "main": "DELETE FROM \"sys_role_dept\" WHERE (role_id, dept_id) IN ( VALUES @values(data) )",
+            "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id} @endfor)"
           }
         }
       }

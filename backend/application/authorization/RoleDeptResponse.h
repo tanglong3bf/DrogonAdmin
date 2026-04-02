@@ -6,7 +6,6 @@
 
 class RoleDeptResponse
 {
-    std::int32_t id_;
     std::int32_t roleId_;
     std::int32_t deptId_;
 

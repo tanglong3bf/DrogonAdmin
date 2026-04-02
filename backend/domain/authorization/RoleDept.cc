@@ -2,31 +2,27 @@
 
 #include "common/util/Utilities.hpp"
 
-RoleDept::RoleDept(const std::int32_t deptId) : deptId_{deptId}
+using namespace std;
+using namespace trantor;
+
+RoleDept::RoleDept(const int32_t deptId) : deptId_{deptId}
 {
 }
 
-RoleDept::RoleDept(const std::int32_t deptId, int32_t createdBy)
+RoleDept::RoleDept(const int32_t deptId, int32_t createdBy)
     : deptId_{deptId},
-      AuditableEntity{createdBy,
-                      trantor::Date::now(),
-                      createdBy,
-                      trantor::Date::now()}
+      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
 {
 }
 
 RoleDept::RoleDept(const SysRoleDept &model)
-    : INIT(id, Id), INIT(roleId, RoleId), INIT(deptId, DeptId)
+    : INIT(roleId, RoleId), INIT(deptId, DeptId)
 {
 }
 
 RoleDept::operator SysRoleDept() const
 {
     SysRoleDept model;
-    if (id_)
-    {
-        model.setId(*id_);
-    }
     if (roleId_)
     {
         model.setRoleId(*roleId_);
@@ -34,15 +30,5 @@ RoleDept::operator SysRoleDept() const
     model.setDeptId(deptId_);
     model.setCreatedBy(*createdBy_);
     model.setCreatedTime(*createdTime_);
-    model.setUpdatedBy(*updatedBy_);
-    model.setUpdatedTime(*updatedTime_);
-    if (deletedBy_)
-    {
-        model.setDeletedBy(*deletedBy_);
-    }
-    if (deletedTime_)
-    {
-        model.setDeletedTime(*deletedTime_);
-    }
     return model;
 }

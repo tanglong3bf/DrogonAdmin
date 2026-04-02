@@ -228,9 +228,7 @@ const submit = async (form?: FormInstance) => {
     if (role.relation_type === oldRole?.relation_type) {
       role.relation_type = undefined
     }
-    if (role.dept_ids?.length === oldRole?.depts?.length) {
-      role.dept_ids = undefined
-    }
+    // 不处理 dept_ids，好麻烦
     await updateRole(role.role_id!, role)
     await handleQuery()
     dialogVisible.value = false

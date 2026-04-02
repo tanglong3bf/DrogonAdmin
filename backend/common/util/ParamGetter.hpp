@@ -228,15 +228,8 @@ class ParamGetter
 
         if (array.empty())
         {
-            if constexpr (is_necessary)
-            {
-                throw BusinessException{key + "数组不能为空"};
-            }
-            else
-            {
-                LOG_WARN << key + "数组为空，已忽略";
-                return std::nullopt;
-            }
+            // 允许返回空数组
+            return {};
         }
 
         for (const auto &element : array)

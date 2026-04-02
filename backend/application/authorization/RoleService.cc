@@ -40,16 +40,26 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
                                               list};
 }
 
-drogon::Task<> RoleService::createRole(const RoleCreateRequest &request,
-                                       const int32_t createdBy) const
+Task<> RoleService::createRole(const RoleCreateRequest &request,
+                               const int32_t createdBy) const
 {
     auto role = co_await roleAssembler_->fromCreateRequest(request, createdBy);
     role.toNew();
     co_await roleRepository_->save(role);
 }
 
-drogon::Task<> RoleService::deleteRole(const std::int32_t roleId,
-                                       const std::int32_t deletedBy) const
+Task<> RoleService::updateRole(const std::int32_t roleId,
+                               const RoleUpdateRequest request,
+                               const std::int32_t updatedBy) const
+{
+    auto role = co_await roleRepository_->getById(roleId);
+    co_await roleUpdater_->updateRole(role, request, updatedBy);
+    role.toUpdate();
+    co_await roleRepository_->save(role);
+}
+
+Task<> RoleService::deleteRole(const std::int32_t roleId,
+                               const std::int32_t deletedBy) const
 {
     auto role = co_await roleRepository_->getById(roleId);
     co_await roleHandler_->deleteRole(role, deletedBy);

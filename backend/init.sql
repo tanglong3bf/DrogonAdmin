@@ -12,7 +12,7 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 29/03/2026 17:40:52
+ Date: 02/04/2026 22:07:12
 */
 
 -- ----------------------------
@@ -40,17 +40,6 @@ DROP TABLE IF EXISTS "public"."sys_user";
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "public"."sys_dept_dept_id_seq";
 CREATE SEQUENCE "public"."sys_dept_dept_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-
--- ----------------------------
--- Sequence structure for sys_role_dept_id_seq
--- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."sys_role_dept_id_seq";
-CREATE SEQUENCE "public"."sys_role_dept_id_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -119,11 +108,11 @@ CREATE TABLE "public"."sys_role" (
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
   "created_by" int4 NOT NULL,
-  "created_time" date NOT NULL,
+  "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
-  "updated_time" date NOT NULL,
+  "updated_time" timestamp(0) NOT NULL,
   "deleted_by" int4,
-  "deleted_time" date
+  "deleted_time" timestamp(0)
 )
 ;
 COMMENT ON COLUMN "public"."sys_role"."role_id" IS '角色id';
@@ -143,34 +132,28 @@ COMMENT ON COLUMN "public"."sys_role"."deleted_time" IS '删除时间';
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
+INSERT INTO "public"."sys_role" VALUES (1, '系统管理员', 'admin', NULL, 1, 3, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (2, '测试角色', 'test', 'test_test_test', 2, 2, 1, 1, '2026-03-29 00:00:00', 1, '2026-03-29 00:00:00', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_role_dept
 -- ----------------------------
 CREATE TABLE "public"."sys_role_dept" (
-  "id" int4 NOT NULL DEFAULT nextval('sys_role_dept_id_seq'::regclass),
   "role_id" int4 NOT NULL,
   "dept_id" int4 NOT NULL,
   "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL,
-  "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(6) NOT NULL,
-  "deleted_by" int4,
-  "deleted_time" timestamp(6)
+  "created_time" timestamp(6) NOT NULL
 )
 ;
 COMMENT ON COLUMN "public"."sys_role_dept"."role_id" IS '角色id';
 COMMENT ON COLUMN "public"."sys_role_dept"."dept_id" IS '部门id';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_role_dept"."updated_by" IS '最新一次更新者';
-COMMENT ON COLUMN "public"."sys_role_dept"."updated_time" IS '最新一次更新时间';
-COMMENT ON COLUMN "public"."sys_role_dept"."deleted_by" IS '删除者';
-COMMENT ON COLUMN "public"."sys_role_dept"."deleted_time" IS '删除时间';
 
 -- ----------------------------
 -- Records of sys_role_dept
 -- ----------------------------
+INSERT INTO "public"."sys_role_dept" VALUES (1, 7, 1, '2026-04-02 21:53:40.210895');
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -215,6 +198,26 @@ COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for sys_user_role
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."sys_user_role";
+CREATE TABLE "public"."sys_user_role" (
+  "user_id" int4 NOT NULL,
+  "role_id" int4 NOT NULL,
+  "created_by" int4 NOT NULL,
+  "created_time" timestamp(6) NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."sys_user_role"."user_id" IS '用户id';
+COMMENT ON COLUMN "public"."sys_user_role"."role_id" IS '角色id';
+COMMENT ON COLUMN "public"."sys_user_role"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_user_role"."created_time" IS '创建时间';
+
+-- ----------------------------
+-- Records of sys_user_role
+-- ----------------------------
+
+-- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
@@ -230,19 +233,6 @@ ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dep
 -- Primary Key structure for table sys_role
 -- ----------------------------
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
-
--- ----------------------------
--- Indexes structure for table sys_role_dept
--- ----------------------------
-CREATE UNIQUE INDEX "uk_sys_role_dept_role_dept_undelete" ON "public"."sys_role_dept" USING btree (
-  "role_id" "pg_catalog"."int4_ops" ASC NULLS LAST,
-  "dept_id" "pg_catalog"."int4_ops" ASC NULLS LAST
-) WHERE deleted_by IS NULL;
-
--- ----------------------------
--- Primary Key structure for table sys_role_dept
--- ----------------------------
-ALTER TABLE "public"."sys_role_dept" ADD CONSTRAINT "sys_role_dept_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table sys_user

@@ -6,6 +6,10 @@
     void set##Field(const decltype(field##_)::value_type &field) \
     {                                                            \
         field##_ = field;                                        \
+    }                                                            \
+    void set##Field##ToNullOpt()                                 \
+    {                                                            \
+        field##_ = std::nullopt;                                 \
     }
 
 #define OPT_GETTER(field, Field)   \
@@ -26,19 +30,30 @@
         return field##_;           \
     }
 
-#define INIT(field, Field)  \
+#define SET_ENTITY_FIELD_IF_CHANGED(entity, Field, ...)   \
+    do                                                    \
+    {                                                     \
+        if (request.get##Field() &&                       \
+            entity.get##Field() != *request.get##Field()) \
+        {                                                 \
+            entity.set##Field(*request.get##Field());     \
+            __VA_ARGS__;                                  \
+        }                                                 \
+    } while (0)
+
+#define INIT(field, Field)        \
     field##_                      \
     {                             \
         model.getValueOf##Field() \
     }
 
-#define ENUM_INIT(type, field, Field)          \
+#define ENUM_INIT(type, field, Field)                \
     field##_                                         \
     {                                                \
         static_cast<type>(model.getValueOf##Field()) \
     }
 
-#define OPT_INIT(field, Field)                   \
+#define OPT_INIT(field, Field)                         \
     field##_                                           \
     {                                                  \
         model.get##Field() != nullptr                  \

@@ -58,7 +58,6 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     }
 
     auto roleDeptList = co_await roleDeptMapper().findBy(
-        Criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull} &&
         Criteria{SysRoleDept::Cols::_role_id, CompareOperator::In, roleIds});
 
     // TODO:

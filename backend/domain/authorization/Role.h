@@ -8,7 +8,6 @@
 #include "QuotaType.h"
 #include "domain/models/SysRole.h"
 
-
 class Role : public AuditableEntity, public ChangeableEntity
 {
     using SysRole = drogon_model::drogon_admin_db::SysRole;
@@ -51,11 +50,19 @@ class Role : public AuditableEntity, public ChangeableEntity
     GETTER(quotaType, QuotaType)
     OPT_GETTER(userQuota, UserQuota)
     GETTER(relationType, RelationType)
-    GETTER(depts, Depts)
+
+    auto &getDepts()
+    {
+        return depts_;
+    }
 
     OPT_SETTER(roleId, RoleId)
+    SETTER(name, Name)
+    SETTER(code, Code)
     OPT_SETTER(description, Description)
+    SETTER(quotaType, QuotaType)
     OPT_SETTER(userQuota, UserQuota)
+    SETTER(relationType, RelationType)
     SETTER(depts, Depts)
 
     void addRoleDept(const RoleDept &dept);

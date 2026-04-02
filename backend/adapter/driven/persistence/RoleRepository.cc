@@ -20,12 +20,12 @@ Task<size_t> RoleRepository::countBelongDept(const int32_t deptId) const
 }
 
 Task<vector<RoleDept>> RoleRepository::getExcludingDeptByDeptId(
-    const std::int32_t deptId) const
+    const int32_t deptId) const
 {
     auto sql = sqlGenerator()->getSql("get_excluding_dept_by_dept_id",
                                       {{"dept_id", deptId}});
     auto result = co_await dbClient()->execSqlCoro(sql);
-    std::vector<SysRoleDept> sysRoleDeptList;
+    vector<SysRoleDept> sysRoleDeptList;
     for (const auto &row : result)
     {
         sysRoleDeptList.emplace_back(row);
@@ -73,23 +73,19 @@ Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList) const
     }
 }
 
-drogon::Task<std::size_t> RoleRepository::countByName(
-    const std::string &name) const
+Task<size_t> RoleRepository::countByName(const string &name) const
 {
-    Criteria criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysRole::Cols::_name, name};
+    Criteria criteria{SysRole::Cols::_name, name};
     co_return co_await roleMapper().count(criteria);
 }
 
-drogon::Task<std::size_t> RoleRepository::countByCode(
-    const std::string &name) const
+Task<size_t> RoleRepository::countByCode(const string &name) const
 {
-    Criteria criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysRole::Cols::_code, name};
+    Criteria criteria{SysRole::Cols::_code, name};
     co_return co_await roleMapper().count(criteria);
 }
 
-drogon::Task<> RoleRepository::save(const Role &role) const
+Task<> RoleRepository::save(Role &role) const
 {
     const auto trans = co_await dbClient()->newTransactionCoro();
     switch (role.getChangingStatus())
@@ -146,9 +142,8 @@ drogon::Task<> RoleRepository::save(const Role &role) const
             for (const auto &dept : roleDepts)
             {
                 Json::Value json{Json::objectValue};
-                json["id"] = *dept.getId();
-                json["deleted_by"] = *dept.getDeletedBy();
-                json["deleted_time"] = dept.getDeletedTime()->toDbStringLocal();
+                json["role_id"] = *dept.getRoleId();
+                json["dept_id"] = dept.getDeptId();
                 data.append(json);
             }
             auto sql = sqlGenerator()->getSql("multi_delete_role_dept",
@@ -157,19 +152,66 @@ drogon::Task<> RoleRepository::save(const Role &role) const
             co_return;
         }
         case ChangingStatus::UPDATED:
-            throw runtime_error("update not supported");
+        {
+            SysRole sysRole = static_cast<SysRole>(role);
+            co_await roleMapper(trans).update(sysRole);
+
+            // 处理关联数据
+            auto roleDepts = role.getDepts();
+            if (roleDepts.size() == 0)
+            {
+                co_return;
+            }
+
+            // 关联数据转json
+            Json::Value toDelete{Json::arrayValue};
+            Json::Value newDepts{Json::arrayValue};
+            for (const auto &dept : roleDepts)
+            {
+                Json::Value json{Json::objectValue};
+                json["role_id"] = *dept.getRoleId();
+                json["dept_id"] = dept.getDeptId();
+                if (dept.getChangingStatus() == ChangingStatus::NEW)
+                {
+                    json["created_by"] = *dept.getCreatedBy();
+                    json["created_time"] =
+                        dept.getCreatedTime()->toDbStringLocal();
+                    newDepts.append(json);
+                }
+                else if (dept.getChangingStatus() == ChangingStatus::DELETED)
+                {
+                    toDelete.append(json);
+                }
+            }
+
+            // 获取sql并执行
+            if (toDelete.size() > 0)
+            {
+                auto deleteSql =
+                    sqlGenerator()->getSql("multi_delete_role_dept",
+                                           {{"data", toDelete}});
+                co_await trans->execSqlCoro(deleteSql);
+            }
+            if (newDepts.size() > 0)
+            {
+                auto insertSql =
+                    sqlGenerator()->getSql("multi_insert_role_dept",
+                                           {{"data", newDepts}});
+                co_await trans->execSqlCoro(insertSql);
+            }
+            co_return;
+        }
         case ChangingStatus::UNCHANGED:
             co_return;
     }
 }
 
-drogon::Task<Role> RoleRepository::getById(const std::int32_t roleId) const
+Task<Role> RoleRepository::getById(const int32_t roleId) const
 {
     const auto sysRole = co_await roleMapper().findByPrimaryKey(roleId);
     Role role{sysRole};
 
-    Criteria criteria{SysRoleDept::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysRoleDept::Cols::_role_id, roleId};
+    Criteria criteria{SysRoleDept::Cols::_role_id, roleId};
 
     const auto sysRoleDepts = co_await roleDeptMapper().findBy(criteria);
 
@@ -203,7 +245,7 @@ inline DbClientPtr RoleRepository::dbClient()
 }
 
 inline CoroMapper<SysRole> RoleRepository::roleMapper(
-    const std::shared_ptr<drogon::orm::Transaction> &trans)
+    const shared_ptr<Transaction> &trans)
 {
     return CoroMapper<SysRole>{trans == nullptr ? dbClient() : trans};
 }
