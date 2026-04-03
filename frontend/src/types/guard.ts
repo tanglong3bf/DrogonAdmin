@@ -1,7 +1,7 @@
 import type { LoginResponse, MenuResponse } from './auth'
 import type { UploadAvatarResponse } from './user'
 import type { Department } from './department'
-import { Role, RoleDept } from './role'
+import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null

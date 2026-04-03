@@ -1,25 +1,6 @@
-import { Department } from './department'
-
-/**
- * 限制类型
- */
-enum QuotaType {
-  Unlimited = 0,
-  TotalLimit = 1,
-  PerDeptLimit = 2
-}
-
-/**
- * 角色部门关联类型
- */
-enum RelationType {
-  All = 0,
-  Whitelist = 1,
-  Blacklist = 2
-}
+import type { QuotaType, RelationType } from './enums'
 
 export interface RoleDept {
-  id: number
   role_id: number
   dept_id: number
 }
@@ -55,7 +36,7 @@ export interface RoleFormData {
   code?: string
   description?: string
   quota_type?: QuotaType
-  user_quota?: number
+  user_quota?: number | null
   relation_type?: RelationType
-  dept_ids?: number[]
+  dept_ids?: number[] | null
 }

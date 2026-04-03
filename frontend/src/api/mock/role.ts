@@ -30,7 +30,11 @@ if (mockConfig.role.get_role_list) {
                   quota_type: 1,
                   role_id: 1,
                   user_quota: 3,
-                  relation_type: 0
+                  relation_type: 1,
+                  depts: [
+                    { role_id: 1, dept_id: 1 },
+                    { role_id: 1, dept_id: 7 }
+                  ]
                 },
                 {
                   code: 'test_role',
@@ -48,7 +52,12 @@ if (mockConfig.role.get_role_list) {
                   quota_type: 2,
                   role_id: 3,
                   user_quota: 3,
-                  relation_type: 0
+                  relation_type: 2,
+                  depts: [
+                    { role_id: 3, dept_id: 4 },
+                    { role_id: 3, dept_id: 5 },
+                    { role_id: 3, dept_id: 6 }
+                  ]
                 }
               ]
             }

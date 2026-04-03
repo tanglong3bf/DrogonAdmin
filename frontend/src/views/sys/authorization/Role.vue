@@ -6,24 +6,9 @@ import { ElMessageBox, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
 import { getDeptTree } from '@/api/department'
 import { deleteRole, getRoleList, newRole, updateRole } from '@/api/role'
-import {
-  type Role,
-  type RoleFormData,
-  type RoleQueryParams
-} from '@/types/role'
-import { Pagination } from '@/types/common'
-
-enum QuotaType {
-  Unlimited = 0,
-  TotalLimit = 1,
-  PerDeptLimit = 2
-}
-
-enum RelationType {
-  All = 0,
-  Whitelist = 1,
-  Blacklist = 2
-}
+import type { Role, RoleFormData, RoleQueryParams } from '@/types/role'
+import type { Pagination } from '@/types/common'
+import { QuotaType, RelationType } from '@/types/enums'
 
 /**
  * 从后端返回的真实数据
@@ -204,32 +189,37 @@ const submit = async (form?: FormInstance) => {
     dialogVisible.value = false
     resetRoleForm()
   }
-  // UPDATE
+  // UPDATE TODO:
   else {
     const oldRole = roleList.value.find(
       item => item.role_id === roleOriginalId.value
     )
+
     // 比较 role 与 oldRole
-    if (role.name === oldRole?.name) {
-      role.name = undefined
+    const nameChanged = role.name !== oldRole?.name
+    const codeChanged = role.code !== oldRole?.code
+    const descChanged = role.description !== oldRole?.description
+    const quotaTypeChanged = role.quota_type !== oldRole?.quota_type
+    const userQuotaChanged = role.user_quota !== oldRole?.user_quota
+    const relationTypeChanged = role.relation_type !== oldRole?.relation_type
+
+    // 构造参数
+    const data: RoleFormData = {
+      name: nameChanged ? role.name : undefined,
+      code: codeChanged ? role.code : undefined,
+      description: descChanged ? role.description : undefined,
+      quota_type: quotaTypeChanged ? role.quota_type : undefined,
+      user_quota: userQuotaChanged
+        ? role.user_quota
+          ? role.user_quota
+          : null
+        : undefined,
+      relation_type: relationTypeChanged ? role.relation_type : undefined,
+      // 不处理 dept_ids，好麻烦
+      dept_ids: role.dept_ids
     }
-    if (role.code === oldRole?.code) {
-      role.code = undefined
-    }
-    if (role.description === oldRole?.description) {
-      role.description = undefined
-    }
-    if (role.quota_type === oldRole?.quota_type) {
-      role.quota_type = undefined
-    }
-    if (role.user_quota === oldRole?.user_quota) {
-      role.user_quota = undefined
-    }
-    if (role.relation_type === oldRole?.relation_type) {
-      role.relation_type = undefined
-    }
-    // 不处理 dept_ids，好麻烦
-    await updateRole(role.role_id!, role)
+
+    await updateRole(role.role_id!, data)
     await handleQuery()
     dialogVisible.value = false
   }
@@ -257,7 +247,7 @@ const handleCurrentChange = (page: number) => {
 const updateRoleBtn = (row: Role) => {
   roleOriginalId.value = row.role_id
 
-  const rowCopied = { ...row }
+  const rowCopied = { ...row, dept_ids: row.depts?.map(item => item.dept_id) }
 
   role.role_id = rowCopied.role_id
   role.name = rowCopied.name
@@ -266,7 +256,7 @@ const updateRoleBtn = (row: Role) => {
   role.quota_type = rowCopied.quota_type
   role.user_quota = rowCopied.user_quota
   role.relation_type = rowCopied.relation_type
-  role.dept_ids = rowCopied.depts?.map(item => item.dept_id)
+  role.dept_ids = rowCopied.dept_ids
 
   dialogType.value = DialogType.UPDATE
   dialogVisible.value = true
