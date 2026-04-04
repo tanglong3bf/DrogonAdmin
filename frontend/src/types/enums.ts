@@ -15,3 +15,20 @@ export enum RelationType {
   Whitelist = 1,
   Blacklist = 2
 }
+
+/**
+ * 用户性别
+ */
+export enum Sex {
+  Secrecy = 0,
+  Male,
+  Female
+}
+
+/**
+ * 用户状态
+ */
+export enum Status {
+  Enable = 0,
+  Disable
+}

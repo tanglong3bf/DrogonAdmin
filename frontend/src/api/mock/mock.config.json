@@ -3,6 +3,7 @@
     "login": true
   },
   "user": {
+    "get_user_list": true,
     "update_basic_info": true,
     "update_password": true,
     "upload_avatar": true

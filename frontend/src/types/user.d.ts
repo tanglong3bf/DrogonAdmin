@@ -1,3 +1,21 @@
+import { Sex } from 'enums'
+import { Status } from 'enums'
+
+/**
+ * 用户
+ */
+export interface User {
+  user_id: number
+  avatar: string
+  username: string
+  nickname: string
+  sex: Sex
+  dept_id: number
+  phone_number?: string
+  email?: string
+  status: Status
+}
+
 /**
  * 更新用户信息请求体
  *
@@ -21,4 +39,14 @@ export interface UserPasswordUpdateRequest {
 
 export interface UploadAvatarResponse {
   file_path: string
+}
+
+export interface UserQueryParams {
+  username?: string
+  nickname?: string
+  sex?: Sex
+  dept_id?: number
+  phone_number?: string
+  email?: string
+  status?: number
 }

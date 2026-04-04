@@ -1,10 +1,27 @@
-import { isUploadAvatarResponse } from '@/types/guard'
+import { PaginatedResponse } from '@/types/common'
+import {
+  isPaginatedResponse,
+  isUploadAvatarResponse,
+  isUser
+} from '@/types/guard'
 import type {
   UploadAvatarResponse,
+  User,
   UserInfoUpdateRequest,
-  UserPasswordUpdateRequest
+  UserPasswordUpdateRequest,
+  UserQueryParams
 } from '@/types/user'
 import request, { validateResponse } from '@/utils/request'
+
+/**
+ * 获取用户列表
+ */
+export const getUserList = (queryParams: UserQueryParams) => {
+  return validateResponse<PaginatedResponse<User>>(
+    request.get('/user', { params: queryParams }),
+    isPaginatedResponse(isUser)
+  )
+}
 
 /**
  * 更新用户信息接口
