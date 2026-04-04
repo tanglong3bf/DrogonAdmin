@@ -2,21 +2,20 @@
 
 #include <drogon/HttpResponse.h>
 #include <jsoncpp/json/value.h>
-#include <cstdint>
 #include <vector>
 
 template <typename T>
 class PaginatedResponse
 {
-    std::int32_t page_;
-    std::int32_t pageSize_;
-    std::int32_t total_;
+    std::size_t page_;
+    std::size_t pageSize_;
+    std::size_t total_;
     std::vector<T> list_;
 
   public:
-    PaginatedResponse(const std::int32_t page,
-                      const std::int32_t pageSize,
-                      const std::int32_t total,
+    PaginatedResponse(const std::size_t page,
+                      const std::size_t pageSize,
+                      const std::size_t total,
                       const std::vector<T> &list)
         : page_{page}, pageSize_(pageSize), total_(total), list_(list)
     {

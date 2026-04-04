@@ -1,4 +1,4 @@
-#include "application/organization/DeptCqrsRepo.h"
+#include "application/organization/dept/DeptCqrsRepo.h"
 
 #include <drogon/HttpAppFramework.h>
 

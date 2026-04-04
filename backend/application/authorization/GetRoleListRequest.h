@@ -10,8 +10,8 @@ class GetRoleListRequest
 {
     std::optional<std::string> name_;
     std::optional<std::int32_t> deptId_;
-    std::int32_t page_;
-    std::int32_t pageSize_;
+    std::size_t page_;
+    std::size_t pageSize_;
 
   public:
     OPT_SETTER(name, Name)

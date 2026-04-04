@@ -2,7 +2,7 @@
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/utils/coroutine.h>
-#include "application/organization/DeptSortRequest.h"
+#include "application/organization/dept/DeptSortRequest.h"
 #include "common/exception/BusinessException.h"
 
 using namespace std;

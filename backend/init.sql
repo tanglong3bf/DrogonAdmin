@@ -12,7 +12,7 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 02/04/2026 22:07:12
+ Date: 04/04/2026 20:33:05
 */
 
 -- ----------------------------
@@ -51,6 +51,17 @@ CACHE 1;
 -- ----------------------------
 DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
 CREATE SEQUENCE "public"."sys_role_role_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for sys_user_user_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "public"."sys_user_user_id_seq";
+CREATE SEQUENCE "public"."sys_user_user_id_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -159,7 +170,7 @@ INSERT INTO "public"."sys_role_dept" VALUES (1, 7, 1, '2026-04-02 21:53:40.21089
 -- Table structure for sys_user
 -- ----------------------------
 CREATE TABLE "public"."sys_user" (
-  "user_id" int4 NOT NULL,
+  "user_id" int4 NOT NULL DEFAULT nextval('sys_user_user_id_seq'::regclass),
   "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
   "password" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
   "nickname" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
@@ -196,6 +207,7 @@ COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
+INSERT INTO "public"."sys_user" VALUES (1, 'admin123', '123', '管理员', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -223,6 +235,20 @@ COMMENT ON COLUMN "public"."sys_user_role"."created_time" IS '创建时间';
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
 SELECT setval('"public"."sys_dept_dept_id_seq"', 9, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+ALTER SEQUENCE "public"."sys_role_role_id_seq"
+OWNED BY "public"."sys_role"."role_id";
+SELECT setval('"public"."sys_role_role_id_seq"', 1, false);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+ALTER SEQUENCE "public"."sys_user_user_id_seq"
+OWNED BY "public"."sys_user"."user_id";
+SELECT setval('"public"."sys_user_user_id_seq"', 1, true);
 
 -- ----------------------------
 -- Primary Key structure for table sys_dept

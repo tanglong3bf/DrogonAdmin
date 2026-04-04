@@ -2,10 +2,10 @@
 
 #include <drogon/HttpController.h>
 #include <drogon/DrClassMap.h>
-#include "application/organization/DeptService.h"
-#include "application/organization/DeptCreateRequest.h"
-#include "application/organization/DeptSortRequest.h"
-#include "application/organization/DeptUpdateRequest.h"
+#include "application/organization/dept/DeptService.h"
+#include "application/organization/dept/DeptCreateRequest.h"
+#include "application/organization/dept/DeptSortRequest.h"
+#include "application/organization/dept/DeptUpdateRequest.h"
 
 class DeptController : public drogon::HttpController<DeptController>
 {

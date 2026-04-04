@@ -17,7 +17,8 @@ aux_source_directory(adapter/driven/persistence REPO_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application/auth AUTH_SERVICE_SRC)
 aux_source_directory(application/authorization AUTHORIZATION_SERVICE_SRC)
-aux_source_directory(application/organization ORG_SERVICE_SRC)
+aux_source_directory(application/organization/dept DEPT_SERVICE_SRC)
+aux_source_directory(application/organization/user USER_SERVICE_SRC)
 aux_source_directory(domain/models MODEL_SRC)
 aux_source_directory(domain/authorization AUTHORIZATION_DOMAIN_SRC)
 aux_source_directory(domain/organization ORG_DOMAIN_SRC)
@@ -36,7 +37,8 @@ target_sources(
           ${CTL_SRC}
           ${AUTH_SERVICE_SRC}
           ${AUTHORIZATION_SERVICE_SRC}
-          ${ORG_SERVICE_SRC}
+          ${DEPT_SERVICE_SRC}
+          ${USER_SERVICE_SRC}
           ${MODEL_SRC}
           ${AUTHORIZATION_DOMAIN_SRC}
           ${ORG_DOMAIN_SRC}

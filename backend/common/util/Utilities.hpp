@@ -53,12 +53,12 @@
         static_cast<type>(model.getValueOf##Field()) \
     }
 
-#define OPT_INIT(field, Field)                         \
-    field##_                                           \
-    {                                                  \
-        model.get##Field() != nullptr                  \
-            ? make_optional(model.getValueOf##Field()) \
-            : nullopt                                  \
+#define OPT_INIT(field, Field)                              \
+    field##_                                                \
+    {                                                       \
+        model.get##Field() != nullptr                       \
+            ? std::make_optional(model.getValueOf##Field()) \
+            : std::nullopt                                  \
     }
 
 #define AUDITABLE_INIT                                              \

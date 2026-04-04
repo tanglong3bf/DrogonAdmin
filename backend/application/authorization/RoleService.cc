@@ -17,7 +17,7 @@ Task<> RoleService::deleteExcludingDept(const int32_t deptId,
 Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
     const GetRoleListRequest &request) const
 {
-    const int32_t count =
+    const size_t count =
         co_await roleCqrsRepo_->countByNameAndDeptId(request.getName(),
                                                      request.getDeptId());
 
@@ -33,7 +33,9 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
         (count + request.getPageSize() - 1) / request.getPageSize();
     const auto list = co_await roleCqrsRepo_->getRoleList(request, maxPage);
 
-    co_return PaginatedResponse<RoleResponse>{request.getPage(),
+    co_return PaginatedResponse<RoleResponse>{maxPage < request.getPage()
+                                                  ? maxPage
+                                                  : request.getPage(),
                                               request.getPageSize(),
                                               count,
                                               list};

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <drogon/utils/coroutine.h>
-#include "application/organization/DeptSortRequest.h"
+#include "application/organization/dept/DeptSortRequest.h"
 #include "domain/organization/DeptHandler.h"
 #include "application/authorization/RoleService.h"
 #include "DeptCqrsRepo.h"
