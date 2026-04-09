@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getUserList, newUser } from '@/api/user'
+import { getUserList, newUser, updateUser } from '@/api/user'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { Pagination } from '@/types/common'
 import type { User, UserFormData, UserQueryParams } from '@/types/user'
@@ -213,6 +213,41 @@ const submit = (form?: FormInstance) => {
       dialogVisible.value = false
       resetUserForm()
     }
+    // 更新
+    else {
+      console.log(user)
+      const oldUser = userList.value.find(
+        item => item.user_id === userOriginalId.value
+      )
+      console.log(oldUser)
+
+      // 比较 user 与 oldUser
+      const nicknameChanged = user.nickname !== oldUser?.nickname
+      const sexChanged = user.sex !== oldUser?.sex
+      const deptIdChanged = user.dept_id !== oldUser?.dept_id
+      const phoneNumberChanged = user.phone_number !== oldUser?.phone_number
+      const emailChanged = user.email !== oldUser?.email
+      const statusChanged = user.status !== oldUser?.status
+
+      // 构造参数
+      const data: UserFormData = {
+        nickname: nicknameChanged ? user.nickname : undefined,
+        sex: sexChanged ? user.sex : undefined,
+        dept_id: deptIdChanged ? user.dept_id : undefined,
+        phone_number: phoneNumberChanged
+          ? user.phone_number
+            ? user.phone_number
+            : null
+          : undefined,
+        email: emailChanged ? (user.email ? user.email : null) : undefined,
+        status: statusChanged ? user.status : undefined,
+        role_ids: user.role_ids
+      }
+
+      await updateUser(user.user_id!, data)
+      await handleQuery()
+      dialogVisible.value = false
+    }
   })
 }
 
@@ -224,8 +259,22 @@ const newUserBtn = () => {
   dialogVisible.value = true
 }
 
-const updateUserBtn = (user: User) => {
-  ElMessage.error('功能未实现')
+/**
+ * 更新用户按钮
+ */
+const updateUserBtn = (row: User) => {
+  dialogType.value = DialogType.UPDATE
+  userOriginalId.value = row.user_id
+  user.user_id = row.user_id
+  user.username = row.username
+  user.nickname = row.nickname
+  user.sex = row.sex
+  user.dept_id = row.dept_id
+  user.phone_number = row.phone_number
+  user.email = row.email
+  user.status = row.status
+  user.role_ids = row.user_roles?.map(item => item.role_id)
+  dialogVisible.value = true
 }
 
 const setRoleBtn = (userId: number) => {
@@ -326,9 +375,6 @@ const deleteUserBtn = (userId: number) => {
       </el-form-item>
     </el-form>
   </dg-card>
-  <span style="font-size: 36px" v-if="false"
-    >用户列表和新增用户快完事了，仅差获取角色列表</span
-  >
   <!-- 主体数据展示 -->
   <dg-card>
     <!-- 按钮 -->
@@ -391,7 +437,11 @@ const deleteUserBtn = (userId: number) => {
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="user.username" placeholder="请输入用户名" />
+            <el-input
+              v-model="user.username"
+              placeholder="请输入用户名"
+              :disabled="dialogType === DialogType.UPDATE"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -484,6 +534,7 @@ const deleteUserBtn = (userId: number) => {
   </el-dialog>
   <!-- debug -->
   <!--
+  dialogVisible: {{ dialogVisible }}<br />
   queryParams: {{ queryParams }}<br />
   userList: <br />
   <ul v-for="user in userList">

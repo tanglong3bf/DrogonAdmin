@@ -23,11 +23,19 @@ export const getUserList = (queryParams: UserQueryParams) => {
     isPaginatedResponse(isUser)
   )
 }
+
 /**
  * 新增一个用户
  */
 export const newUser = (data: UserFormData) => {
   return request.post('/user', data)
+}
+
+/**
+ * 更新一个用户
+ */
+export const updateUser = (user_id: number, user: UserFormData) => {
+  return request.put(`/user/${user_id}`, { ...user, user_id: undefined })
 }
 
 /**

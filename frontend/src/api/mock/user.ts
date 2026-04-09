@@ -77,6 +77,9 @@ if (mockConfig.user.upload_avatar) {
     )
 }
 
+/**
+ * 获取用户列表mock
+ */
 if (mockConfig.user.get_user_list) {
   mock
     .onGet('/user')
@@ -117,6 +120,9 @@ if (mockConfig.user.get_user_list) {
     )
 }
 
+/**
+ * 新增用户mock
+ */
 if (mockConfig.user.new_user) {
   mock.onPost('/user').reply((config: AxiosRequestConfig): [number] => {
     const data = JSON.parse(config.data)
@@ -124,4 +130,18 @@ if (mockConfig.user.new_user) {
 
     return [201]
   })
+}
+
+/**
+ * 更新用户mock
+ */
+if (mockConfig.user.update_user) {
+  mock
+    .onPut(/^\/user\/[1-9]\d*$/)
+    .reply((config: AxiosRequestConfig): [number] => {
+      const data = JSON.parse(config.data)
+      console.log('更新用户', data)
+
+      return [204]
+    })
 }

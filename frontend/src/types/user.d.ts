@@ -31,8 +31,8 @@ export interface UserFormData {
   nickname?: string
   sex?: Sex
   dept_id?: number
-  phone_number?: string
-  email?: string
+  phone_number?: string | null
+  email?: string | null
   status?: Status
   role_ids?: number[]
 }
