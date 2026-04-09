@@ -1,12 +1,12 @@
 #pragma once
 
-#include <memory>
+#include "Dept.h"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "domain/models/SysDept.h"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/utils/coroutine.h>
-#include "common/framework/DrAdminObject.hpp"
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "domain/models/SysDept.h"
-#include "Dept.h"
+#include <memory>
 
 /**
  * @brief 部门仓库

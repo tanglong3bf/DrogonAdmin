@@ -32,3 +32,11 @@ export enum Status {
   Enable = 0,
   Disable
 }
+
+/**
+ * 对话框类型枚举
+ */
+export enum DialogType {
+  ADD = 0, // 新增
+  UPDATE = 1 // 更新
+}

@@ -13,7 +13,7 @@ HttpResponsePtr toResponse(const UserResponse &response)
 };  // namespace drogon
 
 UserResponse::UserResponse(const User &user)
-    : userId_{user.getDeptId()},
+    : userId_{*user.getUserId()},
       username_{user.getUsername()},
       nickname_{user.getNickname()},
       avatar_{user.getAvatar()},
@@ -23,6 +23,15 @@ UserResponse::UserResponse(const User &user)
       email_{user.getEmail()},
       status_{user.getStatus()}
 {
+    if (user.getUserRoles().size() > 0)
+    {
+        userRoles_.reserve(user.getUserRoles().size());
+
+        for (const auto &userRole : user.getUserRoles())
+        {
+            userRoles_.push_back(UserRoleResponse{userRole});
+        }
+    }
 }
 
 Json::Value UserResponse::toJson() const
@@ -43,5 +52,13 @@ Json::Value UserResponse::toJson() const
         json["email"] = *email_;
     }
     json["status"] = static_cast<int8_t>(status_);
+    if (userRoles_.size() > 0)
+    {
+        json["user_roles"] = Json::Value(Json::arrayValue);
+        for (const auto &userRole : userRoles_)
+        {
+            json["user_roles"].append(userRole.toJson());
+        }
+    }
     return json;
 }

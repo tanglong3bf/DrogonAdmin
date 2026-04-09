@@ -3,9 +3,10 @@
 #include <drogon/orm/DbClient.h>
 #include <drogon/utils/coroutine.h>
 #include "SqlGenerator/src/SqlGenerator.h"
-#include "GetRoleListRequest.h"
+#include "dto/GetRoleListRequest.h"
+#include "dto/AssignableRoleResponse.h"
 #include "common/framework/DrAdminObject.hpp"
-#include "RoleResponse.h"
+#include "dto/RoleResponse.h"
 #include "domain/models/SysRole.h"
 
 class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
@@ -32,8 +33,17 @@ class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
         const GetRoleListRequest &request,
         const int32_t maxPage /*很不优雅*/) const;
 
+    /**
+     * @brief 获取指定部门可分配的角色
+     */
+    drogon::Task<std::vector<AssignableRoleResponse>> getAssignableRoles(
+        const int32_t deptId) const;
+
   protected:
     std::vector<RoleResponse> buildList(
+        const drogon::orm::Result &dbResult) const;
+
+    std::vector<AssignableRoleResponse> buildAssignableList(
         const drogon::orm::Result &dbResult) const;
 
   private:

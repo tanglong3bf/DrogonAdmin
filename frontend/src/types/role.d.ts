@@ -40,3 +40,8 @@ export interface RoleFormData {
   relation_type?: RelationType
   dept_ids?: number[] | null
 }
+
+export interface RoleOption {
+  role_id: number
+  name: string
+}

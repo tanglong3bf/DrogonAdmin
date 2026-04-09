@@ -3,11 +3,14 @@
 #include <memory>
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/RoleRepository.h"
-#include "domain/organization/UserVerifier.h"
+#include "domain/organization/user/UserVerifier.h"
 
 class RoleHandler : public DrAdminObject<RoleHandler>
 {
   public:
+    /**
+     * @brief 删除角色
+     */
     drogon::Task<> deleteRole(Role &role, int32_t deletedBy) const;
 
   private:

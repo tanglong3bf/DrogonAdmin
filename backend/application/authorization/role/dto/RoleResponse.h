@@ -2,7 +2,7 @@
 
 #include <drogon/orm/Result.h>
 #include <jsoncpp/json/value.h>
-#include "application/authorization/RoleDeptResponse.h"
+#include "RoleDeptResponse.h"
 #include "common/util/Utilities.hpp"
 #include "domain/authorization/DeptScopeType.h"
 #include "domain/authorization/Role.h"

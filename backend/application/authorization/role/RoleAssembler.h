@@ -1,7 +1,7 @@
 #pragma once
 
 #include <drogon/utils/coroutine.h>
-#include "application/authorization/RoleCreateRequest.h"
+#include "dto/RoleCreateRequest.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/Role.h"
 #include "domain/authorization/RoleRepository.h"

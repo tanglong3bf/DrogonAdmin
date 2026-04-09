@@ -8,7 +8,7 @@ import { getDeptTree } from '@/api/department'
 import { deleteRole, getRoleList, newRole, updateRole } from '@/api/role'
 import type { Role, RoleFormData, RoleQueryParams } from '@/types/role'
 import type { Pagination } from '@/types/common'
-import { QuotaType, RelationType } from '@/types/enums'
+import { DialogType, QuotaType, RelationType } from '@/types/enums'
 
 /**
  * 从后端返回的真实数据
@@ -71,14 +71,6 @@ onMounted(async () => {
  * 是否展示新增/更新对话框
  */
 const dialogVisible = ref(false)
-
-/**
- * 定义对话框类型枚举
- */
-enum DialogType {
-  ADD = 0, // 新增
-  UPDATE = 1 // 更新
-}
 
 /**
  * 对话框类型

@@ -1,7 +1,8 @@
-#include "application/authorization/RoleCqrsRepo.h"
+#include "application/authorization/role/RoleCqrsRepo.h"
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
+#include "domain/authorization/RoleDept.h"
 #include "domain/models/SysRole.h"
 #include "domain/authorization/Role.h"
 
@@ -37,8 +38,8 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     ParamList params;
     const int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
-    params["offset"] = request.getPageSize() * (page - 1);
-    params["limit"] = request.getPageSize();
+    params["offset"] = static_cast<int32_t>(request.getPageSize() * (page - 1));
+    params["limit"] = static_cast<int32_t>(request.getPageSize());
     if (request.getDeptId())
     {
         params["dept_id"] = *request.getDeptId();
@@ -75,6 +76,14 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     co_return roleList;
 }
 
+Task<vector<AssignableRoleResponse>> RoleCqrsRepo::getAssignableRoles(
+    const int32_t deptId) const
+{
+    const auto sql = sqlGenerator()->getSql("get_assignable_roles");
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql, deptId);
+    co_return buildAssignableList(dbResult);
+}
+
 vector<RoleResponse> RoleCqrsRepo::buildList(const Result &dbResult) const
 {
     vector<RoleResponse> result;
@@ -82,6 +91,19 @@ vector<RoleResponse> RoleCqrsRepo::buildList(const Result &dbResult) const
     {
         RoleResponse roleResponse{Role{SysRole{row}}};
         result.push_back(roleResponse);
+    }
+    return result;
+}
+
+vector<AssignableRoleResponse> RoleCqrsRepo::buildAssignableList(
+    const Result &dbResult) const
+{
+    vector<AssignableRoleResponse> result;
+    for (const auto &row : dbResult)
+    {
+        AssignableRoleResponse assignableRoleResponse{
+            row["role_id"].as<int32_t>(), row["name"].as<string>()};
+        result.push_back(assignableRoleResponse);
     }
     return result;
 }

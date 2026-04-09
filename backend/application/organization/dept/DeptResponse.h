@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <jsoncpp/json/value.h>
-#include "domain/organization/Dept.h"
+#include "domain/organization/dept/Dept.h"
 
 /**
  * @brief 部门响应数据封装

@@ -1,6 +1,6 @@
 #include "RoleUpdater.h"
-#include <unordered_set>
 
+#include <unordered_set>
 #include "common/util/Utilities.hpp"
 #include "common/exception/BusinessException.h"
 #include "domain/authorization/RoleDept.h"

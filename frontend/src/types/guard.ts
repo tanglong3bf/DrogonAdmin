@@ -1,5 +1,5 @@
 import type { LoginResponse, MenuResponse } from './auth'
-import type { UploadAvatarResponse, User } from './user'
+import type { UploadAvatarResponse, User, UserRole } from './user'
 import type { Department } from './department'
 import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
@@ -117,6 +117,13 @@ export function isRole(data: unknown): data is Role {
     isArrayOrUndefinedField(data, 'depts', isRoleDept)
   )
 }
+export function isUserRole(data: unknown): data is UserRole {
+  return (
+    isObject(data) &&
+    isNumberField(data, 'user_id') &&
+    isNumberField(data, 'role_id')
+  )
+}
 
 export function isUser(data: unknown): data is User {
   return (
@@ -129,7 +136,8 @@ export function isUser(data: unknown): data is User {
     isNumberField(data, 'dept_id') &&
     isStringOrUndefinedField(data, 'phone_number') &&
     isStringOrUndefinedField(data, 'email') &&
-    [0, 1].includes((data as any).status)
+    [0, 1].includes((data as any).status) &&
+    isArrayOrUndefinedField(data, 'user_roles', isUserRole)
   )
 }
 

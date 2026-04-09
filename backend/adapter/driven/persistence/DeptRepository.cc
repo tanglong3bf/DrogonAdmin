@@ -1,4 +1,4 @@
-#include "domain/organization/DeptRepository.h"
+#include "domain/organization/dept/DeptRepository.h"
 
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/CoroMapper.h>

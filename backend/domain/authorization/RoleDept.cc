@@ -27,7 +27,13 @@ RoleDept::operator SysRoleDept() const
         model.setRoleId(*roleId_);
     }
     model.setDeptId(deptId_);
-    model.setCreatedBy(*createdBy_);
-    model.setCreatedTime(*createdTime_);
+    if (createdBy_)
+    {
+        model.setCreatedBy(*createdBy_);
+    }
+    if (createdTime_)
+    {
+        model.setCreatedTime(*createdTime_);
+    }
     return model;
 }

@@ -16,12 +16,14 @@ message(STATUS "use c++23")
 aux_source_directory(adapter/driven/persistence REPO_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application/auth AUTH_SERVICE_SRC)
-aux_source_directory(application/authorization AUTHORIZATION_SERVICE_SRC)
+aux_source_directory(application/authorization/role ROLE_SERVICE_SRC)
+aux_source_directory(application/authorization/role/dto ROLE_DTO_SRC)
 aux_source_directory(application/organization/dept DEPT_SERVICE_SRC)
 aux_source_directory(application/organization/user USER_SERVICE_SRC)
 aux_source_directory(domain/models MODEL_SRC)
 aux_source_directory(domain/authorization AUTHORIZATION_DOMAIN_SRC)
-aux_source_directory(domain/organization ORG_DOMAIN_SRC)
+aux_source_directory(domain/organization/dept DEPT_DOMAIN_SRC)
+aux_source_directory(domain/organization/user USER_DOMAIN_SRC)
 aux_source_directory(common/exception EXCEPTION_SRC)
 aux_source_directory(common/framework/domain COMMON_DOMAIN_SRC)
 aux_source_directory(common/util/plugins/DrogonJwtUtil/src JWT_SRC)
@@ -36,12 +38,14 @@ target_sources(
           ${REPO_SRC}
           ${CTL_SRC}
           ${AUTH_SERVICE_SRC}
-          ${AUTHORIZATION_SERVICE_SRC}
+          ${ROLE_SERVICE_SRC}
+          ${ROLE_DTO_SRC}
           ${DEPT_SERVICE_SRC}
           ${USER_SERVICE_SRC}
           ${MODEL_SRC}
           ${AUTHORIZATION_DOMAIN_SRC}
-          ${ORG_DOMAIN_SRC}
+          ${DEPT_DOMAIN_SRC}
+          ${USER_DOMAIN_SRC}
           ${EXCEPTION_SRC}
           ${COMMON_DOMAIN_SRC}
           ${JWT_SRC}

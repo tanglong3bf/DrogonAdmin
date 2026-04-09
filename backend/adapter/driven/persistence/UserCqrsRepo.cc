@@ -3,6 +3,7 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 #include "domain/models/SysUser.h"
+#include "domain/organization/user/UserRole.h"
 
 using namespace std;
 using namespace drogon;
@@ -27,7 +28,27 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     const auto sysUserList = co_await userMapper()
                                  .paginate(page, request.getPageSize())
                                  .findBy(criteria);
-    co_return buildUserList(sysUserList);
+    auto userList = buildUserList(sysUserList);
+    // 获取用户id列表
+    vector<int32_t> userIdList{};
+    for (const auto &user : userList)
+    {
+        userIdList.push_back(*user.getUserId());
+    }
+
+    auto userRolesList = co_await userRoleMapper().findBy(
+        Criteria{SysUserRole::Cols::_user_id, CompareOperator::In, userIdList});
+    for (auto &user : userList)
+    {
+        for (const auto &userRole : userRolesList)
+        {
+            if (userRole.getValueOfUserId() == user.getUserId())
+            {
+                user.addUserRole(UserRole{userRole});
+            }
+        }
+    }
+    co_return buildUserResponseList(userList);
 }
 
 Criteria UserCqrsRepo::buildCriteria(const UserQueryRequest &request) const
@@ -77,19 +98,36 @@ Criteria UserCqrsRepo::buildCriteria(const UserQueryRequest &request) const
     return criteria;
 }
 
-vector<UserResponse> UserCqrsRepo::buildUserList(
+vector<User> UserCqrsRepo::buildUserList(
     const vector<SysUser> &sysUserList) const
 {
-    vector<UserResponse> userList;
+    vector<User> userList;
     for (const auto &sysUser : sysUserList)
     {
-        userList.push_back(UserResponse{User{sysUser}});
+        userList.push_back(User{sysUser});
     }
     return userList;
+}
+
+vector<UserResponse> UserCqrsRepo::buildUserResponseList(
+    const vector<User> &userList) const
+{
+    vector<UserResponse> userResponseList;
+    for (const auto &user : userList)
+    {
+        userResponseList.push_back(UserResponse{user});
+    }
+    return userResponseList;
 }
 
 inline CoroMapper<SysUser> UserCqrsRepo::userMapper()
 {
     static CoroMapper<SysUser> userMapper{app().getDbClient()};
     return userMapper;
+}
+
+inline CoroMapper<SysUserRole> UserCqrsRepo::userRoleMapper()
+{
+    static CoroMapper<SysUserRole> userRoleMapper{app().getDbClient()};
+    return userRoleMapper;
 }

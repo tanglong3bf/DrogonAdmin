@@ -2,6 +2,8 @@
 
 #include "application/organization/user/UserQueryRequest.h"
 
+using namespace drogon::utils;
+
 // Add definition of your processing function here
 drogon::Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                                                    const string username,
@@ -25,4 +27,13 @@ drogon::Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                              pageSize};
     const auto paginated = co_await userService_->getUserList(request);
     co_return toResponse(paginated);
+}
+
+Task<HttpResponsePtr> UserController::createUser(
+    const HttpRequestPtr req,
+    const UserCreateRequest request) const
+{
+    const auto createdBy = fromString<int32_t>(req->getParameter("userId"));
+    co_await userService_->createUser(request, createdBy);
+    co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }

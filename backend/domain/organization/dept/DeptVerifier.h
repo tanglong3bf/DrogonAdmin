@@ -27,6 +27,13 @@ class DeptVerifier : public DrAdminObject<DeptVerifier>
      */
     drogon::Task<> verifyNoSubDept(const std::int32_t deptId) const;
 
+    /**
+     * @brief 验证指定部门可以新增一个具有指定角色列表的用户
+     */
+    drogon::Task<> verifyRoleAssignmentAllowed(
+        const std::int32_t deptId,
+        const std::vector<std::int32_t> roleIds) const;
+
   private:
     DeptRepositoryPtr deptRepository_{
         drogon::DrClassMap::getSingleInstance<DeptRepository>()};

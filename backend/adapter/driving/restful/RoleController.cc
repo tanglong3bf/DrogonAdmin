@@ -1,4 +1,5 @@
 #include "RoleController.h"
+
 #include <drogon/HttpTypes.h>
 #include <drogon/utils/Utilities.h>
 
@@ -12,6 +13,7 @@ Task<HttpResponsePtr> RoleController::list(const HttpRequestPtr req,
                                            const string page,
                                            const string pageSize) const
 {
+    // TODO: 改成构造
     GetRoleListRequest request;
     if (name.size() > 0)
     {
@@ -81,4 +83,11 @@ Task<HttpResponsePtr> RoleController::deleteRole(const HttpRequestPtr req,
     const auto deletedBy = fromString<int32_t>(req->getParameter("userId"));
     co_await roleService_->deleteRole(roleId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}
+
+Task<HttpResponsePtr> RoleController::getAssignableRoles(
+    const HttpRequestPtr req,
+    const int32_t deptId) const
+{
+    co_return toResponse(co_await roleService_->getAssignableRoles(deptId));
 }

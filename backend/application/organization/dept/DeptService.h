@@ -2,8 +2,8 @@
 
 #include <drogon/utils/coroutine.h>
 #include "application/organization/dept/DeptSortRequest.h"
-#include "domain/organization/DeptHandler.h"
-#include "application/authorization/RoleService.h"
+#include "domain/organization/dept/DeptHandler.h"
+#include "application/authorization/role/RoleService.h"
 #include "DeptCqrsRepo.h"
 #include "DeptAssembler.h"
 #include "DeptCreateRequest.h"

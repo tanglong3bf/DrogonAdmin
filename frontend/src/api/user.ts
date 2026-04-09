@@ -7,6 +7,7 @@ import {
 import type {
   UploadAvatarResponse,
   User,
+  UserFormData,
   UserInfoUpdateRequest,
   UserPasswordUpdateRequest,
   UserQueryParams
@@ -21,6 +22,12 @@ export const getUserList = (queryParams: UserQueryParams) => {
     request.get('/user', { params: queryParams }),
     isPaginatedResponse(isUser)
   )
+}
+/**
+ * 新增一个用户
+ */
+export const newUser = (data: UserFormData) => {
+  return request.post('/user', data)
 }
 
 /**

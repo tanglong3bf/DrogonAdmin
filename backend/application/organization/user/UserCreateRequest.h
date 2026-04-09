@@ -2,38 +2,38 @@
 
 #include <cstdint>
 #include <optional>
-#include <string>
-#include "UserRoleResponse.h"
+#include <jsoncpp/json/value.h>
+#include "common/util/Utilities.hpp"
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
-#include "domain/organization/user/User.h"
 
-class UserResponse
+/**
+ * @brief 创建用户请求
+ *
+ * @note 密码默认为 123456
+ * @note 头像默认为 #
+ */
+class UserCreateRequest
 {
-    std::int32_t userId_;
     std::string username_;
     std::string nickname_;
-    std::string avatar_;
     Sex sex_;
     std::int32_t deptId_;
     std::optional<std::string> phoneNumber_;
     std::optional<std::string> email_;
     Status status_;
-    std::vector<UserRoleResponse> userRoles_;
+    std::optional<std::vector<std::int32_t>> roleIds_;
 
   public:
-    // 实体类
-    explicit UserResponse(const User &user);
+    void setByJson(const Json::Value &json);
 
-    Json::Value toJson() const;
-
-    GETTER(userId, UserId)
+    // getters
     GETTER(username, Username)
     GETTER(nickname, Nickname)
-    GETTER(avatar, Avatar)
     GETTER(sex, Sex)
     GETTER(deptId, DeptId)
     OPT_GETTER(phoneNumber, PhoneNumber)
     OPT_GETTER(email, Email)
     GETTER(status, Status)
+    OPT_GETTER(roleIds, RoleIds)
 };

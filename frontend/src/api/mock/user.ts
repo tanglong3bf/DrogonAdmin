@@ -116,3 +116,12 @@ if (mockConfig.user.get_user_list) {
       }
     )
 }
+
+if (mockConfig.user.new_user) {
+  mock.onPost('/user').reply((config: AxiosRequestConfig): [number] => {
+    const data = JSON.parse(config.data)
+    console.log('新增用户', data)
+
+    return [201]
+  })
+}

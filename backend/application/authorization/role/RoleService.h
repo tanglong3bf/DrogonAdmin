@@ -2,13 +2,14 @@
 
 #include <drogon/utils/coroutine.h>
 #include <memory>
-#include "GetRoleListRequest.h"
+#include "dto/GetRoleListRequest.h"
 #include "RoleCqrsRepo.h"
-#include "RoleResponse.h"
-#include "application/authorization/RoleAssembler.h"
-#include "application/authorization/RoleCreateRequest.h"
-#include "application/authorization/RoleUpdateRequest.h"
-#include "application/authorization/RoleUpdater.h"
+#include "dto/RoleResponse.h"
+#include "dto/AssignableRoleResponse.h"
+#include "RoleAssembler.h"
+#include "dto/RoleCreateRequest.h"
+#include "dto/RoleUpdateRequest.h"
+#include "RoleUpdater.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/RoleHandler.h"
 #include "domain/authorization/RoleRepository.h"
@@ -50,6 +51,12 @@ class RoleService : public DrAdminObject<RoleService>
      */
     drogon::Task<> deleteRole(const std::int32_t roleId,
                               const std::int32_t deletedBy) const;
+
+    /**
+     * @brief 获取指定部门可以分配的角色
+     */
+    drogon::Task<std::vector<AssignableRoleResponse>> getAssignableRoles(
+        const std::int32_t deptId) const;
 
   private:
     RoleRepositoryPtr roleRepository_{

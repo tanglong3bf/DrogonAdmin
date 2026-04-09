@@ -11,6 +11,8 @@ class UserCqrsRepo : public DrAdminObject<UserCqrsRepo>
 {
     using SysUser = drogon_model::drogon_admin_db::SysUser;
     using UserMapper = drogon::orm::CoroMapper<SysUser>;
+    using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
+    using UserRoleMapper = drogon::orm::CoroMapper<SysUserRole>;
 
   public:
     /**
@@ -28,11 +30,14 @@ class UserCqrsRepo : public DrAdminObject<UserCqrsRepo>
 
   protected:
     drogon::orm::Criteria buildCriteria(const UserQueryRequest &request) const;
-    std::vector<UserResponse> buildUserList(
+    std::vector<User> buildUserList(
         const std::vector<SysUser> &sysUserList) const;
+    std::vector<UserResponse> buildUserResponseList(
+        const std::vector<User> &userList) const;
 
   private:
     static UserMapper userMapper();
+    static UserRoleMapper userRoleMapper();
 };
 
 using UserCqrsRepoPtr = std::shared_ptr<UserCqrsRepo>;

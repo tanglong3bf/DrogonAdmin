@@ -2,6 +2,7 @@
 
 #include <drogon/HttpController.h>
 #include "application/organization/user/UserService.h"
+#include "application/organization/user/UserCreateRequest.h"
 
 using namespace std;
 using namespace drogon;
@@ -14,6 +15,7 @@ class UserController : public drogon::HttpController<UserController>
                   "/user?username={}&nickname={}&sex={}&dept_id={}&phone_"
                   "number={}&email={}&status={}&page={}&page_size={}",
                   Get);
+    ADD_METHOD_TO(UserController::createUser, "/user", Post);
     METHOD_LIST_END
 
     Task<HttpResponsePtr> list(const HttpRequestPtr req,
@@ -26,6 +28,9 @@ class UserController : public drogon::HttpController<UserController>
                                const string status,
                                const string page,
                                const string pageSize) const;
+
+    Task<HttpResponsePtr> createUser(const HttpRequestPtr req,
+                                     const UserCreateRequest request) const;
 
   private:
     UserServicePtr userService_{

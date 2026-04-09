@@ -2,11 +2,14 @@
 
 #include <drogon/utils/coroutine.h>
 #include <memory>
+#include "application/organization/user/UserAssembler.h"
 #include "application/organization/user/UserCqrsRepo.h"
+#include "application/organization/user/UserCreateRequest.h"
 #include "application/organization/user/UserQueryRequest.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
 #include "UserResponse.h"
+#include "domain/organization/user/UserRepository.h"
 
 /**
  * @brief 用户服务
@@ -20,9 +23,16 @@ class UserService : public DrAdminObject<UserService>
     drogon::Task<PaginatedResponse<UserResponse>> getUserList(
         const UserQueryRequest &request) const;
 
+    drogon::Task<> createUser(const UserCreateRequest &request,
+                              const int32_t createdBy) const;
+
   private:
     UserCqrsRepoPtr userCqrsRepo_{
         drogon::DrClassMap::getSingleInstance<UserCqrsRepo>()};
+    UserAssemblerPtr userAssembler_{
+        drogon::DrClassMap::getSingleInstance<UserAssembler>()};
+    UserRepositoryPtr userRepository_{
+        drogon::DrClassMap::getSingleInstance<UserRepository>()};
 };
 
 using UserServicePtr = std::shared_ptr<UserService>;

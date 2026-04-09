@@ -19,3 +19,23 @@ drogon::Task<> UserVerifier::verifyRoleNotUsed(const std::int32_t roleId) const
         throw BusinessException("指定角色被用户使用");
     }
 }
+
+drogon::Task<> UserVerifier::verifyUsernameNotDuplicated(
+    const std::string &username) const
+{
+    const auto count = co_await userRepository_->countByUsername(username);
+    if (count > 0)
+    {
+        throw BusinessException("指定用户名已被使用");
+    }
+}
+
+drogon::Task<> UserVerifier::verifyNicknameNotDuplicated(
+    const std::string &nickname) const
+{
+    const auto count = co_await userRepository_->countByNickname(nickname);
+    if (count > 0)
+    {
+        throw BusinessException("指定昵称已被使用");
+    }
+}

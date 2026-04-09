@@ -21,6 +21,18 @@ class UserVerifier : public DrAdminObject<UserVerifier>
      */
     drogon::Task<> verifyRoleNotUsed(const std::int32_t roleId) const;
 
+    /**
+     * @brief 用户名不重复
+     */
+    drogon::Task<> verifyUsernameNotDuplicated(
+        const std::string &username) const;
+
+    /**
+     * @brief 昵称不重复
+     */
+    drogon::Task<> verifyNicknameNotDuplicated(
+        const std::string &nickname) const;
+
   private:
     UserRepositoryPtr userRepository_{
         drogon::DrClassMap::getSingleInstance<UserRepository>()};

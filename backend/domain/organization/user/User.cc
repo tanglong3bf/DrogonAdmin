@@ -1,9 +1,40 @@
 #include "User.h"
 
 using namespace std;
+using namespace trantor;
+
+User::User(const string &username,
+           const string &nickname,
+           const Sex &sex,
+           const int32_t &deptId,
+           const Status &status)
+    : username_{username},
+      nickname_{nickname},
+      avatar_{"#"},
+      sex_{sex},
+      deptId_{deptId},
+      status_{status}
+{
+}
+
+User::User(const string &username,
+           const string &nickname,
+           const Sex &sex,
+           const int32_t &deptId,
+           const Status &status,
+           const int32_t createdBy)
+    : username_{username},
+      nickname_{nickname},
+      avatar_{"#"},
+      sex_{sex},
+      deptId_{deptId},
+      status_{status},
+      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+{
+}
 
 User::User(const SysUser &model)
-    : INIT(userId, UserId),
+    : OPT_INIT(userId, UserId),
       INIT(username, Username),
       INIT(nickname, Nickname),
       INIT(avatar, Avatar),
@@ -19,8 +50,12 @@ User::User(const SysUser &model)
 User::operator SysUser() const
 {
     SysUser model;
-    model.setUserId(userId_);
+    if (userId_)
+    {
+        model.setUserId(*userId_);
+    }
     model.setUsername(username_);
+    model.setPassword("123456");
     model.setNickname(nickname_);
     model.setAvatar(avatar_);
     model.setSex(static_cast<int16_t>(sex_));
@@ -47,4 +82,13 @@ User::operator SysUser() const
         model.setDeletedTime(*deletedTime_);
     }
     return model;
+}
+
+void User::addUserRole(const UserRole &userRole)
+{
+    this->userRoles_.push_back(userRole);
+}
+
+void User::addUserRoleByRoleId(const std::int32_t &roleId)
+{
 }

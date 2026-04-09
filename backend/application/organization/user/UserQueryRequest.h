@@ -5,8 +5,8 @@
 #include <string>
 
 #include "common/util/Utilities.hpp"
-#include "domain/organization/Sex.h"
-#include "domain/organization/Status.h"
+#include "domain/organization/user/Sex.h"
+#include "domain/organization/user/Status.h"
 
 class UserQueryRequest
 {

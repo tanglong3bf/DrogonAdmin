@@ -7,6 +7,7 @@
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/models/SysUser.h"
 #include "domain/models/SysUserRole.h"
+#include "User.h"
 
 /**
  * @brief 用户仓库
@@ -31,10 +32,28 @@ class UserRepository : public DrAdminObject<UserRepository>
      */
     drogon::Task<std::size_t> countByRole(const std::int32_t roleId) const;
 
+    /**
+     * @brief 统计指定用户名有多少用户
+     */
+    drogon::Task<std::size_t> countByUsername(
+        const std::string &username) const;
+
+    /**
+     * @brief 统计指定昵称有多少用户
+     */
+    drogon::Task<std::size_t> countByNickname(
+        const std::string &nickname) const;
+
+    /**
+     * @brief 保存用户
+     */
+    drogon::Task<> save(User &user) const;
+
   private:
     static SqlGenerator *sqlGenerator();
     static DbClientPtr dbClient();
-    static UserMapper userMapper();
+    static UserMapper userMapper(
+        const std::shared_ptr<drogon::orm::Transaction> trans = nullptr);
     static UserRoleMapper userRoleMapper();
 };
 

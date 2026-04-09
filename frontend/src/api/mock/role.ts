@@ -91,3 +91,26 @@ if (mockConfig.role.delete_role) {
       return [204]
     })
 }
+
+if (mockConfig.role.get_role_option) {
+  mock
+    .onGet(/^\/role\/assignable(\?dept_id=([1-9]\d*)?)?/)
+    .reply((config: AxiosRequestConfig): [number, ResponseBody<any>] => {
+      console.log(config)
+      return [
+        200,
+        {
+          data: [
+            {
+              role_id: 1,
+              name: '系统管理员'
+            },
+            {
+              role_id: 2,
+              name: '测试角色'
+            }
+          ]
+        }
+      ]
+    })
+}

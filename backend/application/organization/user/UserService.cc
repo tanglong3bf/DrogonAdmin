@@ -1,5 +1,7 @@
 #include "UserService.h"
 
+using namespace drogon;
+
 drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
     const UserQueryRequest &request) const
 {
@@ -22,4 +24,12 @@ drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
                                               request.getPageSize(),
                                               count,
                                               list};
+}
+
+Task<> UserService::createUser(const UserCreateRequest &request,
+                               const int32_t createdBy) const
+{
+    auto user = co_await userAssembler_->fromCreateRequest(request, createdBy);
+    user.toNew();
+    co_await userRepository_->save(user);
 }

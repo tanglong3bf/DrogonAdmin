@@ -406,6 +406,23 @@
           "multi_delete_role_dept": {
             "main": "DELETE FROM \"sys_role_dept\" WHERE (role_id, dept_id) IN ( VALUES @values(data) )",
             "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id} @endfor)"
+          },
+          "multi_insert_user_role": {
+            "main": {
+              "sql": "INSERT INTO sys_user_role (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
+              "params": {
+                "fields": ["user_id", "role_id", "created_by", "created_time"]
+              }
+            },
+            "values": "(@for(item in data, separator='), (') ${item.user_id}, ${item.role_id}, ${item.created_by}, '${item.created_time}'::timestamp @endfor)"
+          },
+          "get_assignable_roles": {
+            "main": "SELECT DISTINCT r.role_id, r.name FROM public.sys_role r @where()",
+            "where": "WHERE r.deleted_by IS NULL AND (r.relation_type = 0 OR (@sub_query(type = '1')) OR (@sub_query(type = '2')))",
+            "sub_query": {
+              "sql": "r.relation_type = ${type} AND @if(type == '2') NOT @endif EXISTS ( SELECT 1 FROM public.sys_role_dept rd WHERE rd.role_id = r.role_id AND rd.dept_id = ${emm})",
+              "params": { "emm": "$1" }
+            }
           }
         }
       }

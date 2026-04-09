@@ -3,9 +3,9 @@
 #include <drogon/DrClassMap.h>
 #include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
-#include "domain/organization/Dept.h"
-#include "domain/organization/DeptRepository.h"
-#include "domain/organization/DeptVerifier.h"
+#include "domain/organization/dept/Dept.h"
+#include "domain/organization/dept/DeptRepository.h"
+#include "domain/organization/dept/DeptVerifier.h"
 #include "DeptCreateRequest.h"
 
 /**

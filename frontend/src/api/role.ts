@@ -1,5 +1,10 @@
 import request, { validateResponse } from '@/utils/request'
-import type { Role, RoleFormData, RoleQueryParams } from '@/types/role'
+import type {
+  Role,
+  RoleFormData,
+  RoleOption,
+  RoleQueryParams
+} from '@/types/role'
 import { PaginatedResponse } from '@/types/common'
 import { isPaginatedResponse, isRole } from '@/types/guard'
 
@@ -40,4 +45,11 @@ export const updateRole = (role_id: number, role: RoleFormData) => {
  */
 export const deleteRole = (role_id: number) => {
   return request.delete(`/role/${role_id}`)
+}
+
+/**
+ * 获取指定部门可以使用的角色列表
+ */
+export const getAssignableRoles = (dept_id?: number): Promise<RoleOption[]> => {
+  return request.get('/role/assignable', { params: { dept_id } })
 }

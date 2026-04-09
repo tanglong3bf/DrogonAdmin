@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { getUserList } from '@/api/user'
+import { getUserList, newUser } from '@/api/user'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { Pagination } from '@/types/common'
-import type { User, UserQueryParams } from '@/types/user'
+import type { User, UserFormData, UserQueryParams } from '@/types/user'
 import { onMounted, reactive, ref } from 'vue'
 import { Department } from '@/types/department'
 import { getDeptTree } from '@/api/department'
-import { ElMessage } from 'element-plus/es'
+import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
+import { DialogType, Sex, Status } from '@/types/enums'
+import { getAssignableRoles } from '@/api/role'
+import { RoleOption } from '@/types/role'
 
+/**
+ * 用户列表
+ */
 const userList = ref<User[]>([])
 
 /**
@@ -55,8 +61,11 @@ const resetQuery = () => {
  */
 const deptTree = ref<Department[]>([])
 
+const roleList = ref<RoleOption[]>([])
+
 onMounted(async () => {
   deptTree.value = await getDeptTree()
+  roleList.value = await getAssignableRoles(user.dept_id)
   resetQuery()
   handleQuery()
 })
@@ -77,8 +86,142 @@ const handleCurrentChange = (page: number) => {
   handleQuery()
 }
 
+/**
+ * 对话框类型
+ */
+const dialogType = ref<DialogType>(DialogType.ADD)
+
+/**
+ * 用户表单数据
+ */
+const user = reactive<UserFormData>({
+  status: Status.Enable,
+  sex: Sex.Secrecy
+})
+
+/**
+ * 用户表单实例
+ */
+const userForm = ref<FormInstance>()
+
+/**
+ * 表单验证规则
+ */
+const rules = reactive<FormRules<UserFormData>>({
+  username: [
+    {
+      required: true,
+      message: '请输入用户名',
+      trigger: 'blur'
+    }
+  ],
+  nickname: [
+    {
+      required: true,
+      message: '请输入昵称',
+      trigger: 'blur'
+    }
+  ],
+  sex: [
+    {
+      required: true,
+      message: '请选择性别',
+      trigger: 'change'
+    }
+  ],
+  dept_id: [
+    {
+      required: true,
+      message: '请选择部门',
+      trigger: 'change'
+    }
+  ],
+  phone_number: {
+    pattern:
+      /^1(?:3[0-9]|4[013456789]|5[0-35-9]|6[0-9]|7[0-8]|8[0-9]|9[0-9])\d{8}$/,
+    message: '手机号格式错误',
+    trigger: 'blur'
+  },
+  email: {
+    pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    message: '邮箱格式错误',
+    trigger: 'blur'
+  },
+  status: [
+    {
+      required: true,
+      message: '请选择状态',
+      trigger: 'change'
+    }
+  ]
+})
+
+/**
+ * 重置新增/更新用户表单
+ */
+const resetUserForm = () => {
+  user.user_id = undefined
+  user.username = undefined
+  user.nickname = undefined
+  user.sex = Sex.Secrecy
+  user.dept_id = undefined
+  user.phone_number = undefined
+  user.email = undefined
+  user.status = Status.Enable
+  user.role_ids = undefined
+}
+
+const dialogVisible = ref(false)
+
+/**
+ * 取消新增/更新
+ */
+const cancel = () => {
+  dialogVisible.value = false
+}
+
+/**
+ * 更新用户id，用于在更新后查找原始数据
+ */
+const userOriginalId = ref(0)
+
+/**
+ * 提交新增/更新用户表单
+ */
+const submit = (form?: FormInstance) => {
+  form?.validate(async (valid: boolean, fields? /*:ValidateFieldsError*/) => {
+    if (!valid) {
+      // 弹出错误信息
+      for (const key in fields) {
+        ElMessage.error(fields[key][0].message)
+      }
+      return
+    }
+    // 新增
+    if (dialogType.value === DialogType.ADD) {
+      if (user.phone_number === '') {
+        user.phone_number = undefined
+      }
+      if (user.email === '') {
+        user.email = undefined
+      }
+      if (user.role_ids && user.role_ids.length === 0) {
+        user.role_ids = undefined
+      }
+      await newUser(user)
+      await handleQuery()
+      dialogVisible.value = false
+      resetUserForm()
+    }
+  })
+}
+
+/**
+ * 新增用户
+ */
 const newUserBtn = () => {
-  ElMessage.error('功能未实现')
+  resetUserForm()
+  dialogVisible.value = true
 }
 
 const updateUserBtn = (user: User) => {
@@ -183,6 +326,9 @@ const deleteUserBtn = (userId: number) => {
       </el-form-item>
     </el-form>
   </dg-card>
+  <span style="font-size: 36px" v-if="false"
+    >用户列表和新增用户快完事了，仅差获取角色列表</span
+  >
   <!-- 主体数据展示 -->
   <dg-card>
     <!-- 按钮 -->
@@ -209,7 +355,7 @@ const deleteUserBtn = (userId: number) => {
           <span v-else-if="row.status === 1">禁用</span>
         </template>
       </el-table-column>
-
+      <!-- 操作列 -->
       <el-table-column fixed="right" label="操作" min-width="256px">
         <template v-slot="{ row }">
           <el-button plain type="primary" @click="updateUserBtn(row)"
@@ -235,10 +381,114 @@ const deleteUserBtn = (userId: number) => {
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
   />
+  <!-- 新增/更新 对话框 -->
+  <el-dialog
+    :title="dialogType ? '更新用户' : '新增用户'"
+    v-model="dialogVisible"
+    width="650px"
+  >
+    <el-form ref="userForm" :rules="rules" :model="user" label-width="100px">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="user.username" placeholder="请输入用户名" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="user.nickname" placeholder="请输入昵称" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <!-- 来一个tag，提示默认密码为123456 -->
+
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="性别" prop="sex">
+            <el-radio-group v-model="user.sex">
+              <el-radio :label="0">保密</el-radio>
+              <el-radio :label="1">男</el-radio>
+              <el-radio :label="2">女</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="所属部门" prop="dept_id">
+            <el-cascader
+              v-model="user.dept_id"
+              :options="deptTree"
+              placeholder="请选择部门"
+              :props="{
+                checkStrictly: true,
+                emitPath: false,
+                value: 'dept_id',
+                label: 'name',
+                children: 'children'
+              }"
+              filterable
+              collapse-tags
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="手机号" prop="phone_number">
+            <el-input
+              v-model="user.phone_number"
+              placeholder="请输入手机号"
+              clearable
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="user.email" placeholder="请输入邮箱" clearable />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="状态" prop="status">
+            <el-radio-group v-model="user.status">
+              <el-radio :label="0">正常</el-radio>
+              <el-radio :label="1">禁用</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="角色" prop="role_ids">
+            <el-select
+              v-model="user.role_ids"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              placeholder="请选择角色"
+              style="width: 240px"
+            >
+              <el-option
+                v-for="item in roleList"
+                :key="item.role_id"
+                :label="item.name"
+                :value="item.role_id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <template #footer>
+      <el-button @click="cancel()">取 消</el-button>
+      <el-button type="primary" @click="submit(userForm)">提 交</el-button>
+    </template>
+  </el-dialog>
   <!-- debug -->
   <!--
   queryParams: {{ queryParams }}<br />
-  userList: {{ userList }}<br />
+  userList: <br />
+  <ul v-for="user in userList">
+    <li>{{ user }}</li>
+  </ul>
   total: {{ total }}
   -->
 </template>

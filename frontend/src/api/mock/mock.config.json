@@ -4,6 +4,7 @@
   },
   "user": {
     "get_user_list": true,
+    "new_user": true,
     "update_basic_info": true,
     "update_password": true,
     "upload_avatar": true
@@ -19,6 +20,7 @@
     "get_role_list": true,
     "new_role": true,
     "update_role": true,
-    "delete_role": true
+    "delete_role": true,
+    "get_role_option": true
   }
 }

@@ -2,7 +2,7 @@
 
 #include <drogon/utils/coroutine.h>
 #include <memory>
-#include "application/authorization/RoleUpdateRequest.h"
+#include "dto/RoleUpdateRequest.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/Role.h"
 

@@ -14,7 +14,7 @@ Task<> DeptVerifier::verifyDepartmentExists(const int32_t deptId) const
     }
     catch (const UnexpectedRows &e)
     {
-        throw BusinessException("指定的父部门id不存在");
+        throw BusinessException("指定的部门id不存在");
     }
 }
 
@@ -37,4 +37,13 @@ drogon::Task<> DeptVerifier::verifyNoSubDept(const std::int32_t deptId) const
     {
         throw BusinessException("指定部门包含子部门");
     }
+}
+
+// TODO: 逻辑略复杂，先留着
+Task<> DeptVerifier::verifyRoleAssignmentAllowed(
+    const int32_t deptId,
+    const vector<int32_t> roleIds) const
+{
+    LOG_WARN << "逻辑略复杂，先留着。";
+    co_return;
 }

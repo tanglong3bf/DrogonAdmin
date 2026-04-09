@@ -5,7 +5,7 @@
 #include "common/framework/DrAdminObject.hpp"
 #include "Dept.h"
 #include "DeptVerifier.h"
-#include "UserVerifier.h"
+#include "domain/organization/user/UserVerifier.h"
 #include "domain/authorization/RoleVerifier.h"
 
 /**
