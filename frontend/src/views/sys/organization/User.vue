@@ -3,7 +3,7 @@ import { getUserList, newUser, updateUser } from '@/api/user'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { Pagination } from '@/types/common'
 import type { User, UserFormData, UserQueryParams } from '@/types/user'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { Department } from '@/types/department'
 import { getDeptTree } from '@/api/department'
 import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
@@ -171,7 +171,30 @@ const resetUserForm = () => {
   user.role_ids = undefined
 }
 
+/**
+ * 显示新增/更新用户对话框
+ */
 const dialogVisible = ref(false)
+
+/**
+ * 监听部门id变化
+ */
+watch(
+  () => user.dept_id, // getter 函数，监听 dept_id 的变化
+  async (newVal, oldVal) => {
+    console.log('dept_id 已变更:', { oldVal, newVal })
+    if (newVal !== oldVal) {
+      // 部门id发生切换时，重新获取可用角色
+      const newRoles = await getAssignableRoles(newVal)
+      roleList.value = newRoles
+
+      // 清理 user.role_ids 中不在新 roleList 的项
+      const validRoleIds = new Set(newRoles.map(r => r.role_id))
+      user.role_ids = user.role_ids?.filter(id => validRoleIds.has(id))
+    }
+  },
+  { immediate: true }
+)
 
 /**
  * 取消新增/更新
