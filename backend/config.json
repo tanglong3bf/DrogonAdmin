@@ -416,6 +416,10 @@
             },
             "values": "(@for(item in data, separator='), (') ${item.user_id}, ${item.role_id}, ${item.created_by}, '${item.created_time}'::timestamp @endfor)"
           },
+          "multi_delete_user_role": {
+            "main": "DELETE FROM \"sys_user_role\" WHERE (user_id, role_id) IN ( VALUES @values(data) )",
+            "values": "(@for(item in data, separator='), (') ${item.user_id}, ${item.role_id} @endfor)"
+          },
           "get_assignable_roles": {
             "main": "SELECT DISTINCT r.role_id, r.name FROM public.sys_role r @where()",
             "where": "WHERE r.deleted_by IS NULL AND (r.relation_type = 0 OR (@sub_query(type = '1')) OR (@sub_query(type = '2')))",

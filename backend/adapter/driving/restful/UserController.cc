@@ -37,3 +37,13 @@ Task<HttpResponsePtr> UserController::createUser(
     co_await userService_->createUser(request, createdBy);
     co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
+
+drogon::Task<HttpResponsePtr> UserController::updateUser(
+    const HttpRequestPtr req,
+    const int32_t userId,
+    const UserUpdateRequest request) const
+{
+    const auto updatedBy = fromString<int32_t>(req->getParameter("userId"));
+    co_await userService_->updateUser(userId, request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

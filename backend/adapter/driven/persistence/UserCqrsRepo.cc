@@ -26,6 +26,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     const int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
     const auto sysUserList = co_await userMapper()
+                                 .orderBy(SysUser::Cols::_user_id)
                                  .paginate(page, request.getPageSize())
                                  .findBy(criteria);
     auto userList = buildUserList(sysUserList);

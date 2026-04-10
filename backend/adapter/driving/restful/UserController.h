@@ -16,8 +16,12 @@ class UserController : public drogon::HttpController<UserController>
                   "number={}&email={}&status={}&page={}&page_size={}",
                   Get);
     ADD_METHOD_TO(UserController::createUser, "/user", Post);
+    ADD_METHOD_TO(UserController::updateUser, "/user/{id}", Put);
     METHOD_LIST_END
 
+    /**
+     * @brief 带条件分页查询用户列表
+     */
     Task<HttpResponsePtr> list(const HttpRequestPtr req,
                                const string username,
                                const string nickname,
@@ -29,8 +33,18 @@ class UserController : public drogon::HttpController<UserController>
                                const string page,
                                const string pageSize) const;
 
+    /**
+     * @brief 新增用户
+     */
     Task<HttpResponsePtr> createUser(const HttpRequestPtr req,
                                      const UserCreateRequest request) const;
+
+    /**
+     * @brief 更新用户
+     */
+    Task<HttpResponsePtr> updateUser(const HttpRequestPtr req,
+                                     const int32_t userId,
+                                     const UserUpdateRequest request) const;
 
   private:
     UserServicePtr userService_{

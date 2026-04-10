@@ -55,8 +55,13 @@ class User : public AuditableEntity, public ChangeableEntity
     GETTER(status, Status)
     GETTER(userRoles, UserRoles)
 
+    SETTER(nickname, Nickname)
+    SETTER(sex, Sex)
+    SETTER(deptId, DeptId)
     OPT_SETTER(phoneNumber, PhoneNumber)
     OPT_SETTER(email, Email)
+    SETTER(status, Status)
+    SETTER(userRoles, UserRoles)
 
     void addUserRole(const UserRole &userRole);
     void addUserRoleByRoleId(const std::int32_t &roleId);

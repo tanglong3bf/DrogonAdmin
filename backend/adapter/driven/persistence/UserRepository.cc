@@ -71,13 +71,82 @@ drogon::Task<> UserRepository::save(User &user) const
             co_return;
         }
         case ChangingStatus::UPDATED:
+        {
+            const auto trans = co_await dbClient()->newTransactionCoro();
+            const auto model = static_cast<SysUser>(user);
+            co_await userMapper(trans).update(model);
+
+            Json::Value toInsert{Json::arrayValue};
+            Json::Value toDelete{Json::arrayValue};
+
+            for (auto &userRole : user.getUserRoles())
+            {
+                const auto status = userRole.getChangingStatus();
+                const auto item = static_cast<SysUserRole>(userRole);
+                switch (status)
+                {
+                    case ChangingStatus::NEW:
+                        toInsert.append(item.toJson());
+                        break;
+                    case ChangingStatus::DELETED:
+                        toDelete.append(item.toJson());
+                        break;
+                    case ChangingStatus::UNCHANGED:
+                        // 未做更改，无需操作数据库
+                        break;
+                    case ChangingStatus::UPDATED:
+                        throw std::runtime_error("不支持更新用户角色");
+                        break;
+                }
+                if (toInsert.size() > 0)
+                {
+                    const auto insertSql =
+                        sqlGenerator()->getSql("multi_insert_user_role",
+                                               {{"data", toInsert}});
+                    co_await trans->execSqlCoro(insertSql);
+                }
+                if (toDelete.size() > 0)
+                {
+                    const auto deleteSql =
+                        sqlGenerator()->getSql("multi_delete_user_role",
+                                               {{"data", toDelete}});
+                    co_await trans->execSqlCoro(deleteSql);
+                }
+            }
             co_return;
+        }
         case ChangingStatus::DELETED:
             co_return;
         case ChangingStatus::UNCHANGED:
             LOG_WARN << "无需修改的数据调用了save，请检查代码逻辑";
             co_return;
     }
+}
+
+Task<User> UserRepository::getById(const int32_t userId,
+                                   bool withRelation) const
+{
+    const auto sysUser = co_await userMapper().findByPrimaryKey(userId);
+    User user{sysUser};
+    if (withRelation)
+    {
+        const auto sysUserRoles = co_await userRoleMapper().findBy(
+            Criteria{SysUserRole::Cols::_user_id, userId});
+        const auto userRoles = buildUserRoleList(sysUserRoles);
+        user.setUserRoles(userRoles);
+    }
+    co_return user;
+}
+
+vector<UserRole> UserRepository::buildUserRoleList(
+    const vector<SysUserRole> &sysUserRoles) const
+{
+    vector<UserRole> userRoles;
+    for (const auto &sysUserRole : sysUserRoles)
+    {
+        userRoles.push_back(UserRole{sysUserRole});
+    }
+    return userRoles;
 }
 
 inline SqlGenerator *UserRepository::sqlGenerator()

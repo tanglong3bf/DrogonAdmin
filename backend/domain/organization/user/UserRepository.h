@@ -18,8 +18,8 @@ class UserRepository : public DrAdminObject<UserRepository>
     using SqlGenerator = tl::sql::SqlGenerator;
     using UserMapper =
         drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysUser>;
-    using UserRoleMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysUserRole>;
+    using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
+    using UserRoleMapper = drogon::orm::CoroMapper<SysUserRole>;
 
   public:
     /**
@@ -48,6 +48,16 @@ class UserRepository : public DrAdminObject<UserRepository>
      * @brief 保存用户
      */
     drogon::Task<> save(User &user) const;
+
+    /**
+     * @brief 根据ID获取用户
+     */
+    drogon::Task<User> getById(const std::int32_t userId,
+                               bool withRelation = false) const;
+
+  protected:
+    std::vector<UserRole> buildUserRoleList(
+        const std::vector<SysUserRole> &sysUserRoles) const;
 
   private:
     static SqlGenerator *sqlGenerator();

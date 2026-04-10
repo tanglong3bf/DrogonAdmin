@@ -6,6 +6,8 @@
 #include "application/organization/user/UserCqrsRepo.h"
 #include "application/organization/user/UserCreateRequest.h"
 #include "application/organization/user/UserQueryRequest.h"
+#include "application/organization/user/UserUpdateRequest.h"
+#include "application/organization/user/UserUpdater.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
 #include "UserResponse.h"
@@ -23,8 +25,18 @@ class UserService : public DrAdminObject<UserService>
     drogon::Task<PaginatedResponse<UserResponse>> getUserList(
         const UserQueryRequest &request) const;
 
+    /**
+     * @brief 新增用户
+     */
     drogon::Task<> createUser(const UserCreateRequest &request,
                               const int32_t createdBy) const;
+
+    /**
+     * @brief 更新用户
+     */
+    drogon::Task<> updateUser(const std::int32_t userId,
+                              const UserUpdateRequest &request,
+                              const int32_t updatedBy) const;
 
   private:
     UserCqrsRepoPtr userCqrsRepo_{
@@ -33,6 +45,8 @@ class UserService : public DrAdminObject<UserService>
         drogon::DrClassMap::getSingleInstance<UserAssembler>()};
     UserRepositoryPtr userRepository_{
         drogon::DrClassMap::getSingleInstance<UserRepository>()};
+    UserUpdaterPtr userUpdater_{
+        drogon::DrClassMap::getSingleInstance<UserUpdater>()};
 };
 
 using UserServicePtr = std::shared_ptr<UserService>;

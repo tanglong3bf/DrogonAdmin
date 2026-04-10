@@ -33,3 +33,13 @@ Task<> UserService::createUser(const UserCreateRequest &request,
     user.toNew();
     co_await userRepository_->save(user);
 }
+
+Task<> UserService::updateUser(const std::int32_t userId,
+                               const UserUpdateRequest &request,
+                               const int32_t updatedBy) const
+{
+    auto user = co_await userRepository_->getById(userId, true);
+    co_await userUpdater_->updateUser(user, request, updatedBy);
+    user.toUpdate();
+    co_await userRepository_->save(user);
+}
