@@ -39,6 +39,13 @@ export const updateUser = (user_id: number, user: UserFormData) => {
 }
 
 /**
+ * 删除用户
+ */
+export const deleteUser = (user_id: number) => {
+  return request.delete(`/user/${user_id}`)
+}
+
+/**
  * 更新用户信息接口
  */
 export const updateUserInfo = (

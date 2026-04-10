@@ -145,3 +145,15 @@ if (mockConfig.user.update_user) {
       return [204]
     })
 }
+
+/**
+ * 删除用户mock
+ */
+if (mockConfig.user.delete_user) {
+  mock
+    .onDelete(/^\/user\/[1-9]\d*$/)
+    .reply((config: AxiosRequestConfig): [number] => {
+      console.log('删除用户', config)
+      return [204]
+    })
+}

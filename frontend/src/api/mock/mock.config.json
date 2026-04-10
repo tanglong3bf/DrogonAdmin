@@ -6,6 +6,7 @@
     "get_user_list": true,
     "new_user": true,
     "update_user": true,
+    "delete_user": true,
     "update_basic_info": true,
     "update_password": true,
     "upload_avatar": true

@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { getUserList, newUser, updateUser } from '@/api/user'
+import { deleteUser, getUserList, newUser, updateUser } from '@/api/user'
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { Pagination } from '@/types/common'
 import type { User, UserFormData, UserQueryParams } from '@/types/user'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { Department } from '@/types/department'
 import { getDeptTree } from '@/api/department'
-import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
+import {
+  ElMessage,
+  ElMessageBox,
+  FormInstance,
+  FormRules
+} from 'element-plus/es'
 import { DialogType, Sex, Status } from '@/types/enums'
 import { getAssignableRoles } from '@/api/role'
 import { RoleOption } from '@/types/role'
@@ -300,12 +305,22 @@ const updateUserBtn = (row: User) => {
   dialogVisible.value = true
 }
 
-const setRoleBtn = (userId: number) => {
-  ElMessage.error('功能未实现')
-}
-
-const deleteUserBtn = (userId: number) => {
-  ElMessage.error('功能未实现')
+const deleteUserBtn = async (userId: number) => {
+  try {
+    await ElMessageBox.confirm(
+      `请确认是否要删除 ${userList.value.find(item => item.user_id === userId)?.username} 用户`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    await deleteUser(userId)
+    queryParams.page = 1
+    resetQuery()
+    await handleQuery()
+  } catch (_ignore) {}
 }
 </script>
 
@@ -429,9 +444,6 @@ const deleteUserBtn = (userId: number) => {
         <template v-slot="{ row }">
           <el-button plain type="primary" @click="updateUserBtn(row)"
             >更新</el-button
-          >
-          <el-button plain type="warning" @click="setRoleBtn(row.user_id)"
-            >分配角色</el-button
           >
           <el-button plain type="danger" @click="deleteUserBtn(row.user_id)"
             >删除</el-button
