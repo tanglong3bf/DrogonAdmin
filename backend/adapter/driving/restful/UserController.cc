@@ -47,3 +47,12 @@ drogon::Task<HttpResponsePtr> UserController::updateUser(
     co_await userService_->updateUser(userId, request, updatedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
+
+drogon::Task<HttpResponsePtr> UserController::deleteUser(
+    const HttpRequestPtr req,
+    const int32_t userId) const
+{
+    const auto deletedBy = fromString<int32_t>(req->getParameter("userId"));
+    co_await userService_->deleteUser(userId, deletedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

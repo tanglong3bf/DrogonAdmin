@@ -11,6 +11,7 @@
 #include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
 #include "UserResponse.h"
+#include "domain/organization/user/UserHandler.h"
 #include "domain/organization/user/UserRepository.h"
 
 /**
@@ -38,6 +39,12 @@ class UserService : public DrAdminObject<UserService>
                               const UserUpdateRequest &request,
                               const int32_t updatedBy) const;
 
+    /**
+     * @brief 删除用户
+     */
+    drogon::Task<> deleteUser(const std::int32_t userId,
+                              const int32_t deletedBy) const;
+
   private:
     UserCqrsRepoPtr userCqrsRepo_{
         drogon::DrClassMap::getSingleInstance<UserCqrsRepo>()};
@@ -47,6 +54,8 @@ class UserService : public DrAdminObject<UserService>
         drogon::DrClassMap::getSingleInstance<UserRepository>()};
     UserUpdaterPtr userUpdater_{
         drogon::DrClassMap::getSingleInstance<UserUpdater>()};
+    UserHandlerPtr userHandler_{
+        drogon::DrClassMap::getSingleInstance<UserHandler>()};
 };
 
 using UserServicePtr = std::shared_ptr<UserService>;

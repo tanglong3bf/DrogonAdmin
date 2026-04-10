@@ -43,3 +43,12 @@ Task<> UserService::updateUser(const std::int32_t userId,
     user.toUpdate();
     co_await userRepository_->save(user);
 }
+
+drogon::Task<> UserService::deleteUser(const std::int32_t userId,
+                                       const int32_t deletedBy) const
+{
+    auto user = co_await userRepository_->getById(userId, true);
+    co_await userHandler_->deleteUser(user, deletedBy);
+    user.toDelete();
+    co_await userRepository_->save(user);
+}

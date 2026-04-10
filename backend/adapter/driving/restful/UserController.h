@@ -14,9 +14,11 @@ class UserController : public drogon::HttpController<UserController>
     ADD_METHOD_TO(UserController::list,
                   "/user?username={}&nickname={}&sex={}&dept_id={}&phone_"
                   "number={}&email={}&status={}&page={}&page_size={}",
-                  Get);
-    ADD_METHOD_TO(UserController::createUser, "/user", Post);
-    ADD_METHOD_TO(UserController::updateUser, "/user/{id}", Put);
+                  Get,
+                  Options);
+    ADD_METHOD_TO(UserController::createUser, "/user", Post, Options);
+    ADD_METHOD_TO(UserController::updateUser, "/user/{id}", Put, Options);
+    ADD_METHOD_TO(UserController::deleteUser, "/user/{id}", Delete, Options);
     METHOD_LIST_END
 
     /**
@@ -45,6 +47,12 @@ class UserController : public drogon::HttpController<UserController>
     Task<HttpResponsePtr> updateUser(const HttpRequestPtr req,
                                      const int32_t userId,
                                      const UserUpdateRequest request) const;
+
+    /**
+     * @brief 删除用户
+     */
+    Task<HttpResponsePtr> deleteUser(const HttpRequestPtr req,
+                                     const int32_t userId) const;
 
   private:
     UserServicePtr userService_{

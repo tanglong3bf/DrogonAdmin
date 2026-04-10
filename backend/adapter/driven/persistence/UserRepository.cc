@@ -116,7 +116,17 @@ drogon::Task<> UserRepository::save(User &user) const
             co_return;
         }
         case ChangingStatus::DELETED:
+        {
+            const auto trans = co_await dbClient()->newTransactionCoro();
+            const auto model = static_cast<SysUser>(user);
+            // 本体删除(软删除)
+            co_await userMapper(trans).update(model);
+            // 关联数据删除
+            co_await userRoleMapper(trans).deleteBy(
+                Criteria{SysUserRole::Cols::_user_id, *user.getUserId()});
+
             co_return;
+        }
         case ChangingStatus::UNCHANGED:
             LOG_WARN << "无需修改的数据调用了save，请检查代码逻辑";
             co_return;
@@ -167,7 +177,8 @@ inline CoroMapper<SysUser> UserRepository::userMapper(
     return CoroMapper<SysUser>{trans == nullptr ? dbClient() : trans};
 }
 
-inline CoroMapper<SysUserRole> UserRepository::userRoleMapper()
+inline CoroMapper<SysUserRole> UserRepository::userRoleMapper(
+    const shared_ptr<Transaction> trans)
 {
-    return CoroMapper<SysUserRole>{dbClient()};
+    return CoroMapper<SysUserRole>{trans == nullptr ? dbClient() : trans};
 }

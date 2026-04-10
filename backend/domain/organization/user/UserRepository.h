@@ -64,7 +64,8 @@ class UserRepository : public DrAdminObject<UserRepository>
     static DbClientPtr dbClient();
     static UserMapper userMapper(
         const std::shared_ptr<drogon::orm::Transaction> trans = nullptr);
-    static UserRoleMapper userRoleMapper();
+    static UserRoleMapper userRoleMapper(
+        const std::shared_ptr<drogon::orm::Transaction> trans = nullptr);
 };
 
 using UserRepositoryPtr = std::shared_ptr<UserRepository>;
