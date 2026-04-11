@@ -11,28 +11,34 @@ Task<> DeptHandler::updateDept(Dept &dept,
                                const string &newName,
                                const int32_t updatedBy) const
 {
+    // 校验
     validateNameNotSame(dept.getName(), newName);
     co_await deptVerifier_->verifyDeptNameNotDuplicated(newName,
                                                         dept.getParentId());
 
+    // 更新值
     dept.setName(newName);
     dept.setUpdatedBy(updatedBy);
+    dept.toUpdate();
 }
 
-drogon::Task<> DeptHandler::deleteDept(Dept &dept,
-                                       const int32_t deletedBy) const
+Task<> DeptHandler::deleteDept(Dept &dept, const int32_t deletedBy) const
 {
+    // 校验
     co_await deptVerifier_->verifyNoSubDept(*dept.getDeptId());
     co_await userVerifier_->verifyNoUserInDept(*dept.getDeptId());
     co_await roleVerifier_->verifyNoRolesBelongToDept(*dept.getDeptId());
 
+    // 删除
     dept.setDeletedBy(deletedBy);
+    dept.toDelete();
 }
 
-drogon::Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
-                                                 const vector<Dept> &allDepts,
-                                                 const int32_t updatedBy) const
+Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
+                                         const vector<Dept> &allDepts,
+                                         const int32_t updatedBy) const
 {
+    // 校验
     validateDeptIdsInAllDepts(deptIds, allDepts);
 
     // 部门id到allDepts索引的映射
@@ -65,6 +71,7 @@ drogon::Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
                 Dept dept = allDepts[idx];
                 dept.setSortNum(newSortNum);
                 dept.setUpdatedBy(updatedBy);
+                dept.toUpdate();
                 sortResult.push_back(std::move(dept));
             }
             processed[idx] = true;
@@ -83,6 +90,7 @@ drogon::Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
                 Dept dept = allDepts[i];
                 dept.setSortNum(newSortNum);
                 dept.setUpdatedBy(updatedBy);
+                dept.toUpdate();
                 sortResult.push_back(std::move(dept));
             }
         }

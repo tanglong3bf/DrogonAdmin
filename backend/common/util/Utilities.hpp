@@ -30,7 +30,7 @@
         return field##_;           \
     }
 
-#define SET_ENTITY_FIELD_IF_CHANGED(entity, Field, ...)   \
+#define ENTITY_SET(entity, Field, ...)                    \
     do                                                    \
     {                                                     \
         if (request.get##Field() &&                       \
@@ -61,7 +61,9 @@
             : std::nullopt                                  \
     }
 
-#define AUDITABLE_INIT                                              \
+#define AUDITABLE_INIT createdBy, Date::now(), createdBy, Date::now()
+
+#define AUDITABLE_INIT_BY_MODEL                                     \
     model.getValueOfCreatedBy(), model.getValueOfCreatedTime(),     \
         model.getValueOfUpdatedBy(), model.getValueOfUpdatedTime(), \
         model.getDeletedBy() != nullptr                             \
@@ -70,6 +72,20 @@
         model.getDeletedTime() != nullptr                           \
             ? std::make_optional(model.getValueOfDeletedTime())     \
             : std::nullopt
+
+#define SET_OPT(field, Field)            \
+    do                                   \
+    {                                    \
+        if (field##_)                    \
+        {                                \
+            model.set##Field(*field##_); \
+        }                                \
+    } while (0)
+
+#define SET_VAL(field, Field) model.set##Field(field##_)
+
+#define SET_VAL_CAST(type, field, Field) \
+    model.set##Field(static_cast<type>(field##_))
 
 template <typename T>
 std::string toString(const T &);

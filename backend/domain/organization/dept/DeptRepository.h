@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Dept.h"
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "common/framework/DrAdminObject.hpp"
-#include "domain/models/SysDept.h"
+#include <memory>
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/utils/coroutine.h>
-#include <memory>
+#include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include "domain/models/SysDept.h"
+#include "Dept.h"
 
 /**
  * @brief 部门仓库
@@ -14,8 +14,8 @@
 class DeptRepository : public DrAdminObject<DeptRepository>
 {
     using DbClientPtr = drogon::orm::DbClientPtr;
-    using SysDeptMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysDept>;
+    using SysDept = drogon_model::drogon_admin_db::SysDept;
+    using SysDeptMapper = drogon::orm::CoroMapper<SysDept>;
     using SqlGenerator = tl::sql::SqlGenerator;
 
   public:
@@ -51,7 +51,7 @@ class DeptRepository : public DrAdminObject<DeptRepository>
      * @brief 批量获取部门
      */
     drogon::Task<std::vector<Dept>> getByIds(
-        const std::vector<int32_t> &idsVector) const;
+        const std::vector<std::int32_t> &idsVector) const;
 
     /**
      * @brief 获取指定部门下的所有子部门
@@ -67,7 +67,7 @@ class DeptRepository : public DrAdminObject<DeptRepository>
   private:
     static SqlGenerator *sqlGenerator();
     static DbClientPtr dbClient();
-    SysDeptMapper deptMapper() const;
+    static SysDeptMapper deptMapper();
 };
 
 using DeptRepositoryPtr = std::shared_ptr<DeptRepository>;

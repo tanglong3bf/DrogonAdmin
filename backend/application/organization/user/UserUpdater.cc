@@ -10,12 +10,12 @@ Task<> UserUpdater::updateUser(User &user,
                                const int32_t updatedBy) const
 {
     bool isUpdated = false;
-    SET_ENTITY_FIELD_IF_CHANGED(user, Nickname, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(user, Sex, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(user, DeptId, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(user, PhoneNumber, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(user, Email, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(user, Status, isUpdated = true);
+    ENTITY_SET(user, Nickname, isUpdated = true);
+    ENTITY_SET(user, Sex, isUpdated = true);
+    ENTITY_SET(user, DeptId, isUpdated = true);
+    ENTITY_SET(user, PhoneNumber, isUpdated = true);
+    ENTITY_SET(user, Email, isUpdated = true);
+    ENTITY_SET(user, Status, isUpdated = true);
 
     if (request.getRoleIds())
     {

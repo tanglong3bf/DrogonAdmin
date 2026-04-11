@@ -13,12 +13,12 @@ Task<> RoleUpdater::updateRole(Role &role,
                                const int32_t updatedBy) const
 {
     bool isUpdated = false;
-    SET_ENTITY_FIELD_IF_CHANGED(role, Name, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(role, Code, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(role, Description, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(role, QuotaType, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(role, UserQuota, isUpdated = true);
-    SET_ENTITY_FIELD_IF_CHANGED(role, RelationType, isUpdated = true);
+    ENTITY_SET(role, Name, isUpdated = true);
+    ENTITY_SET(role, Code, isUpdated = true);
+    ENTITY_SET(role, Description, isUpdated = true);
+    ENTITY_SET(role, QuotaType, isUpdated = true);
+    ENTITY_SET(role, UserQuota, isUpdated = true);
+    ENTITY_SET(role, RelationType, isUpdated = true);
 
     if (request.getDeptIds())
     {

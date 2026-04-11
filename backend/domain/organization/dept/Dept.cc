@@ -10,56 +10,31 @@ Dept::Dept(const string &name, const int32_t sortNum)
 }
 
 Dept::Dept(const string &name, const int32_t sortNum, const int32_t createdBy)
-    : name_{name},
-      sortNum_{sortNum},
-      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+    : name_{name}, sortNum_{sortNum}, AuditableEntity{AUDITABLE_INIT}
 {
 }
 
-Dept::Dept(const SysDept &sysDept)
-    : deptId_(sysDept.getValueOfDeptId()),
-      name_(sysDept.getValueOfName()),
-      sortNum_(sysDept.getValueOfSortNum()),
-      parentId_(sysDept.getParentId() != nullptr
-                    ? make_optional(sysDept.getValueOfParentId())
-                    : nullopt),
-      AuditableEntity(sysDept.getValueOfCreatedBy(),
-                      sysDept.getValueOfCreatedTime(),
-                      sysDept.getValueOfUpdatedBy(),
-                      sysDept.getValueOfUpdatedTime(),
-                      sysDept.getDeletedBy() != nullptr
-                          ? make_optional(sysDept.getValueOfDeletedBy())
-                          : nullopt,
-                      sysDept.getDeletedTime() != nullptr
-                          ? make_optional(sysDept.getValueOfDeletedTime())
-                          : nullopt)
+Dept::Dept(const SysDept &model)
+    : OPT_INIT(deptId, DeptId),
+      INIT(name, Name),
+      INIT(sortNum, SortNum),
+      OPT_INIT(parentId, ParentId),
+      AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
 
-Dept::operator drogon_model::drogon_admin_db::SysDept() const
+Dept::operator SysDept() const
 {
-    SysDept sysDept;
-    if (deptId_)
-    {
-        sysDept.setDeptId(*deptId_);
-    }
-    sysDept.setName(name_);
-    sysDept.setSortNum(sortNum_);
-    if (parentId_)
-    {
-        sysDept.setParentId(*parentId_);
-    }
-    sysDept.setCreatedBy(*createdBy_);
-    sysDept.setCreatedTime(*createdTime_);
-    sysDept.setUpdatedBy(*updatedBy_);
-    sysDept.setUpdatedTime(*updatedTime_);
-    if (deletedBy_)
-    {
-        sysDept.setDeletedBy(*deletedBy_);
-    }
-    if (deletedTime_)
-    {
-        sysDept.setDeletedTime(*deletedTime_);
-    }
-    return sysDept;
+    SysDept model;
+    SET_OPT(deptId, DeptId);
+    SET_VAL(name, Name);
+    SET_VAL(sortNum, SortNum);
+    SET_OPT(parentId, ParentId);
+    SET_OPT(createdBy, CreatedBy);
+    SET_OPT(createdTime, CreatedTime);
+    SET_OPT(updatedBy, UpdatedBy);
+    SET_OPT(updatedTime, UpdatedTime);
+    SET_OPT(deletedBy, DeletedBy);
+    SET_OPT(deletedTime, DeletedTime);
+    return model;
 }

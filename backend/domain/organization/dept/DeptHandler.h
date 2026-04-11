@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
@@ -24,21 +25,23 @@ class DeptHandler : public DrAdminObject<DeptHandler>
     /**
      * @brief 删除部门
      */
-    drogon::Task<> deleteDept(Dept &dept, const int32_t deletedBy) const;
+    drogon::Task<> deleteDept(Dept &dept, const std::int32_t deletedBy) const;
 
     /**
      * @brief 排序部门
      */
     drogon::Task<std::vector<Dept>> sortDept(
-        const std::vector<int32_t> &deptIds,
+        const std::vector<std::int32_t> &deptIds,
         const std::vector<Dept> &allDepts,
-        const int32_t updatedBy) const;
+        const std::int32_t updatedBy) const;
 
   private:
+    /// @brief 验证新旧名称是否相同
     void validateNameNotSame(const std::string &oldName,
                              const std::string &newName) const;
 
-    void validateDeptIdsInAllDepts(const std::vector<int32_t> &deptIds,
+    /// @brief 验证部门id列表都在部门列表中
+    void validateDeptIdsInAllDepts(const std::vector<std::int32_t> &deptIds,
                                    const std::vector<Dept> &allDepts) const;
 
   private:
@@ -46,7 +49,7 @@ class DeptHandler : public DrAdminObject<DeptHandler>
         drogon::DrClassMap::getSingleInstance<DeptVerifier>()};
     UserVerifierPtr userVerifier_{
         drogon::DrClassMap::getSingleInstance<UserVerifier>()};
-    // 耦合
+    // 跨模块
     RoleVerifierPtr roleVerifier_{
         drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
 };

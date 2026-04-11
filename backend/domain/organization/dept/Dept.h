@@ -31,9 +31,11 @@ class Dept : public AuditableEntity, public ChangeableEntity
          const std::int32_t sortNum,
          const std::int32_t createdBy);
 
-    // 和model类互转
-    explicit Dept(const SysDept &sysDept);
+    /// @group 和model类互转
+    /// @{
+    explicit Dept(const SysDept &model);
     explicit operator SysDept() const;
+    /// @}
 
     // setters
     SETTER(name, Name)

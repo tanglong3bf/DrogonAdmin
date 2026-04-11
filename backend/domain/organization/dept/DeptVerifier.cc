@@ -2,6 +2,7 @@
 
 #include "common/exception/BusinessException.h"
 
+using int32_t = std::int32_t;
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
@@ -30,7 +31,7 @@ Task<> DeptVerifier::verifyDeptNameNotDuplicated(
     }
 }
 
-drogon::Task<> DeptVerifier::verifyNoSubDept(const std::int32_t deptId) const
+Task<> DeptVerifier::verifyNoSubDept(const int32_t deptId) const
 {
     const auto count = co_await deptRepository_->countSubDept(deptId);
     if (count > 0)

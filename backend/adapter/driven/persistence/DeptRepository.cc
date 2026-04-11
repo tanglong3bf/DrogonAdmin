@@ -166,7 +166,7 @@ inline DbClientPtr DeptRepository::dbClient()
     return dbClient_;
 }
 
-inline CoroMapper<SysDept> DeptRepository::deptMapper() const
+inline CoroMapper<SysDept> DeptRepository::deptMapper()
 {
     return CoroMapper<SysDept>{dbClient()};
 }

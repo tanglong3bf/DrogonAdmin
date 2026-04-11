@@ -37,7 +37,7 @@ Role::Role(const drogon_model::drogon_admin_db::SysRole &model)
       ENUM_INIT(QuotaType, quotaType, QuotaType),
       OPT_INIT(userQuota, UserQuota),
       ENUM_INIT(RelationType, relationType, RelationType),
-      AuditableEntity(AUDITABLE_INIT)
+      AuditableEntity(AUDITABLE_INIT_BY_MODEL)
 {
 }
 

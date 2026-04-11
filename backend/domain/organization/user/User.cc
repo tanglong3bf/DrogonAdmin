@@ -29,7 +29,7 @@ User::User(const string &username,
       sex_{sex},
       deptId_{deptId},
       status_{status},
-      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+      AuditableEntity{AUDITABLE_INIT}
 {
 }
 
@@ -43,44 +43,28 @@ User::User(const SysUser &model)
       OPT_INIT(phoneNumber, PhoneNumber),
       OPT_INIT(email, Email),
       ENUM_INIT(Status, status, Status),
-      AuditableEntity(AUDITABLE_INIT)
+      AuditableEntity(AUDITABLE_INIT_BY_MODEL)
 {
 }
 
 User::operator SysUser() const
 {
     SysUser model;
-    if (userId_)
-    {
-        model.setUserId(*userId_);
-    }
-    model.setUsername(username_);
-    model.setPassword("123456");
-    model.setNickname(nickname_);
-    model.setAvatar(avatar_);
-    model.setSex(static_cast<int16_t>(sex_));
-    model.setDeptId(deptId_);
-    if (phoneNumber_)
-    {
-        model.setPhoneNumber(*phoneNumber_);
-    }
-    if (email_)
-    {
-        model.setEmail(*email_);
-    }
-    model.setStatus(static_cast<int16_t>(status_));
-    model.setCreatedBy(*createdBy_);
-    model.setCreatedTime(*createdTime_);
-    model.setUpdatedBy(*updatedBy_);
-    model.setUpdatedTime(*updatedTime_);
-    if (deletedBy_)
-    {
-        model.setDeletedBy(*deletedBy_);
-    }
-    if (deletedTime_)
-    {
-        model.setDeletedTime(*deletedTime_);
-    }
+    SET_OPT(userId, UserId);
+    SET_VAL(username, Username);
+    SET_VAL(nickname, Nickname);
+    SET_VAL(avatar, Avatar);
+    SET_VAL_CAST(int16_t, sex, Sex);
+    SET_VAL(deptId, DeptId);
+    SET_OPT(phoneNumber, PhoneNumber);
+    SET_OPT(email, Email);
+    SET_VAL_CAST(int16_t, status, Status);
+    SET_OPT(createdBy, CreatedBy);
+    SET_OPT(createdTime, CreatedTime);
+    SET_OPT(updatedBy, UpdatedBy);
+    SET_OPT(updatedTime, UpdatedTime);
+    SET_OPT(deletedBy, DeletedBy);
+    SET_OPT(deletedTime, DeletedTime);
     return model;
 }
 
