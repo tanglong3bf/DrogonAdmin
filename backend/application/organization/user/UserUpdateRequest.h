@@ -4,6 +4,8 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include "domain/organization/user/Email.h"
+#include "domain/organization/user/PhoneNumber.h"
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
 
@@ -12,8 +14,8 @@ class UserUpdateRequest
     std::optional<std::string> nickname_;
     std::optional<Sex> sex_;
     std::optional<std::int32_t> deptId_;
-    std::optional<std::string> phoneNumber_;
-    std::optional<std::string> email_;
+    std::optional<PhoneNumber> phoneNumber_;
+    std::optional<Email> email_;
     std::optional<Status> status_;
     std::optional<std::vector<std::int32_t>> roleIds_;
 

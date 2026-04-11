@@ -51,7 +51,9 @@ drogon::Task<> UserRepository::save(User &user) const
         case ChangingStatus::NEW:
         {
             const auto trans = co_await dbClient()->newTransactionCoro();
-            const auto model = static_cast<SysUser>(user);
+            auto model = static_cast<SysUser>(user);
+            // 补充默认密码
+            model.setPassword("123456");
             const auto userInDb = co_await userMapper(trans).insert(model);
             if (user.getUserRoles().size() > 0)
             {

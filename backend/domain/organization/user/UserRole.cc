@@ -22,18 +22,9 @@ UserRole::UserRole(const SysUserRole &model)
 UserRole::operator SysUserRole() const
 {
     SysUserRole model;
-    if (userId_)
-    {
-        model.setUserId(*userId_);
-    }
-    model.setRoleId(roleId_);
-    if (createdBy_)
-    {
-        model.setCreatedBy(*createdBy_);
-    }
-    if (createdTime_)
-    {
-        model.setCreatedTime(*createdTime_);
-    }
+    SET_OPT(userId, UserId);
+    SET_VAL(roleId, RoleId);
+    SET_OPT(createdBy, CreatedBy);
+    SET_OPT(createdTime, CreatedTime);
     return model;
 }

@@ -40,10 +40,10 @@ User::User(const SysUser &model)
       INIT(avatar, Avatar),
       ENUM_INIT(Sex, sex, Sex),
       INIT(deptId, DeptId),
-      OPT_INIT(phoneNumber, PhoneNumber),
-      OPT_INIT(email, Email),
+      OPT_OV_INIT(PhoneNumber, phoneNumber, PhoneNumber),
+      OPT_OV_INIT(Email, email, Email),
       ENUM_INIT(Status, status, Status),
-      AuditableEntity(AUDITABLE_INIT_BY_MODEL)
+      AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
 
@@ -56,8 +56,8 @@ User::operator SysUser() const
     SET_VAL(avatar, Avatar);
     SET_VAL_CAST(int16_t, sex, Sex);
     SET_VAL(deptId, DeptId);
-    SET_OPT(phoneNumber, PhoneNumber);
-    SET_OPT(email, Email);
+    SET_OPT_OV(phoneNumber, PhoneNumber);
+    SET_OPT_OV(email, Email);
     SET_VAL_CAST(int16_t, status, Status);
     SET_OPT(createdBy, CreatedBy);
     SET_OPT(createdTime, CreatedTime);
@@ -71,8 +71,4 @@ User::operator SysUser() const
 void User::addUserRole(const UserRole &userRole)
 {
     this->userRoles_.push_back(userRole);
-}
-
-void User::addUserRoleByRoleId(const std::int32_t &roleId)
-{
 }

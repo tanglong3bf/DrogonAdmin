@@ -16,8 +16,8 @@ class UserRepository : public DrAdminObject<UserRepository>
 {
     using DbClientPtr = drogon::orm::DbClientPtr;
     using SqlGenerator = tl::sql::SqlGenerator;
-    using UserMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysUser>;
+    using SysUser = drogon_model::drogon_admin_db::SysUser;
+    using UserMapper = drogon::orm::CoroMapper<SysUser>;
     using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
     using UserRoleMapper = drogon::orm::CoroMapper<SysUserRole>;
 

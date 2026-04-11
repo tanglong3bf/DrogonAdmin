@@ -61,6 +61,15 @@
             : std::nullopt                                  \
     }
 
+// OV: Object Value
+#define OPT_OV_INIT(type, field, Field)                           \
+    field##_                                                      \
+    {                                                             \
+        model.get##Field() != nullptr                             \
+            ? std::make_optional(type{model.getValueOf##Field()}) \
+            : std::nullopt                                        \
+    }
+
 #define AUDITABLE_INIT createdBy, Date::now(), createdBy, Date::now()
 
 #define AUDITABLE_INIT_BY_MODEL                                     \
@@ -83,6 +92,15 @@
     } while (0)
 
 #define SET_VAL(field, Field) model.set##Field(field##_)
+
+#define SET_OPT_OV(field, Field)                 \
+    do                                           \
+    {                                            \
+        if (field##_)                            \
+        {                                        \
+            model.set##Field(field##_->value()); \
+        }                                        \
+    } while (0)
 
 #define SET_VAL_CAST(type, field, Field) \
     model.set##Field(static_cast<type>(field##_))

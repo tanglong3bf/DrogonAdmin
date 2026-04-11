@@ -2,11 +2,14 @@
 
 #include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
-#include "domain/organization/user/User.h"
+#include "User.h"
 
 class UserHandler : public DrAdminObject<UserHandler>
 {
   public:
+    /**
+     * @brief 删除用户
+     */
     drogon::Task<> deleteUser(User &user, const std::int32_t deletedBy) const;
 };
 

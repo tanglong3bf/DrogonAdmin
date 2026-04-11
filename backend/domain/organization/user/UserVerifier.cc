@@ -2,7 +2,10 @@
 
 #include "common/exception/BusinessException.h"
 
-drogon::Task<> UserVerifier::verifyNoUserInDept(const std::int32_t deptId) const
+using namespace std;
+using namespace drogon;
+
+Task<> UserVerifier::verifyNoUserInDept(const int32_t deptId) const
 {
     const auto count = co_await userRepository_->countByDept(deptId);
     if (count > 0)
@@ -11,7 +14,7 @@ drogon::Task<> UserVerifier::verifyNoUserInDept(const std::int32_t deptId) const
     }
 }
 
-drogon::Task<> UserVerifier::verifyRoleNotUsed(const std::int32_t roleId) const
+Task<> UserVerifier::verifyRoleNotUsed(const int32_t roleId) const
 {
     const auto count = co_await userRepository_->countByRole(roleId);
     if (count > 0)
@@ -20,8 +23,7 @@ drogon::Task<> UserVerifier::verifyRoleNotUsed(const std::int32_t roleId) const
     }
 }
 
-drogon::Task<> UserVerifier::verifyUsernameNotDuplicated(
-    const std::string &username) const
+Task<> UserVerifier::verifyUsernameNotDuplicated(const string &username) const
 {
     const auto count = co_await userRepository_->countByUsername(username);
     if (count > 0)
@@ -30,8 +32,7 @@ drogon::Task<> UserVerifier::verifyUsernameNotDuplicated(
     }
 }
 
-drogon::Task<> UserVerifier::verifyNicknameNotDuplicated(
-    const std::string &nickname) const
+Task<> UserVerifier::verifyNicknameNotDuplicated(const string &nickname) const
 {
     const auto count = co_await userRepository_->countByNickname(nickname);
     if (count > 0)

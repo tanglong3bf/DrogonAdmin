@@ -3,12 +3,14 @@
 #include <cstdint>
 #include <optional>
 #include <string>
-#include "Sex.h"
-#include "Status.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "common/util/Utilities.hpp"
 #include "domain/models/SysUser.h"
+#include "Sex.h"
+#include "Status.h"
+#include "Email.h"
+#include "PhoneNumber.h"
 #include "UserRole.h"
 
 class User : public AuditableEntity, public ChangeableEntity
@@ -21,8 +23,8 @@ class User : public AuditableEntity, public ChangeableEntity
     std::string avatar_;
     Sex sex_;
     std::int32_t deptId_;
-    std::optional<std::string> phoneNumber_;
-    std::optional<std::string> email_;
+    std::optional<PhoneNumber> phoneNumber_;
+    std::optional<Email> email_;
     Status status_;
     std::vector<UserRole> userRoles_;
 
@@ -64,5 +66,4 @@ class User : public AuditableEntity, public ChangeableEntity
     SETTER(userRoles, UserRoles)
 
     void addUserRole(const UserRole &userRole);
-    void addUserRoleByRoleId(const std::int32_t &roleId);
 };

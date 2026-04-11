@@ -3,7 +3,10 @@
 #include <cstdint>
 #include "common/util/Utilities.hpp"
 
-enum class Sex : int8_t
+/**
+ * @brief 性别
+ */
+enum class Sex : std::int16_t
 {
     Unknown = 0,
     Male = 1,

@@ -11,6 +11,7 @@ class UserRole : public ChangeableEntity
 {
     using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
 
+    // 创建用户时可能没有id
     std::optional<std::int32_t> userId_;  ///< 用户id
     std::int32_t roleId_;                 ///< 角色id
     std::optional<std::int32_t> createdBy_;
@@ -21,7 +22,7 @@ class UserRole : public ChangeableEntity
     UserRole(const std::int32_t roleId, int32_t createdBy);
 
     // 和model类互转
-    explicit UserRole(const SysUserRole &sysUserRole);
+    explicit UserRole(const SysUserRole &model);
     explicit operator SysUserRole() const;
 
     OPT_SETTER(userId, UserId);

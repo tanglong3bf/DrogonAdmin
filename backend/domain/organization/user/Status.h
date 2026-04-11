@@ -4,10 +4,13 @@
 #include <string>
 #include "common/util/Utilities.hpp"
 
-enum class Status : int8_t
+/**
+ * @brief 用户状态
+ */
+enum class Status : int16_t
 {
-    Enabled = 0,
-    Disabled = 1,
+    Enabled = 0,   ///< 正常
+    Disabled = 1,  ///< 禁用
 };
 
 template <>

@@ -1,7 +1,11 @@
 #include "Sex.h"
 
+#include <trantor/utils/Logger.h>
+
+using namespace std;
+
 template <>
-std::string toString(const Sex &sex)
+string toString(const Sex &sex)
 {
     switch (sex)
     {
@@ -12,5 +16,6 @@ std::string toString(const Sex &sex)
         case Sex::Female:
             return "Female";
     }
+    LOG_ERROR << "错误的 Sex :" << static_cast<int32_t>(sex);
     return "Sex::[error]";
 }
