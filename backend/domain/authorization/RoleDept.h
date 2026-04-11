@@ -11,10 +11,10 @@ class RoleDept : public ChangeableEntity
 {
     using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
 
-    std::optional<std::int32_t> roleId_;  ///< 角色id
-    std::int32_t deptId_;                 ///< 部门id
-    std::optional<std::int32_t> createdBy_;
-    std::optional<trantor::Date> createdTime_;
+    std::optional<std::int32_t> roleId_;        ///< 角色id
+    std::int32_t deptId_;                       ///< 部门id
+    std::optional<std::int32_t> createdBy_;     ///< 创建者id
+    std::optional<trantor::Date> createdTime_;  ///< 创建时间
 
   public:
     RoleDept(const std::int32_t deptId);

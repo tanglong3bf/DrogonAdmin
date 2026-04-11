@@ -22,18 +22,9 @@ RoleDept::RoleDept(const SysRoleDept &model)
 RoleDept::operator SysRoleDept() const
 {
     SysRoleDept model;
-    if (roleId_)
-    {
-        model.setRoleId(*roleId_);
-    }
-    model.setDeptId(deptId_);
-    if (createdBy_)
-    {
-        model.setCreatedBy(*createdBy_);
-    }
-    if (createdTime_)
-    {
-        model.setCreatedTime(*createdTime_);
-    }
+    SET_OPT(roleId, RoleId);
+    SET_VAL(deptId, DeptId);
+    SET_OPT(createdBy, CreatedBy);
+    SET_OPT(createdTime, CreatedTime);
     return model;
 }

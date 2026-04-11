@@ -99,7 +99,7 @@ Task<> RoleRepository::save(Role &role) const
             const auto roleId = sysRoleInDb.getValueOfRoleId();
 
             // 处理关联数据
-            auto roleDepts = role.getDepts();
+            auto roleDepts = role.getRoleDepts();
             if (roleDepts.size() == 0)
             {
                 co_return;
@@ -132,7 +132,7 @@ Task<> RoleRepository::save(Role &role) const
                                                 *role.getDeletedBy(),
                                                 *role.getDeletedTime());
             // 处理关联数据
-            auto roleDepts = role.getDepts();
+            auto roleDepts = role.getRoleDepts();
             if (roleDepts.size() == 0)
             {
                 co_return;
@@ -157,7 +157,7 @@ Task<> RoleRepository::save(Role &role) const
             co_await roleMapper(trans).update(sysRole);
 
             // 处理关联数据
-            auto roleDepts = role.getDepts();
+            auto roleDepts = role.getRoleDepts();
             if (roleDepts.size() == 0)
             {
                 co_return;

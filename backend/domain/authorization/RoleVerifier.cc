@@ -14,8 +14,7 @@ Task<> RoleVerifier::verifyNoRolesBelongToDept(const int32_t deptId) const
     }
 }
 
-drogon::Task<> RoleVerifier::verifyRoleNameNotDuplicated(
-    const std::string &name) const
+Task<> RoleVerifier::verifyRoleNameNotDuplicated(const string &name) const
 {
     const auto count = co_await roleRepository_->countByName(name);
     if (count > 0)
@@ -24,8 +23,7 @@ drogon::Task<> RoleVerifier::verifyRoleNameNotDuplicated(
     }
 }
 
-drogon::Task<> RoleVerifier::verifyRoleCodeNotDuplicated(
-    const std::string &code) const
+Task<> RoleVerifier::verifyRoleCodeNotDuplicated(const string &code) const
 {
     const auto count = co_await roleRepository_->countByCode(code);
     if (count > 0)

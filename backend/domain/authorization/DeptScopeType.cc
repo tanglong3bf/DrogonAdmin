@@ -2,8 +2,10 @@
 
 #include <trantor/utils/Logger.h>
 
+using namespace std;
+
 template <>
-std::string toString(const RelationType &relationType)
+string toString(const RelationType &relationType)
 {
     switch (relationType)
     {
@@ -15,5 +17,5 @@ std::string toString(const RelationType &relationType)
             return "Blacklist";
     }
     LOG_WARN << "错误的 RelationType :" << static_cast<int32_t>(relationType);
-    return "[error]";
+    return "RelationType::[error]";
 }

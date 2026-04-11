@@ -77,10 +77,5 @@ Role::operator SysRole() const
 
 void Role::addRoleDept(const RoleDept &dept)
 {
-    depts_.push_back(dept);
-}
-
-void Role::setRoleDepts(const std::vector<RoleDept> &depts)
-{
-    depts_ = depts;
+    roleDepts_.push_back(dept);
 }

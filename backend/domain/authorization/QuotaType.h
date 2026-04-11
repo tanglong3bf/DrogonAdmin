@@ -7,7 +7,7 @@
 /**
  * @brief 用户数量限制类型
  */
-enum class QuotaType : int8_t
+enum class QuotaType : int16_t
 {
     Unlimited = 0,    ///< 不限制
     TotalLimit = 1,   ///< 总数量限制

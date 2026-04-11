@@ -5,8 +5,8 @@
 #include <drogon/utils/coroutine.h>
 #include "SqlGenerator/src/SqlGenerator.h"
 #include "common/framework/DrAdminObject.hpp"
-#include "Role.h"
 #include "domain/models/SysRoleDept.h"
+#include "Role.h"
 #include "RoleDept.h"
 
 /**
@@ -16,8 +16,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
 {
     using DbClientPtr = drogon::orm::DbClientPtr;
     using SqlGenerator = tl::sql::SqlGenerator;
-    using RoleMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRole>;
+    using SysRole = drogon_model::drogon_admin_db::SysRole;
+    using RoleMapper = drogon::orm::CoroMapper<SysRole>;
     using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
     using RoleDeptMapper = drogon::orm::CoroMapper<SysRoleDept>;
 

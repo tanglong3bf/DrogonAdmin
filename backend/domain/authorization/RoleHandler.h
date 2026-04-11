@@ -2,8 +2,8 @@
 
 #include <memory>
 #include "common/framework/DrAdminObject.hpp"
-#include "domain/authorization/RoleRepository.h"
 #include "domain/organization/user/UserVerifier.h"
+#include "RoleRepository.h"
 
 class RoleHandler : public DrAdminObject<RoleHandler>
 {

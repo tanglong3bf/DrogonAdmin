@@ -25,7 +25,7 @@ Task<> RoleUpdater::updateRole(Role &role,
         vector<int> deptIds = *request.getDeptIds();
         sort(deptIds.begin(), deptIds.end());
 
-        updateRoleDepts(const_cast<vector<RoleDept> &>(role.getDepts()),
+        updateRoleDepts(const_cast<vector<RoleDept> &>(role.getRoleDepts()),
                         deptIds,
                         *role.getRoleId(),
                         updatedBy);
@@ -43,11 +43,11 @@ Task<> RoleUpdater::updateRole(Role &role,
     }
     if (role.getRelationType() == RelationType::All)
     {
-        if (role.getDepts().size() != 0)
+        if (role.getRoleDepts().size() != 0)
         {
-            for (auto &dept : role.getDepts())
+            for (auto &dept : role.getRoleDepts())
             {
-                dept.toDelete();
+                const_cast<RoleDept &>(dept).toDelete();
             }
             isUpdated = true;
         }

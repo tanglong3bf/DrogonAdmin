@@ -6,7 +6,7 @@
 /**
  * @brief 角色部门关联类型
  */
-enum class RelationType : std::int8_t
+enum class RelationType : std::int16_t
 {
     All = 0,        ///< 所有部门可用角色
     Whitelist = 1,  ///< 白名单

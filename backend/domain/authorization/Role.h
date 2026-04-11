@@ -3,24 +3,24 @@
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "common/util/Utilities.hpp"
+#include "domain/models/SysRole.h"
 #include "RoleDept.h"
 #include "DeptScopeType.h"
 #include "QuotaType.h"
-#include "domain/models/SysRole.h"
 
 class Role : public AuditableEntity, public ChangeableEntity
 {
     using SysRole = drogon_model::drogon_admin_db::SysRole;
 
     // 新增时没有id
-    std::optional<std::int32_t> roleId_;
-    std::string name_;
-    std::string code_;
-    std::optional<std::string> description_;
-    QuotaType quotaType_;
-    std::optional<std::int32_t> userQuota_;
-    RelationType relationType_;
-    std::vector<RoleDept> depts_;
+    std::optional<std::int32_t> roleId_;      ///< 角色id
+    std::string name_;                        ///< 角色名称
+    std::string code_;                        ///< 角色代码
+    std::optional<std::string> description_;  ///< 描述
+    QuotaType quotaType_;                     ///< 用户数量限制类型
+    std::optional<std::int32_t> userQuota_;   ///< 具体限制数量
+    RelationType relationType_;               ///< 部门关联关系
+    std::vector<RoleDept> roleDepts_;         ///< 关联部门
 
   public:
     /**
@@ -50,11 +50,7 @@ class Role : public AuditableEntity, public ChangeableEntity
     GETTER(quotaType, QuotaType)
     OPT_GETTER(userQuota, UserQuota)
     GETTER(relationType, RelationType)
-
-    auto &getDepts()
-    {
-        return depts_;
-    }
+    GETTER(roleDepts, RoleDepts)
 
     OPT_SETTER(roleId, RoleId)
     SETTER(name, Name)
@@ -63,8 +59,7 @@ class Role : public AuditableEntity, public ChangeableEntity
     SETTER(quotaType, QuotaType)
     OPT_SETTER(userQuota, UserQuota)
     SETTER(relationType, RelationType)
-    SETTER(depts, Depts)
+    SETTER(roleDepts, RoleDepts)
 
     void addRoleDept(const RoleDept &dept);
-    void setRoleDepts(const std::vector<RoleDept> &depts);
 };
