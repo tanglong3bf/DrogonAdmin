@@ -26,6 +26,6 @@ Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
     {
         dept.setParentId(*request.getParentId());
     }
-
+    dept.toNew();
     co_return dept;
 }

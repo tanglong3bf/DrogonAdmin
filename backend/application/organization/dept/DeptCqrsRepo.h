@@ -1,11 +1,11 @@
 #pragma once
 
-#include <memory>
-#include <drogon/orm/DbClient.h>
-#include <drogon/utils/coroutine.h>
+#include "DeptResponse.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
-#include "DeptResponse.h"
+#include <drogon/orm/DbClient.h>
+#include <drogon/utils/coroutine.h>
+#include <memory>
 
 class DeptCqrsRepo : public DrAdminObject<DeptCqrsRepo>
 {
@@ -22,7 +22,7 @@ class DeptCqrsRepo : public DrAdminObject<DeptCqrsRepo>
      * @brief 在树中找到指定id的部门
      */
     DeptResponse *findById(const std::vector<DeptResponse> &tree,
-                           const int32_t deptId) const;
+                           const std::int32_t deptId) const;
 
     /**
      * @brief 根据数据库查询结果构造一棵树

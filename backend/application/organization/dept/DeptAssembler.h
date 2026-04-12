@@ -1,12 +1,12 @@
 #pragma once
 
-#include <drogon/DrClassMap.h>
-#include <drogon/utils/coroutine.h>
-#include "common/framework/DrAdminObject.hpp"
+#include "DeptCreateRequest.h"
 #include "domain/organization/dept/Dept.h"
 #include "domain/organization/dept/DeptRepository.h"
 #include "domain/organization/dept/DeptVerifier.h"
-#include "DeptCreateRequest.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <drogon/DrClassMap.h>
+#include <drogon/utils/coroutine.h>
 
 /**
  * 部门装配器

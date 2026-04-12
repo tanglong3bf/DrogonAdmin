@@ -1,14 +1,14 @@
 #pragma once
 
-#include <drogon/utils/coroutine.h>
-#include "application/organization/dept/DeptSortRequest.h"
-#include "domain/organization/dept/DeptHandler.h"
-#include "application/authorization/role/RoleService.h"
-#include "DeptCqrsRepo.h"
 #include "DeptAssembler.h"
 #include "DeptCreateRequest.h"
-#include "DeptUpdateRequest.h"
+#include "DeptCqrsRepo.h"
 #include "DeptResponse.h"
+#include "DeptSortRequest.h"
+#include "DeptUpdateRequest.h"
+#include "application/authorization/role/RoleService.h"
+#include "domain/organization/dept/DeptHandler.h"
+#include <drogon/utils/coroutine.h>
 
 class DeptService : public DrAdminObject<DeptService>
 {

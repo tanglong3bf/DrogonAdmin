@@ -1,9 +1,10 @@
 #include "DeptCreateRequest.h"
 
-#include <drogon/HttpRequest.h>
-#include "common/util/ParamGetter.hpp"
 #include "common/exception/BusinessException.h"
+#include "common/util/ParamGetter.hpp"
+#include <drogon/HttpRequest.h>
 
+using namespace std;
 using namespace drogon_admin::util;
 
 namespace drogon
@@ -24,6 +25,6 @@ DeptCreateRequest fromRequest(const HttpRequest &req)
 
 void DeptCreateRequest::setByJson(const Json::Value &json)
 {
-    name_ = getParam<std::string, true>(json, "name");
-    parentId_ = getParam<std::int32_t>(json, "parent_id");
+    name_ = getParam<string, true>(json, "name");
+    parentId_ = getParam<int32_t>(json, "parent_id");
 }

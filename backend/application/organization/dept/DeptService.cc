@@ -1,9 +1,9 @@
 #include "DeptService.h"
 
+#include "DeptSortRequest.h"
+#include "common/exception/BusinessException.h"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/utils/coroutine.h>
-#include "application/organization/dept/DeptSortRequest.h"
-#include "common/exception/BusinessException.h"
 
 using namespace std;
 using namespace drogon;
@@ -15,24 +15,21 @@ Task<vector<DeptResponse>> DeptService::getDeptTree() const
 }
 
 Task<> DeptService::createDept(const DeptCreateRequest &request,
-                               const int32_t createdBy) const
+                               const std::int32_t createdBy) const
 {
     auto dept = co_await deptAssembler_->fromCreateRequest(request, createdBy);
-    dept.toNew();
     co_await deptRepository_->save(dept);
 }
 
-Task<> DeptService::updateDept(const int32_t deptId,
+Task<> DeptService::updateDept(const std::int32_t deptId,
                                const DeptUpdateRequest &request,
-                               const int32_t updatedBy) const
+                               const std::int32_t updatedBy) const
 {
     try
     {
         auto dept = co_await deptRepository_->getById(deptId);
 
         co_await deptHandler_->updateDept(dept, request.getName(), updatedBy);
-
-        dept.toUpdate();
         co_await deptRepository_->save(dept);
     }
     catch (const orm::UnexpectedRows &e)
@@ -42,16 +39,14 @@ Task<> DeptService::updateDept(const int32_t deptId,
     }
 }
 
-Task<> DeptService::deleteDept(const int32_t deptId,
-                               const int32_t deletedBy) const
+Task<> DeptService::deleteDept(const std::int32_t deptId,
+                               const std::int32_t deletedBy) const
 {
     try
     {
         auto dept = co_await deptRepository_->getById(deptId);
 
         co_await deptHandler_->deleteDept(dept, deletedBy);
-
-        dept.toDelete();
 
         // TODO: 事务
         co_await deptRepository_->save(dept);
@@ -65,7 +60,7 @@ Task<> DeptService::deleteDept(const int32_t deptId,
 }
 
 Task<> DeptService::sortDept(const DeptSortRequest &request,
-                             const int32_t updatedBy) const
+                             const std::int32_t updatedBy) const
 {
     const auto parentId = request.getParentId();
     const auto allDepts = co_await deptRepository_->getByParentId(parentId);
@@ -73,10 +68,6 @@ Task<> DeptService::sortDept(const DeptSortRequest &request,
 
     auto sortResult =
         co_await deptHandler_->sortDept(deptIds, allDepts, updatedBy);
-    for (auto &dept : sortResult)
-    {
-        dept.toUpdate();
-    }
 
     co_await deptRepository_->multiSave(sortResult);
 }

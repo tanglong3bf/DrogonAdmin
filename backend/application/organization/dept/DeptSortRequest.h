@@ -3,13 +3,13 @@
 /**
  * @brief 更新部门参数
  */
-#include <jsoncpp/json/value.h>
 #include "common/util/Utilities.hpp"
+#include <jsoncpp/json/value.h>
 
 class DeptSortRequest
 {
-    std::optional<int32_t> parentId_;
-    std::vector<int32_t> deptIds_;
+    std::optional<std::int32_t> parentId_;  ///< 父部门id
+    std::vector<std::int32_t> deptIds_;     ///< 部门id
 
   public:
     void setByJson(const Json::Value &json);

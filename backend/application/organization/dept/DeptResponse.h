@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "domain/organization/dept/Dept.h"
+#include <jsoncpp/json/value.h>
 #include <string>
 #include <vector>
-#include <jsoncpp/json/value.h>
-#include "domain/organization/dept/Dept.h"
+#include <cstdint>
 
 /**
  * @brief 部门响应数据封装
