@@ -1,9 +1,9 @@
 #include "application/organization/user/UserCqrsRepo.h"
 
+#include "domain/organization/user/UserRole.h"
+#include "domain/models/SysUser.h"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
-#include "domain/models/SysUser.h"
-#include "domain/organization/user/UserRole.h"
 
 using namespace std;
 using namespace drogon;
@@ -19,11 +19,11 @@ Task<size_t> UserCqrsRepo::countByQueryReq(
 
 Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     const UserQueryRequest &request,
-    const int32_t maxPage) const
+    const std::int32_t maxPage) const
 {
     Criteria criteria = buildCriteria(request);
 
-    const int32_t page =
+    const std::int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
     const auto sysUserList = co_await userMapper()
                                  .orderBy(SysUser::Cols::_user_id)
@@ -31,7 +31,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
                                  .findBy(criteria);
     auto userList = buildUserList(sysUserList);
     // 获取用户id列表
-    vector<int32_t> userIdList{};
+    vector<std::int32_t> userIdList{};
     for (const auto &user : userList)
     {
         userIdList.push_back(*user.getUserId());

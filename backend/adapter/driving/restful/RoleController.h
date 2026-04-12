@@ -1,9 +1,9 @@
 #pragma once
 
-#include <drogon/HttpController.h>
 #include "application/authorization/role/RoleService.h"
 #include "application/authorization/role/dto/RoleCreateRequest.h"
 #include "application/authorization/role/dto/RoleUpdateRequest.h"
+#include <drogon/HttpController.h>
 
 class RoleController : public drogon::HttpController<RoleController>
 {
@@ -70,14 +70,14 @@ class RoleController : public drogon::HttpController<RoleController>
      */
     drogon::Task<drogon::HttpResponsePtr> deleteRole(
         const drogon::HttpRequestPtr req,
-        const int32_t roleId) const;
+        const std::int32_t roleId) const;
 
     /**
      * @brief 获取指定部门可以分配的角色
      */
     drogon::Task<drogon::HttpResponsePtr> getAssignableRoles(
         const drogon::HttpRequestPtr req,
-        const int32_t deptId) const;
+        const std::int32_t deptId) const;
 
   private:
     RoleServicePtr roleService_{

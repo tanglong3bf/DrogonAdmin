@@ -1,9 +1,9 @@
 #include "domain/authorization/RoleRepository.h"
 
+#include "domain/models/SysRoleDept.h"
+#include "common/framework/domain/ChangeableEntity.h"
 #include <drogon/HttpAppFramework.h>
 #include <trantor/utils/Date.h>
-#include "common/framework/domain/ChangeableEntity.h"
-#include "domain/models/SysRoleDept.h"
 
 using namespace std;
 using namespace drogon;
@@ -11,7 +11,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<size_t> RoleRepository::countBelongDept(const int32_t deptId) const
+Task<size_t> RoleRepository::countBelongDept(const std::int32_t deptId) const
 {
     auto sql =
         sqlGenerator()->getSql("count_belong_dept", {{"dept_id", deptId}});
@@ -20,7 +20,7 @@ Task<size_t> RoleRepository::countBelongDept(const int32_t deptId) const
 }
 
 Task<vector<RoleDept>> RoleRepository::getExcludingDeptByDeptId(
-    const int32_t deptId) const
+    const std::int32_t deptId) const
 {
     auto sql = sqlGenerator()->getSql("get_excluding_dept_by_dept_id",
                                       {{"dept_id", deptId}});
@@ -206,7 +206,7 @@ Task<> RoleRepository::save(Role &role) const
     }
 }
 
-Task<Role> RoleRepository::getById(const int32_t roleId) const
+Task<Role> RoleRepository::getById(const std::int32_t roleId) const
 {
     const auto sysRole = co_await roleMapper().findByPrimaryKey(roleId);
     Role role{sysRole};

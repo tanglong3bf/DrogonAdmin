@@ -1,9 +1,9 @@
 #include "domain/organization/user/UserRepository.h"
 
-#include <drogon/HttpAppFramework.h>
 #include "common/framework/domain/ChangeableEntity.h"
 #include "domain/models/SysUser.h"
 #include "domain/models/SysUserRole.h"
+#include <drogon/HttpAppFramework.h>
 
 using namespace std;
 using namespace drogon;
@@ -11,7 +11,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<size_t> UserRepository::countByDept(const int32_t deptId) const
+Task<size_t> UserRepository::countByDept(const std::int32_t deptId) const
 {
     Criteria criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysUser::Cols::_dept_id, deptId};
@@ -19,7 +19,7 @@ Task<size_t> UserRepository::countByDept(const int32_t deptId) const
     co_return co_await userMapper().count(criteria);
 }
 
-Task<size_t> UserRepository::countByRole(const int32_t roleId) const
+Task<size_t> UserRepository::countByRole(const std::int32_t roleId) const
 {
     Criteria criteria{SysUserRole::Cols::_role_id, roleId};
 
@@ -135,7 +135,7 @@ drogon::Task<> UserRepository::save(User &user) const
     }
 }
 
-Task<User> UserRepository::getById(const int32_t userId,
+Task<User> UserRepository::getById(const std::int32_t userId,
                                    bool withRelation) const
 {
     const auto sysUser = co_await userMapper().findByPrimaryKey(userId);

@@ -1,11 +1,8 @@
 #pragma once
 
-#include <drogon/HttpController.h>
 #include "application/organization/user/UserService.h"
 #include "application/organization/user/UserCreateRequest.h"
-
-using namespace std;
-using namespace drogon;
+#include <drogon/HttpController.h>
 
 class UserController : public drogon::HttpController<UserController>
 {
@@ -14,45 +11,58 @@ class UserController : public drogon::HttpController<UserController>
     ADD_METHOD_TO(UserController::list,
                   "/user?username={}&nickname={}&sex={}&dept_id={}&phone_"
                   "number={}&email={}&status={}&page={}&page_size={}",
-                  Get,
-                  Options);
-    ADD_METHOD_TO(UserController::createUser, "/user", Post, Options);
-    ADD_METHOD_TO(UserController::updateUser, "/user/{id}", Put, Options);
-    ADD_METHOD_TO(UserController::deleteUser, "/user/{id}", Delete, Options);
+                  drogon::Get,
+                  drogon::Options);
+    ADD_METHOD_TO(UserController::createUser,
+                  "/user",
+                  drogon::Post,
+                  drogon::Options);
+    ADD_METHOD_TO(UserController::updateUser,
+                  "/user/{id}",
+                  drogon::Put,
+                  drogon::Options);
+    ADD_METHOD_TO(UserController::deleteUser,
+                  "/user/{id}",
+                  drogon::Delete,
+                  drogon::Options);
     METHOD_LIST_END
 
     /**
      * @brief 带条件分页查询用户列表
      */
-    Task<HttpResponsePtr> list(const HttpRequestPtr req,
-                               const string username,
-                               const string nickname,
-                               const string sex,
-                               const string deptId,
-                               const string phoneNumber,
-                               const string email,
-                               const string status,
-                               const string page,
-                               const string pageSize) const;
+    drogon::Task<drogon::HttpResponsePtr> list(
+        const drogon::HttpRequestPtr req,
+        const std::string username,
+        const std::string nickname,
+        const std::string sex,
+        const std::string deptId,
+        const std::string phoneNumber,
+        const std::string email,
+        const std::string status,
+        const std::string page,
+        const std::string pageSize) const;
 
     /**
      * @brief 新增用户
      */
-    Task<HttpResponsePtr> createUser(const HttpRequestPtr req,
-                                     const UserCreateRequest request) const;
+    drogon::Task<drogon::HttpResponsePtr> createUser(
+        const drogon::HttpRequestPtr req,
+        const UserCreateRequest request) const;
 
     /**
      * @brief 更新用户
      */
-    Task<HttpResponsePtr> updateUser(const HttpRequestPtr req,
-                                     const int32_t userId,
-                                     const UserUpdateRequest request) const;
+    drogon::Task<drogon::HttpResponsePtr> updateUser(
+        const drogon::HttpRequestPtr req,
+        const std::int32_t userId,
+        const UserUpdateRequest request) const;
 
     /**
      * @brief 删除用户
      */
-    Task<HttpResponsePtr> deleteUser(const HttpRequestPtr req,
-                                     const int32_t userId) const;
+    drogon::Task<drogon::HttpResponsePtr> deleteUser(
+        const drogon::HttpRequestPtr req,
+        const std::int32_t userId) const;
 
   private:
     UserServicePtr userService_{

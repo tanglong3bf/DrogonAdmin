@@ -1,11 +1,11 @@
 #pragma once
 
-#include <drogon/HttpController.h>
-#include <drogon/DrClassMap.h>
 #include "application/organization/dept/DeptService.h"
 #include "application/organization/dept/DeptCreateRequest.h"
 #include "application/organization/dept/DeptSortRequest.h"
 #include "application/organization/dept/DeptUpdateRequest.h"
+#include <drogon/HttpController.h>
+#include <drogon/DrClassMap.h>
 
 class DeptController : public drogon::HttpController<DeptController>
 {

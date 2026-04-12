@@ -1,10 +1,10 @@
 #include "application/authorization/role/RoleCqrsRepo.h"
 
+#include "domain/authorization/RoleDept.h"
+#include "domain/authorization/Role.h"
+#include "domain/models/SysRole.h"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
-#include "domain/authorization/RoleDept.h"
-#include "domain/models/SysRole.h"
-#include "domain/authorization/Role.h"
 
 using namespace std;
 using namespace drogon;
@@ -14,7 +14,7 @@ using namespace tl::sql;
 
 Task<size_t> RoleCqrsRepo::countByNameAndDeptId(
     const optional<string> &name,
-    const optional<int32_t> &deptId) const
+    const optional<std::int32_t> &deptId) const
 {
     ParamList params;
     if (deptId)
@@ -36,10 +36,11 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     const size_t maxPage) const
 {
     ParamList params;
-    const int32_t page =
+    const std::int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
-    params["offset"] = static_cast<int32_t>(request.getPageSize() * (page - 1));
-    params["limit"] = static_cast<int32_t>(request.getPageSize());
+    params["offset"] =
+        static_cast<std::int32_t>(request.getPageSize() * (page - 1));
+    params["limit"] = static_cast<std::int32_t>(request.getPageSize());
     if (request.getDeptId())
     {
         params["dept_id"] = *request.getDeptId();
@@ -52,7 +53,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
     auto roleList = buildList(dbResult);
 
-    vector<int32_t> roleIds{};
+    vector<std::int32_t> roleIds{};
     for (const auto &role : roleList)
     {
         roleIds.push_back(role.getRoleId());
@@ -77,7 +78,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
 }
 
 Task<vector<AssignableRoleResponse>> RoleCqrsRepo::getAssignableRoles(
-    const int32_t deptId) const
+    const std::int32_t deptId) const
 {
     const auto sql = sqlGenerator()->getSql("get_assignable_roles");
     const auto dbResult = co_await dbClient()->execSqlCoro(sql, deptId);
@@ -102,7 +103,7 @@ vector<AssignableRoleResponse> RoleCqrsRepo::buildAssignableList(
     for (const auto &row : dbResult)
     {
         AssignableRoleResponse assignableRoleResponse{
-            row["role_id"].as<int32_t>(), row["name"].as<string>()};
+            row["role_id"].as<std::int32_t>(), row["name"].as<string>()};
         result.push_back(assignableRoleResponse);
     }
     return result;

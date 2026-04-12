@@ -29,7 +29,7 @@ Task<vector<DeptResponse>> DeptCqrsRepo::getDeptTree() const
 }
 
 DeptResponse *DeptCqrsRepo::findById(const vector<DeptResponse> &tree,
-                                     const int32_t deptId) const
+                                     const std::int32_t deptId) const
 {
     for (auto &item : tree)
     {

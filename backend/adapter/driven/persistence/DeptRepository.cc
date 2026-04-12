@@ -1,10 +1,10 @@
 #include "domain/organization/dept/DeptRepository.h"
 
-#include <drogon/HttpAppFramework.h>
+#include "domain/models/SysDept.h"
+#include "SqlGenerator/src/SqlGenerator.h"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/orm/Criteria.h>
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "domain/models/SysDept.h"
+#include <drogon/HttpAppFramework.h>
 
 using namespace std;
 using namespace drogon;
@@ -12,8 +12,8 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<int32_t> DeptRepository::getMaxSubDeptSortNum(
-    const optional<int32_t> parentId) const
+Task<std::int32_t> DeptRepository::getMaxSubDeptSortNum(
+    const optional<std::int32_t> parentId) const
 {
     ParamList paramList;
     if (parentId)
@@ -25,7 +25,7 @@ Task<int32_t> DeptRepository::getMaxSubDeptSortNum(
         sqlGenerator()->getSql("get_max_sub_dept_sort_num", paramList);
 
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
-    co_return dbResult[0][0].as<int32_t>();
+    co_return dbResult[0][0].as<std::int32_t>();
 }
 
 Task<> DeptRepository::save(const Dept &dept) const
@@ -49,7 +49,7 @@ Task<> DeptRepository::save(const Dept &dept) const
     }
 }
 
-Task<Dept> DeptRepository::getById(const int32_t deptId) const
+Task<Dept> DeptRepository::getById(const std::int32_t deptId) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_dept_id, deptId};
@@ -58,9 +58,9 @@ Task<Dept> DeptRepository::getById(const int32_t deptId) const
     co_return static_cast<Dept>(sysDept);
 }
 
-Task<int32_t> DeptRepository::countNameByParentId(
+Task<std::int32_t> DeptRepository::countNameByParentId(
     const string &name,
-    const optional<int32_t> &parentId) const
+    const optional<std::int32_t> &parentId) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_name, name};
@@ -77,7 +77,7 @@ Task<int32_t> DeptRepository::countNameByParentId(
     co_return co_await deptMapper().count(criteria);
 }
 
-Task<size_t> DeptRepository::countSubDept(const int32_t deptId) const
+Task<size_t> DeptRepository::countSubDept(const std::int32_t deptId) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_parent_id, deptId};
@@ -86,7 +86,7 @@ Task<size_t> DeptRepository::countSubDept(const int32_t deptId) const
 }
 
 Task<vector<Dept>> DeptRepository::getByIds(
-    const vector<int32_t> &idsVector) const
+    const vector<std::int32_t> &idsVector) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria =
@@ -100,7 +100,7 @@ Task<vector<Dept>> DeptRepository::getByIds(
 }
 
 Task<vector<Dept>> DeptRepository::getByParentId(
-    const optional<int32_t> &parentId) const
+    const optional<std::int32_t> &parentId) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria =
