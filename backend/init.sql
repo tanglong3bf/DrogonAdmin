@@ -12,7 +12,7 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 04/04/2026 20:33:05
+ Date: 12/04/2026 21:26:58
 */
 
 -- ----------------------------
@@ -234,21 +234,21 @@ COMMENT ON COLUMN "public"."sys_user_role"."created_time" IS '创建时间';
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 9, true);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 10, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 1, false);
+SELECT setval('"public"."sys_role_role_id_seq"', 2, false);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_user_user_id_seq"
 OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 1, true);
+SELECT setval('"public"."sys_user_user_id_seq"', 2, true);
 
 -- ----------------------------
 -- Primary Key structure for table sys_dept
@@ -261,6 +261,16 @@ ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dep
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
 
 -- ----------------------------
+-- Primary Key structure for table sys_role_dept
+-- ----------------------------
+ALTER TABLE "public"."sys_role_dept" ADD CONSTRAINT "sys_role_dept_pkey" PRIMARY KEY ("role_id", "dept_id");
+
+-- ----------------------------
 -- Primary Key structure for table sys_user
 -- ----------------------------
 ALTER TABLE "public"."sys_user" ADD CONSTRAINT "sys_user_pkey" PRIMARY KEY ("user_id");
+
+-- ----------------------------
+-- Primary Key structure for table sys_user_role
+-- ----------------------------
+ALTER TABLE "public"."sys_user_role" ADD CONSTRAINT "sys_user_role_pkey" PRIMARY KEY ("user_id", "role_id");
