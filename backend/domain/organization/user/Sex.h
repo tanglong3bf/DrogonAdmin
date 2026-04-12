@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "common/util/Utilities.hpp"
+#include <string>
 
 /**
  * @brief 性别
@@ -13,5 +13,4 @@ enum class Sex : std::int16_t
     Female = 2,
 };
 
-template <>
 std::string toString(const Sex &sex);

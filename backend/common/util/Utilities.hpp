@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #define OPT_SETTER(field, Field)                                 \
     void set##Field(const decltype(field##_)::value_type &field) \
     {                                                            \
@@ -104,6 +102,3 @@
 
 #define SET_VAL_CAST(type, field, Field) \
     model.set##Field(static_cast<type>(field##_))
-
-template <typename T>
-std::string toString(const T &);

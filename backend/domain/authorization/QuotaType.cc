@@ -4,7 +4,6 @@
 
 using namespace std;
 
-template <>
 string toString(const QuotaType &quotaType)
 {
     switch (quotaType)

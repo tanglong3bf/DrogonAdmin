@@ -4,7 +4,6 @@
 
 using namespace std;
 
-template <>
 string toString(const Status &status)
 {
     switch (status)

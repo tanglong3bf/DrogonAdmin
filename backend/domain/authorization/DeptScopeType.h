@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "common/util/Utilities.hpp"
+#include <string>
 
 /**
  * @brief 角色部门关联类型
@@ -13,5 +13,4 @@ enum class RelationType : std::int16_t
     Blacklist = 2   ///< 黑名单
 };
 
-template <>
 std::string toString(const RelationType &deptScopeType);
