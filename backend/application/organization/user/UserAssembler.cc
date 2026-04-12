@@ -39,5 +39,6 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
             user.addUserRole(UserRole{roleId, createdBy});
         }
     }
+    user.toNew();
     co_return user;
 }

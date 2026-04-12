@@ -1,18 +1,18 @@
 #pragma once
 
-#include <drogon/utils/coroutine.h>
-#include <memory>
-#include "application/organization/user/UserAssembler.h"
-#include "application/organization/user/UserCqrsRepo.h"
-#include "application/organization/user/UserCreateRequest.h"
-#include "application/organization/user/UserQueryRequest.h"
-#include "application/organization/user/UserUpdateRequest.h"
-#include "application/organization/user/UserUpdater.h"
-#include "common/framework/DrAdminObject.hpp"
-#include "common/util/PaginatedResponse.hpp"
+#include "UserAssembler.h"
+#include "UserCqrsRepo.h"
+#include "UserCreateRequest.h"
+#include "UserQueryRequest.h"
 #include "UserResponse.h"
+#include "UserUpdateRequest.h"
+#include "UserUpdater.h"
 #include "domain/organization/user/UserHandler.h"
 #include "domain/organization/user/UserRepository.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "common/util/PaginatedResponse.hpp"
+#include <drogon/utils/coroutine.h>
+#include <memory>
 
 /**
  * @brief 用户服务
@@ -30,20 +30,20 @@ class UserService : public DrAdminObject<UserService>
      * @brief 新增用户
      */
     drogon::Task<> createUser(const UserCreateRequest &request,
-                              const int32_t createdBy) const;
+                              const std::int32_t createdBy) const;
 
     /**
      * @brief 更新用户
      */
     drogon::Task<> updateUser(const std::int32_t userId,
                               const UserUpdateRequest &request,
-                              const int32_t updatedBy) const;
+                              const std::int32_t updatedBy) const;
 
     /**
      * @brief 删除用户
      */
     drogon::Task<> deleteUser(const std::int32_t userId,
-                              const int32_t deletedBy) const;
+                              const std::int32_t deletedBy) const;
 
   private:
     UserCqrsRepoPtr userCqrsRepo_{

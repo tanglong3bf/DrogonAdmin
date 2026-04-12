@@ -1,24 +1,26 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string>
-
-#include "common/util/Utilities.hpp"
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
+#include "common/util/Utilities.hpp"
+#include <optional>
+#include <string>
+#include <cstdint>
 
+/**
+ * 用户查询请求
+ */
 class UserQueryRequest
 {
-    std::optional<std::string> username_;
-    std::optional<std::string> nickname_;
-    std::optional<Sex> sex_;
-    std::optional<std::int32_t> deptId_;
-    std::optional<std::string> phoneNumber_;
-    std::optional<std::string> email_;
-    std::optional<Status> status_;
-    std::size_t page_;
-    std::size_t pageSize_;
+    std::optional<std::string> username_;     ///< 用户名
+    std::optional<std::string> nickname_;     ///< nicheng
+    std::optional<Sex> sex_;                  ///< 性别
+    std::optional<std::int32_t> deptId_;      ///< 部门
+    std::optional<std::string> phoneNumber_;  ///< 手机号
+    std::optional<std::string> email_;        ///< 邮箱
+    std::optional<Status> status_;            ///< 状态
+    std::size_t page_;                        ///< 页码
+    std::size_t pageSize_;                    ///< 每页数据量
 
   public:
     UserQueryRequest(std::string username,

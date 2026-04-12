@@ -1,4 +1,5 @@
 #include "UserResponse.h"
+
 #include <drogon/HttpResponse.h>
 
 namespace drogon
@@ -45,11 +46,11 @@ Json::Value UserResponse::toJson() const
     json["dept_id"] = deptId_;
     if (phoneNumber_)
     {
-        json["phone_number"] = *phoneNumber_;
+        json["phone_number"] = phoneNumber_->value();
     }
     if (email_)
     {
-        json["email"] = *email_;
+        json["email"] = email_->value();
     }
     json["status"] = static_cast<int8_t>(status_);
     if (userRoles_.size() > 0)

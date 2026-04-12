@@ -1,25 +1,28 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string>
 #include "UserRoleResponse.h"
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
 #include "domain/organization/user/User.h"
+#include <optional>
+#include <string>
+#include <cstdint>
 
+/**
+ * @brief 用户响应类
+ */
 class UserResponse
 {
-    std::int32_t userId_;
-    std::string username_;
-    std::string nickname_;
-    std::string avatar_;
-    Sex sex_;
-    std::int32_t deptId_;
-    std::optional<std::string> phoneNumber_;
-    std::optional<std::string> email_;
-    Status status_;
-    std::vector<UserRoleResponse> userRoles_;
+    std::int32_t userId_;                      ///< 用户id
+    std::string username_;                     ///< 用户名
+    std::string nickname_;                     ///< 昵称
+    std::string avatar_;                       ///< 头像
+    Sex sex_;                                  ///< 性别
+    std::int32_t deptId_;                      ///< 部门
+    std::optional<PhoneNumber> phoneNumber_;   ///< 电话号码
+    std::optional<Email> email_;               ///< 邮箱
+    Status status_;                            ///< 状态
+    std::vector<UserRoleResponse> userRoles_;  ///< 拥有的角色
 
   public:
     // 实体类

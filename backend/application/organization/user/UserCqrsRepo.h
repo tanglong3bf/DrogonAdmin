@@ -1,11 +1,11 @@
 #pragma once
 
+#include "UserQueryRequest.h"
+#include "UserResponse.h"
+#include "domain/models/SysUser.h"
+#include "common/framework/DrAdminObject.hpp"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/utils/coroutine.h>
-#include "application/organization/user/UserQueryRequest.h"
-#include "application/organization/user/UserResponse.h"
-#include "common/framework/DrAdminObject.hpp"
-#include "domain/models/SysUser.h"
 
 class UserCqrsRepo : public DrAdminObject<UserCqrsRepo>
 {

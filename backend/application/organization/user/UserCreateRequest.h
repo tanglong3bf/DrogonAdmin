@@ -1,11 +1,13 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <jsoncpp/json/value.h>
-#include "common/util/Utilities.hpp"
+#include "domain/organization/user/Email.h"
+#include "domain/organization/user/PhoneNumber.h"
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
+#include "common/util/Utilities.hpp"
+#include <jsoncpp/json/value.h>
+#include <optional>
+#include <cstdint>
 
 /**
  * @brief 创建用户请求
@@ -15,14 +17,14 @@
  */
 class UserCreateRequest
 {
-    std::string username_;
-    std::string nickname_;
-    Sex sex_;
-    std::int32_t deptId_;
-    std::optional<std::string> phoneNumber_;
-    std::optional<std::string> email_;
-    Status status_;
-    std::optional<std::vector<std::int32_t>> roleIds_;
+    std::string username_;                              ///< 用户名
+    std::string nickname_;                              ///< 昵称
+    Sex sex_;                                           ///< 性别
+    std::int32_t deptId_;                               ///< 所属部门
+    std::optional<PhoneNumber> phoneNumber_;            ///< 手机号
+    std::optional<Email> email_;                        ///< 邮箱
+    Status status_;                                     ///< 状态
+    std::optional<std::vector<std::int32_t>> roleIds_;  ///< 拥有的角色
 
   public:
     void setByJson(const Json::Value &json);

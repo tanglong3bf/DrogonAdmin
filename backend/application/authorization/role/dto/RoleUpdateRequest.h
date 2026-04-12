@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsoncpp/json/value.h>
+#include "common/util/Utilities.hpp"
 #include "domain/authorization/DeptScopeType.h"
 #include "domain/authorization/QuotaType.h"
 

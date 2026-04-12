@@ -1,15 +1,21 @@
 #pragma once
 
-#include <memory>
-#include "application/organization/user/UserCreateRequest.h"
-#include "common/framework/DrAdminObject.hpp"
+#include "UserCreateRequest.h"
 #include "domain/organization/user/User.h"
 #include "domain/organization/user/UserVerifier.h"
 #include "domain/organization/dept/DeptVerifier.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <memory>
 
+/**
+ * @brief 用户组装器
+ */
 class UserAssembler : public DrAdminObject<UserAssembler>
 {
   public:
+    /**
+     * @brief 从 UserCreateRequest 创建 User
+     */
     drogon::Task<User> fromCreateRequest(const UserCreateRequest &request,
                                          const int32_t createdBy) const;
 

@@ -1,18 +1,20 @@
 #include "UserQueryRequest.h"
+
 #include <drogon/utils/Utilities.h>
 
+using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
-UserQueryRequest::UserQueryRequest(std::string username,
-                                   std::string nickname,
-                                   std::string sex,
-                                   std::string deptId,
-                                   std::string phoneNumber,
-                                   std::string email,
-                                   std::string status,
-                                   std::string page,
-                                   std::string pageSize)
+UserQueryRequest::UserQueryRequest(string username,
+                                   string nickname,
+                                   string sex,
+                                   string deptId,
+                                   string phoneNumber,
+                                   string email,
+                                   string status,
+                                   string page,
+                                   string pageSize)
 {
     if (username.size() > 0)
     {

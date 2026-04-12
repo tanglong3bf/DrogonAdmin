@@ -30,7 +30,6 @@ Task<> UserService::createUser(const UserCreateRequest &request,
                                const int32_t createdBy) const
 {
     auto user = co_await userAssembler_->fromCreateRequest(request, createdBy);
-    user.toNew();
     co_await userRepository_->save(user);
 }
 
@@ -40,7 +39,6 @@ Task<> UserService::updateUser(const std::int32_t userId,
 {
     auto user = co_await userRepository_->getById(userId, true);
     co_await userUpdater_->updateUser(user, request, updatedBy);
-    user.toUpdate();
     co_await userRepository_->save(user);
 }
 
@@ -49,6 +47,5 @@ drogon::Task<> UserService::deleteUser(const std::int32_t userId,
 {
     auto user = co_await userRepository_->getById(userId, true);
     co_await userHandler_->deleteUser(user, deletedBy);
-    user.toDelete();
     co_await userRepository_->save(user);
 }
