@@ -3,6 +3,7 @@
 #include "domain/models/SysRoleDept.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include <drogon/HttpAppFramework.h>
+#include <drogon/orm/Criteria.h>
 #include <trantor/utils/Date.h>
 
 using namespace std;
@@ -11,20 +12,22 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<size_t> RoleRepository::countBelongDept(const std::int32_t deptId) const
+Task<size_t> RoleRepository::countBelongDept(const std::int32_t deptId,
+                                             const DbClientPtr &dbClient) const
 {
     auto sql =
         sqlGenerator()->getSql("count_belong_dept", {{"dept_id", deptId}});
-    auto result = co_await dbClient()->execSqlCoro(sql);
+    auto result = co_await dbClient->execSqlCoro(sql);
     co_return result[0][0].as<size_t>();
 }
 
 Task<vector<RoleDept>> RoleRepository::getExcludingDeptByDeptId(
-    const std::int32_t deptId) const
+    const std::int32_t deptId,
+    const DbClientPtr &dbClient) const
 {
     auto sql = sqlGenerator()->getSql("get_excluding_dept_by_dept_id",
                                       {{"dept_id", deptId}});
-    auto result = co_await dbClient()->execSqlCoro(sql);
+    auto result = co_await dbClient->execSqlCoro(sql);
     vector<SysRoleDept> sysRoleDeptList;
     for (const auto &row : result)
     {
@@ -33,7 +36,8 @@ Task<vector<RoleDept>> RoleRepository::getExcludingDeptByDeptId(
     co_return buildRoleDeptList(sysRoleDeptList);
 }
 
-Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList) const
+Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList,
+                                     const DbClientPtr &dbClient) const
 {
     vector<SysRoleDept> newData;
     vector<SysRoleDept> toUpdate;
@@ -62,14 +66,16 @@ Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList) const
 
     if (toDelete.size() > 0)
     {
-        Json::Value dataList;
-        for (const auto &item : toDelete)
-        {
-            dataList.append(item.toJson());
-        }
-        auto sql = sqlGenerator()->getSql("multi_delete_for_role_dept",
-                                          {{"data_list", dataList}});
-        co_await dbClient()->execSqlCoro(sql);
+        const auto deptIdsView =
+            toDelete | views::transform([](const auto &data) {
+                return data.getValueOfDeptId();
+            });
+        vector<std::int32_t> deptIds(deptIdsView.begin(), deptIdsView.end());
+        auto criteria =
+            Criteria{SysRoleDept::Cols::_role_id,
+                     toDelete[0].getValueOfRoleId()} &&
+            Criteria{SysRoleDept::Cols::_dept_id, CompareOperator::In, deptIds};
+        co_await roleDeptMapper(dbClient).deleteBy(criteria);
     }
 }
 
@@ -87,7 +93,9 @@ Task<size_t> RoleRepository::countByCode(const string &name) const
 
 Task<> RoleRepository::save(Role &role) const
 {
-    const auto trans = co_await dbClient()->newTransactionCoro();
+    // 由于这里涉及到多表操作，一定需要开启事务
+    // 如果由外界传入，则无法保证
+    const auto trans = co_await app().getDbClient()->newTransactionCoro();
     switch (role.getChangingStatus())
     {
         case ChangingStatus::NEW:
@@ -238,19 +246,14 @@ inline SqlGenerator *RoleRepository::sqlGenerator()
     return sqlGenerator_;
 }
 
-inline DbClientPtr RoleRepository::dbClient()
-{
-    static const DbClientPtr dbClient_ = app().getDbClient();
-    return dbClient_;
-}
-
 inline CoroMapper<SysRole> RoleRepository::roleMapper(
-    const shared_ptr<Transaction> &trans)
+    const DbClientPtr &dbClient)
 {
-    return CoroMapper<SysRole>{trans == nullptr ? dbClient() : trans};
+    return CoroMapper<SysRole>{dbClient};
 }
 
-inline CoroMapper<SysRoleDept> RoleRepository::roleDeptMapper()
+inline CoroMapper<SysRoleDept> RoleRepository::roleDeptMapper(
+    const DbClientPtr &dbClient)
 {
-    return CoroMapper<SysRoleDept>{dbClient()};
+    return CoroMapper<SysRoleDept>{dbClient};
 }

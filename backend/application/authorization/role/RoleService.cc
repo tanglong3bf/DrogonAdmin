@@ -2,16 +2,19 @@
 
 using namespace std;
 using namespace drogon;
+using namespace drogon::orm;
 
 Task<> RoleService::deleteExcludingDept(const std::int32_t deptId,
-                                        const std::int32_t deletedBy) const
+                                        const std::int32_t deletedBy,
+                                        const DbClientPtr &dbClient) const
 {
-    auto roleDepts = co_await roleRepository_->getExcludingDeptByDeptId(deptId);
+    auto roleDepts =
+        co_await roleRepository_->getExcludingDeptByDeptId(deptId, dbClient);
     for (auto &roleDept : roleDepts)
     {
         roleDept.toDelete();
     }
-    co_await roleRepository_->saveRoleDepts(roleDepts);
+    co_await roleRepository_->saveRoleDepts(roleDepts, dbClient);
 }
 
 Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(

@@ -1,12 +1,13 @@
 #pragma once
 
-#include <memory>
-#include <drogon/orm/CoroMapper.h>
-#include <drogon/utils/coroutine.h>
+#include "Dept.h"
+#include "domain/models/SysDept.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
-#include "domain/models/SysDept.h"
-#include "Dept.h"
+#include <drogon/orm/CoroMapper.h>
+#include <drogon/utils/coroutine.h>
+#include <drogon/HttpAppFramework.h>
+#include <memory>
 
 /**
  * @brief 部门仓库
@@ -23,12 +24,15 @@ class DeptRepository : public DrAdminObject<DeptRepository>
      * @brief 指定父部门id，获取最大的sort_num，传空表示根
      */
     drogon::Task<std::int32_t> getMaxSubDeptSortNum(
-        const std::optional<std::int32_t> parentId) const;
+        const std::optional<std::int32_t> parentId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 存储部门数据
      */
-    drogon::Task<> save(const Dept &dept) const;
+    drogon::Task<> save(
+        const Dept &dept,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 根据部门id获取数据
@@ -62,12 +66,14 @@ class DeptRepository : public DrAdminObject<DeptRepository>
     /**
      * @brief 批量存储部门（新增、更新、删除）
      */
-    drogon::Task<> multiSave(const std::vector<Dept> &depts) const;
+    drogon::Task<> multiSave(
+        const std::vector<Dept> &depts,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
   private:
     static SqlGenerator *sqlGenerator();
-    static DbClientPtr dbClient();
-    static SysDeptMapper deptMapper();
+    static SysDeptMapper deptMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
 };
 
 using DeptRepositoryPtr = std::shared_ptr<DeptRepository>;

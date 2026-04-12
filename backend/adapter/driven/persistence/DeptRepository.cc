@@ -13,7 +13,8 @@ using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
 Task<std::int32_t> DeptRepository::getMaxSubDeptSortNum(
-    const optional<std::int32_t> parentId) const
+    const optional<std::int32_t> parentId,
+    const DbClientPtr &dbClient) const
 {
     ParamList paramList;
     if (parentId)
@@ -24,15 +25,15 @@ Task<std::int32_t> DeptRepository::getMaxSubDeptSortNum(
     const auto sql =
         sqlGenerator()->getSql("get_max_sub_dept_sort_num", paramList);
 
-    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    const auto dbResult = co_await dbClient->execSqlCoro(sql);
     co_return dbResult[0][0].as<std::int32_t>();
 }
 
-Task<> DeptRepository::save(const Dept &dept) const
+Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
 {
     const auto sysDept = static_cast<SysDept>(dept);
 
-    auto mapper = deptMapper();
+    auto mapper = deptMapper(dbClient);
 
     switch (dept.getChangingStatus())
     {
@@ -114,7 +115,8 @@ Task<vector<Dept>> DeptRepository::getByParentId(
     co_return {deptView.begin(), deptView.end()};
 }
 
-Task<> DeptRepository::multiSave(const vector<Dept> &depts) const
+Task<> DeptRepository::multiSave(const vector<Dept> &depts,
+                                 const drogon::orm::DbClientPtr &dbClient) const
 {
     // 暂只考虑批量更新
     vector<SysDept> toUpdate;
@@ -151,7 +153,7 @@ Task<> DeptRepository::multiSave(const vector<Dept> &depts) const
     const auto sql = sqlGenerator()->getSql("multi_update_dept",
                                             ParamList{{"data_list", dataList}});
 
-    co_await dbClient()->execSqlCoro(sql);
+    co_await dbClient->execSqlCoro(sql);
 }
 
 inline SqlGenerator *DeptRepository::sqlGenerator()
@@ -160,13 +162,8 @@ inline SqlGenerator *DeptRepository::sqlGenerator()
     return sqlGenerator_;
 }
 
-inline DbClientPtr DeptRepository::dbClient()
+inline CoroMapper<SysDept> DeptRepository::deptMapper(
+    const DbClientPtr &dbClient)
 {
-    static const drogon::orm::DbClientPtr dbClient_ = app().getDbClient();
-    return dbClient_;
-}
-
-inline CoroMapper<SysDept> DeptRepository::deptMapper()
-{
-    return CoroMapper<SysDept>{dbClient()};
+    return CoroMapper<SysDept>{dbClient};
 }

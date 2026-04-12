@@ -12,7 +12,7 @@
  Target Server Version : 180001
  File Encoding         : 65001
 
- Date: 12/04/2026 21:26:58
+ Date: 13/04/2026 14:24:58
 */
 
 -- ----------------------------
@@ -241,14 +241,14 @@ SELECT setval('"public"."sys_dept_dept_id_seq"', 10, true);
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 2, false);
+SELECT setval('"public"."sys_role_role_id_seq"', 2, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."sys_user_user_id_seq"
 OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 2, true);
+SELECT setval('"public"."sys_user_user_id_seq"', 2, false);
 
 -- ----------------------------
 -- Primary Key structure for table sys_dept

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
-#include <drogon/orm/CoroMapper.h>
-#include <drogon/utils/coroutine.h>
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "common/framework/DrAdminObject.hpp"
-#include "domain/models/SysRoleDept.h"
 #include "Role.h"
 #include "RoleDept.h"
+#include "domain/models/SysRoleDept.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include <drogon/HttpAppFramework.h>
+#include <drogon/orm/CoroMapper.h>
+#include <drogon/utils/coroutine.h>
+#include <memory>
 
 /**
  * @brief 角色仓库
@@ -25,19 +26,23 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     /**
      * @brief 统计部门被正向关联的次数
      */
-    drogon::Task<std::size_t> countBelongDept(const std::int32_t deptId) const;
+    drogon::Task<std::size_t> countBelongDept(
+        const std::int32_t deptId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 获取部门被哪些角色排除
      */
     drogon::Task<std::vector<RoleDept>> getExcludingDeptByDeptId(
-        const std::int32_t deptId) const;
+        const std::int32_t deptId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 存储关联数据
      */
     drogon::Task<> saveRoleDepts(
-        const std::vector<RoleDept> &roleDeptList) const;
+        const std::vector<RoleDept> &roleDeptList,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 按照名称统计角色数量
@@ -65,10 +70,10 @@ class RoleRepository : public DrAdminObject<RoleRepository>
 
   private:
     static SqlGenerator *sqlGenerator();
-    static DbClientPtr dbClient();
     static RoleMapper roleMapper(
-        const std::shared_ptr<drogon::orm::Transaction> &trans = nullptr);
-    static RoleDeptMapper roleDeptMapper();
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
+    static RoleDeptMapper roleDeptMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
 };
 
 using RoleRepositoryPtr = std::shared_ptr<RoleRepository>;

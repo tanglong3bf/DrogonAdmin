@@ -334,13 +334,6 @@
             "main": "SELECT MAX(sort_num) FROM sys_dept @condition(parent_id)",
             "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           },
-          // 角色部门中间表的批量删除
-          "multi_delete_for_role_dept": {
-            "main": "UPDATE \"sys_role_dept\" t SET @sets() FROM ( VALUES @values(data_list) ) AS s @fields() WHERE t.id = s.id",
-            "sets": "deleted_by = s.deleted_by, deleted_time = s.deleted_time",
-            "values": "@for(item in data_list, separator='), (') ${item.id}, ${item.deleted_by}, ${item.deleted_time} @endfor",
-            "fields": "id, deleted_by, deleted_time"
-          },
           // 批量更新部门数据、包括批量删除
           "multi_update_dept": {
             "main": {
@@ -368,11 +361,11 @@
           },
           "count_belong_dept": {
             "main": "SELECT COUNT(*) FROM sys_role_dept rd LEFT JOIN sys_role r ON rd.role_id = r.role_id WHERE @condition(dept_id)",
-            "condition": "rd.deleted_by IS NULL AND r.deleted_by IS NULL AND r.relation_type = 1 AND rd.dept_id = ${dept_id} "
+            "condition": "r.deleted_by IS NULL AND r.relation_type = 1 AND rd.dept_id = ${dept_id} "
           },
           "get_excluding_dept_by_dept_id": {
             "main": "SELECT rd.* FROM sys_role_dept rd LEFT JOIN sys_role r ON rd.role_id = r.role_id WHERE @condition(dept_id)",
-            "condition": "rd.deleted_by IS NULL AND r.deleted_by IS NULL AND r.relation_type = 2 AND rd.dept_id = ${dept_id} "
+            "condition": "r.deleted_by IS NULL AND r.relation_type = 2 AND rd.dept_id = ${dept_id} "
           },
           "count_role_by_name_and_dept_id": {
             "main": "@if(dept_id) SELECT COUNT(*) FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name)) @else @allRoles(name) @endif",
@@ -381,7 +374,7 @@
             "excludedRoles": "@baseQuery(name, dept_id, type='0')",
             "normalRoles": "SELECT * FROM sys_role WHERE deleted_by IS NULL AND name LIKE '%${name}%' AND role_id NOT IN (SELECT role_id FROM sys_role_dept)",
             "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
-            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.deleted_by IS NULL @if(type) AND r.relation_type = ${type} @endif",
+            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id @if(type) AND r.relation_type = ${type} @endif",
             "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
           },
           "get_role_list": {
@@ -391,7 +384,7 @@
             "excludedRoles": "@baseQuery(name, dept_id, type='0')",
             "normalRoles": "SELECT * FROM sys_role WHERE deleted_by IS NULL AND name LIKE '%${name}%' AND role_id NOT IN (SELECT role_id FROM sys_role_dept)",
             "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
-            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.deleted_by IS NULL @if(type) AND r.relation_type = ${type} @endif",
+            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id @if(type) AND r.relation_type = ${type} @endif",
             "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
           },
           "multi_insert_role_dept": {

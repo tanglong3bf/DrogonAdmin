@@ -62,7 +62,6 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     auto roleDeptList = co_await roleDeptMapper().findBy(
         Criteria{SysRoleDept::Cols::_role_id, CompareOperator::In, roleIds});
 
-    // TODO: 优化
     for (const auto &roleDept : roleDeptList)
     {
         for (auto &role : roleList)

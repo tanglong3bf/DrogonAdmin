@@ -3,6 +3,7 @@
 #include "DeptSortRequest.h"
 #include "common/exception/BusinessException.h"
 #include <drogon/HttpAppFramework.h>
+#include <drogon/orm/Exception.h>
 #include <drogon/utils/coroutine.h>
 
 using namespace std;
@@ -48,9 +49,20 @@ Task<> DeptService::deleteDept(const std::int32_t deptId,
 
         co_await deptHandler_->deleteDept(dept, deletedBy);
 
-        // TODO: 事务
-        co_await deptRepository_->save(dept);
-        co_await roleService_->deleteExcludingDept(deptId, deletedBy);
+        const auto trans = co_await app().getDbClient()->newTransactionCoro();
+        try
+        {
+            co_await deptRepository_->save(dept, trans);
+            co_await roleService_->deleteExcludingDept(deptId,
+                                                       deletedBy,
+                                                       trans);
+        }
+        catch (const drogon::orm::DrogonDbException &e)
+        {
+            LOG_ERROR << e.base().what();
+            trans->rollback();
+            throw e;
+        }
     }
     catch (const orm::UnexpectedRows &e)
     {

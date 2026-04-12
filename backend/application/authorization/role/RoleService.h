@@ -12,6 +12,8 @@
 #include "domain/authorization/RoleRepository.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
+#include <drogon/HttpAppFramework.h>
+#include <drogon/orm/DbClient.h>
 #include <drogon/utils/coroutine.h>
 #include <memory>
 
@@ -24,8 +26,10 @@ class RoleService : public DrAdminObject<RoleService>
     /**
      * @brief 删除部门时，删除排除该部门的角色关联数据
      */
-    drogon::Task<> deleteExcludingDept(const std::int32_t deptId,
-                                       const std::int32_t deletedBy) const;
+    drogon::Task<> deleteExcludingDept(
+        const std::int32_t deptId,
+        const std::int32_t deletedBy,
+        const drogon::orm::DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 带条件分页查询角色列表
