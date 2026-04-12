@@ -1,11 +1,11 @@
 #pragma once
 
-#include <drogon/utils/coroutine.h>
 #include "dto/RoleCreateRequest.h"
-#include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/Role.h"
 #include "domain/authorization/RoleRepository.h"
 #include "domain/authorization/RoleVerifier.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <drogon/utils/coroutine.h>
 
 /**
  * @brief 角色装配器

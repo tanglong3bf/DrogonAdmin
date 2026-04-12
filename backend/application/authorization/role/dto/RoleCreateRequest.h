@@ -1,9 +1,9 @@
 #pragma once
 
-#include <jsoncpp/json/value.h>
-#include "common/util/Utilities.hpp"
 #include "domain/authorization/DeptScopeType.h"
 #include "domain/authorization/QuotaType.h"
+#include "common/util/Utilities.hpp"
+#include <jsoncpp/json/value.h>
 
 /**
  * @brief 角色创建请求
@@ -18,7 +18,7 @@ class RoleCreateRequest
     QuotaType quotaType_;                     ///< 限制类型
     std::optional<int> userQuota_;            ///< 限制数量
     RelationType relationType_;               ///< 关联类型
-    std::vector<int> deptIds_;                ///< 关联的部门ID列表
+    std::vector<int> deptIds_;                ///< 关联部门
 
   public:
     void setByJson(const Json::Value &json);

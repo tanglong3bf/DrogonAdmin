@@ -1,8 +1,8 @@
 #pragma once
 
+#include "domain/authorization/RoleDept.h"
 #include <jsoncpp/json/value.h>
 #include <cstdint>
-#include "domain/authorization/RoleDept.h"
 
 class RoleDeptResponse
 {

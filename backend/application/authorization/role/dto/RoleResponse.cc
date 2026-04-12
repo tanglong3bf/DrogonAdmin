@@ -1,4 +1,5 @@
 #include "RoleResponse.h"
+
 #include <drogon/HttpResponse.h>
 #include <jsoncpp/json/value.h>
 
@@ -45,12 +46,12 @@ Json::Value RoleResponse::toJson() const
     {
         json["description"] = *description_;
     }
-    json["quota_type"] = static_cast<int8_t>(quotaType_);
+    json["quota_type"] = static_cast<int16_t>(quotaType_);
     if (userQuota_)
     {
         json["user_quota"] = *userQuota_;
     }
-    json["relation_type"] = static_cast<int8_t>(relationType_);
+    json["relation_type"] = static_cast<int16_t>(relationType_);
     json["depts"] = toJsonArray(depts);
 
     return json;

@@ -32,8 +32,8 @@ Task<size_t> RoleCqrsRepo::countByNameAndDeptId(
 }
 
 Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
-    const GetRoleListRequest &request,
-    const int32_t maxPage) const
+    const RoleQueryRequest &request,
+    const size_t maxPage) const
 {
     ParamList params;
     const int32_t page =

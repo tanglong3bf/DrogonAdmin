@@ -1,19 +1,19 @@
 #pragma once
 
-#include <drogon/utils/coroutine.h>
-#include <memory>
-#include "dto/GetRoleListRequest.h"
+#include "RoleAssembler.h"
 #include "RoleCqrsRepo.h"
+#include "RoleUpdater.h"
+#include "dto/RoleQueryRequest.h"
 #include "dto/RoleResponse.h"
 #include "dto/AssignableRoleResponse.h"
-#include "RoleAssembler.h"
 #include "dto/RoleCreateRequest.h"
 #include "dto/RoleUpdateRequest.h"
-#include "RoleUpdater.h"
-#include "common/framework/DrAdminObject.hpp"
 #include "domain/authorization/RoleHandler.h"
 #include "domain/authorization/RoleRepository.h"
+#include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
+#include <drogon/utils/coroutine.h>
+#include <memory>
 
 /**
  * @brief 角色服务
@@ -31,7 +31,7 @@ class RoleService : public DrAdminObject<RoleService>
      * @brief 带条件分页查询角色列表
      */
     drogon::Task<PaginatedResponse<RoleResponse>> getRoleList(
-        const GetRoleListRequest &request) const;
+        const RoleQueryRequest &request) const;
 
     /**
      * @brief 创建角色

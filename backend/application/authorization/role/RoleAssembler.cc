@@ -1,11 +1,11 @@
 #include "RoleAssembler.h"
+
 #include "domain/authorization/Role.h"
 
-using namespace std;
 using namespace drogon;
 
 Task<Role> RoleAssembler::fromCreateRequest(const RoleCreateRequest request,
-                                            int32_t createdBy)
+                                            std::int32_t createdBy)
 {
     // 验证
     const auto name = request.getName();

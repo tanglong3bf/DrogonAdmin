@@ -13,47 +13,7 @@ Task<HttpResponsePtr> RoleController::list(const HttpRequestPtr req,
                                            const string page,
                                            const string pageSize) const
 {
-    // TODO: 改成构造
-    GetRoleListRequest request;
-    if (name.size() > 0)
-    {
-        request.setName(name);
-    }
-    if (deptId.size() > 0)
-    {
-        try
-        {
-            const auto value = fromString<int32_t>(deptId);
-            request.setDeptId(value);
-        }
-        catch (const exception & /* ignore */)
-        {
-        }
-    }
-    if (page.size() > 0)
-    {
-        try
-        {
-            const auto value = fromString<int32_t>(page);
-            request.setPage(value);
-        }
-        catch (const exception & /* ignore */)
-        {
-            request.setPage(1);
-        }
-    }
-    if (pageSize.size() > 0)
-    {
-        try
-        {
-            const auto value = fromString<int32_t>(pageSize);
-            request.setPageSize(value);
-        }
-        catch (const exception & /* ignore */)
-        {
-            request.setPageSize(10);
-        }
-    }
+    RoleQueryRequest request{name, deptId, page, pageSize};
     const auto paginated = co_await roleService_->getRoleList(request);
     co_return toResponse(paginated);
 }

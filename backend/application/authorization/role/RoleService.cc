@@ -3,8 +3,8 @@
 using namespace std;
 using namespace drogon;
 
-Task<> RoleService::deleteExcludingDept(const int32_t deptId,
-                                        const int32_t deletedBy) const
+Task<> RoleService::deleteExcludingDept(const std::int32_t deptId,
+                                        const std::int32_t deletedBy) const
 {
     auto roleDepts = co_await roleRepository_->getExcludingDeptByDeptId(deptId);
     for (auto &roleDept : roleDepts)
@@ -15,7 +15,7 @@ Task<> RoleService::deleteExcludingDept(const int32_t deptId,
 }
 
 Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
-    const GetRoleListRequest &request) const
+    const RoleQueryRequest &request) const
 {
     const size_t count =
         co_await roleCqrsRepo_->countByNameAndDeptId(request.getName(),
@@ -42,7 +42,7 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
 }
 
 Task<> RoleService::createRole(const RoleCreateRequest &request,
-                               const int32_t createdBy) const
+                               const std::int32_t createdBy) const
 {
     auto role = co_await roleAssembler_->fromCreateRequest(request, createdBy);
     role.toNew();
@@ -69,7 +69,7 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
 }
 
 Task<vector<AssignableRoleResponse>> RoleService::getAssignableRoles(
-    const int32_t deptId) const
+    const std::int32_t deptId) const
 {
     co_return co_await roleCqrsRepo_->getAssignableRoles(deptId);
 }

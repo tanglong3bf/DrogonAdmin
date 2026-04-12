@@ -1,20 +1,23 @@
 #pragma once
 
-#include <drogon/orm/DbClient.h>
-#include <drogon/utils/coroutine.h>
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "dto/GetRoleListRequest.h"
+#include "dto/RoleQueryRequest.h"
 #include "dto/AssignableRoleResponse.h"
-#include "common/framework/DrAdminObject.hpp"
 #include "dto/RoleResponse.h"
 #include "domain/models/SysRole.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include <drogon/orm/DbClient.h>
+#include <drogon/utils/coroutine.h>
 
+/**
+ * 角色查询仓库
+ */
 class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
 {
-    using RoleMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRole>;
-    using RoleDeptMapper =
-        drogon::orm::CoroMapper<drogon_model::drogon_admin_db::SysRoleDept>;
+    using SysRole = drogon_model::drogon_admin_db::SysRole;
+    using RoleMapper = drogon::orm::CoroMapper<SysRole>;
+    using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
+    using RoleDeptMapper = drogon::orm::CoroMapper<SysRoleDept>;
 
   public:
     /**
@@ -30,14 +33,14 @@ class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
      * maxPage大于零时，无视request.page
      */
     drogon::Task<std::vector<RoleResponse>> getRoleList(
-        const GetRoleListRequest &request,
-        const int32_t maxPage /*很不优雅*/) const;
+        const RoleQueryRequest &request,
+        const std::size_t maxPage /*很不优雅*/) const;
 
     /**
      * @brief 获取指定部门可分配的角色
      */
     drogon::Task<std::vector<AssignableRoleResponse>> getAssignableRoles(
-        const int32_t deptId) const;
+        const std::int32_t deptId) const;
 
   protected:
     std::vector<RoleResponse> buildList(

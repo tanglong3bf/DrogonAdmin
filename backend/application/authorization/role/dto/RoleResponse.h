@@ -1,11 +1,11 @@
 #pragma once
 
-#include <drogon/orm/Result.h>
-#include <jsoncpp/json/value.h>
 #include "RoleDeptResponse.h"
-#include "common/util/Utilities.hpp"
 #include "domain/authorization/DeptScopeType.h"
 #include "domain/authorization/Role.h"
+#include "common/util/Utilities.hpp"
+#include <drogon/orm/Result.h>
+#include <jsoncpp/json/value.h>
 
 /**
  * @brief 角色响应
@@ -24,7 +24,6 @@ class RoleResponse
   public:
     RoleResponse(const Role &role);
 
-  public:
     Json::Value toJson() const;
 
     GETTER(roleId, RoleId);

@@ -1,8 +1,9 @@
 #include "RoleCreateRequest.h"
 
-#include <drogon/HttpRequest.h>
 #include "common/util/ParamGetter.hpp"
+#include <drogon/HttpRequest.h>
 
+using namespace std;
 using namespace drogon_admin::util;
 
 namespace drogon
@@ -23,12 +24,12 @@ RoleCreateRequest fromRequest(const HttpRequest &req)
 
 void RoleCreateRequest::setByJson(const Json::Value &json)
 {
-    name_ = getParam<std::string, true>(json, "name");
-    code_ = getParam<std::string, true>(json, "code");
-    description_ = getParam<std::string>(json, "description");
+    name_ = getParam<string, true>(json, "name");
+    code_ = getParam<string, true>(json, "code");
+    description_ = getParam<string>(json, "description");
 
     const auto quotaTypeValue =
-        getParam<std::int8_t, true>(json, "quota_type", {0, 2});
+        getParam<std::int16_t, true>(json, "quota_type", {0, 2});
     quotaType_ = static_cast<QuotaType>(quotaTypeValue);
 
     if (quotaType_ != QuotaType::Unlimited)
@@ -37,13 +38,12 @@ void RoleCreateRequest::setByJson(const Json::Value &json)
     }
 
     const auto relationType =
-        getParam<std::int8_t, true>(json, "relation_type", {0, 2});
+        getParam<std::int16_t, true>(json, "relation_type", {0, 2});
     relationType_ = static_cast<RelationType>(relationType);
 
     if (relationType_ != RelationType::All)
     {
-        deptIds_ = getParam<std::vector<std::int32_t>, true>(json,
-                                                             "dept_ids",
-                                                             {1, -1});
+        deptIds_ =
+            getParam<vector<std::int32_t>, true>(json, "dept_ids", {1, -1});
     }
 }

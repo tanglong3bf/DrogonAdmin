@@ -1,7 +1,7 @@
 #include "RoleUpdateRequest.h"
 
-#include <drogon/HttpRequest.h>
 #include "common/util/ParamGetter.hpp"
+#include <drogon/HttpRequest.h>
 
 using namespace std;
 using namespace drogon_admin::util;
