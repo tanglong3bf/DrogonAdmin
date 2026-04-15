@@ -29,7 +29,7 @@ class Role : public AuditableEntity, public ChangeableEntity
     Role(const std::string &name,
          const std::string &code,
          const QuotaType quotaType,
-         const RelationType relationType_);
+         const RelationType relationType);
 
     /**
      * @brief 准备必备参数以及创建者id的构造
@@ -37,7 +37,7 @@ class Role : public AuditableEntity, public ChangeableEntity
     Role(const std::string &name,
          const std::string &code,
          const QuotaType quotaType,
-         const RelationType relationType_,
+         const RelationType relationType,
          const std::int32_t createdBy);
 
     explicit Role(const SysRole &sysRole);
