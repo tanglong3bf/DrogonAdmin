@@ -37,7 +37,7 @@ Task<> UserUpdater::updateUser(User &user,
     }
     else
     {
-        throw BusinessException("角色数据无更新");
+        throw BusinessException("用户数据无更新");
     }
     co_return;
 }
