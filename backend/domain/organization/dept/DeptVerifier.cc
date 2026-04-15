@@ -1,8 +1,8 @@
 #include "DeptVerifier.h"
 
 #include "common/exception/BusinessException.h"
+#include <unordered_map>
 
-using int32_t = std::int32_t;
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
@@ -40,20 +40,41 @@ Task<> DeptVerifier::verifyNoSubDept(const int32_t deptId) const
     }
 }
 
-// TODO: 逻辑略复杂，先留着
+// 没测，需要充分测试
 Task<> DeptVerifier::verifyRoleAssignmentAllowed(
     const int32_t deptId,
     const vector<int32_t> roleIds) const
 {
-    // 仅考虑黑白名单情况，两种情况不允许分配角色
-    // 出现这两种情况，直接抛异常
-    //// 1. 角色有白名单，但不包含指定部门
-    //// 2. 角色有黑名单，并且包含指定部门
-
+    // 检查黑白名单
+    co_await roleVerifier_->verifyRolesBelongToDept(deptId, roleIds);
     // 获取当前部门已经分配的每种角色的用户数量
+    unordered_map<int32_t, size_t> roleCountMap =
+        co_await userRepository_->countByDeptAndRoles(deptId, roleIds);
 
     // 获取当前部门限制的每种角色的用户数量
+    const auto roleList = co_await roleRepository_->getByIds(roleIds, false);
+    unordered_map<int32_t, size_t> roleLimitMap =
+        roleList | views::transform([](const Role &role) {
+            size_t limit = 0;
+            if (role.getQuotaType() == QuotaType::Unlimited)
+            {
+                limit = SIZE_MAX;
+            }
+            else
+            {
+                // 总量限制不会超，这里不做区分
+                limit = *role.getUserQuota();
+            }
+            return make_pair(*role.getRoleId(), limit);
+        }) |
+        ranges::to<unordered_map>();
 
     // 任意一种角色的用户数量大于等于限制的用户数量，抛异常
-    co_return;
+    for (const auto [roleId, count] : roleCountMap)
+    {
+        if (count >= roleLimitMap[roleId])
+        {
+            throw BusinessException("指定部门分配的角色已达用户数量限制");
+        }
+    }
 }

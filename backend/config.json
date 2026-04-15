@@ -419,6 +419,13 @@
             "sub_query": {
               "sql": "r.relation_type = ${type} AND @if(type == '2') NOT @endif EXISTS ( SELECT 1 FROM public.sys_role_dept rd WHERE rd.role_id = r.role_id AND rd.dept_id = ${emm})",
               "params": { "emm": "$1" }
+            },
+            "count_user_by_dept_and_roles": {
+              "main": "SELECT COUNT(*) AS used_count, ur.role_id FROM sys_user u @inner_join() @where(dept_id, role_ids) @group_and_order()",
+              "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id",
+              "where": "WHERE u.dept_id = ${dept_id} AND ur.role_id IN @id_list(role_ids)",
+              "id_list": "(@for(id in role_ids, separator='),(') ${id} @endfor)",
+              "group_and_order": "GROUP BY ur.role_id ORDER BY ur.role_id"
             }
           }
         }

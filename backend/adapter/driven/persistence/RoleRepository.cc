@@ -229,6 +229,58 @@ Task<Role> RoleRepository::getById(const std::int32_t roleId) const
     co_return role;
 }
 
+drogon::Task<std::vector<Role>> RoleRepository::getByIds(
+    const std::vector<std::int32_t> &roleIds,
+    const bool withRelation) const
+{
+    if (roleIds.empty())
+    {
+        co_return std::vector<Role>{};
+    }
+
+    Criteria criteria{SysRole::Cols::_role_id, CompareOperator::In, roleIds};
+    const auto sysRoles = co_await roleMapper().findBy(criteria);
+    auto roles = buildRoleList(sysRoles);
+
+    if (!withRelation)
+    {
+        co_return roles;
+    }
+
+    const auto sysRoleDepts = co_await roleDeptMapper().findBy(criteria);
+
+    std::unordered_map<std::int32_t, std::vector<SysRoleDept>> deptMap;
+    for (const auto &dept : sysRoleDepts)
+    {
+        deptMap[dept.getValueOfRoleId()].push_back(dept);
+    }
+
+    for (auto &role : roles)
+    {
+        auto roleId = role.getRoleId();
+        if (auto it = deptMap.find(*roleId); it != deptMap.end())
+        {
+            for (const auto &dept : it->second)
+            {
+                role.addRoleDept(RoleDept{dept});
+            }
+        }
+    }
+
+    co_return roles;
+}
+
+vector<Role> RoleRepository::buildRoleList(
+    const vector<SysRole> &sysRoleList) const
+{
+    vector<Role> result;
+    for (const auto &sysRole : sysRoleList)
+    {
+        result.emplace_back(static_cast<Role>(sysRole));
+    }
+    return result;
+}
+
 vector<RoleDept> RoleRepository::buildRoleDeptList(
     const vector<SysRoleDept> &sysRoleDeptList) const
 {

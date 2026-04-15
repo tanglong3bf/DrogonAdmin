@@ -1,8 +1,10 @@
 #pragma once
 
-#include <memory>
-#include "common/framework/DrAdminObject.hpp"
 #include "DeptRepository.h"
+#include "domain/authorization/RoleVerifier.h"
+#include "domain/organization/user/UserRepository.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <memory>
 
 /**
  * @brief 部门校验器
@@ -37,6 +39,14 @@ class DeptVerifier : public DrAdminObject<DeptVerifier>
   private:
     DeptRepositoryPtr deptRepository_{
         drogon::DrClassMap::getSingleInstance<DeptRepository>()};
+    UserRepositoryPtr userRepository_{
+        drogon::DrClassMap::getSingleInstance<UserRepository>()};
+    // 耦合
+    RoleVerifierPtr roleVerifier_{
+        drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
+    // 耦合
+    RoleRepositoryPtr roleRepository_{
+        drogon::DrClassMap::getSingleInstance<RoleRepository>()};
 };
 
 using DeptVerifierPtr = std::shared_ptr<DeptVerifier>;

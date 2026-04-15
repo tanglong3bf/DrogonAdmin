@@ -4,6 +4,7 @@
 #include "domain/models/SysUser.h"
 #include "domain/models/SysUserRole.h"
 #include <drogon/HttpAppFramework.h>
+#include <unordered_map>
 
 using namespace std;
 using namespace drogon;
@@ -148,6 +149,30 @@ Task<User> UserRepository::getById(const std::int32_t userId,
         user.setUserRoles(userRoles);
     }
     co_return user;
+}
+
+Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
+    const std::int32_t deptId,
+    const vector<std::int32_t> &roleIds) const
+{
+    ParamList param;
+    param["dept_id"] = deptId;
+    Json::Value roleIdsJson(Json::arrayValue);
+    for (const auto &id : roleIds)
+    {
+        roleIdsJson.append(id);
+    }
+    param["role_ids"] = roleIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_user_by_dept_and_roles", param);
+    // used_count, ur.role_id
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    unordered_map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["role_id"].as<int32_t>()] = row["used_count"].as<size_t>();
+    }
+    co_return result;
 }
 
 vector<UserRole> UserRepository::buildUserRoleList(

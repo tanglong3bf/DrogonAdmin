@@ -2,6 +2,7 @@
 
 #include "UserUpdateRequest.h"
 #include "domain/organization/user/User.h"
+#include "domain/organization/dept/DeptVerifier.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/utils/coroutine.h>
 
@@ -26,6 +27,10 @@ class UserUpdater : public DrAdminObject<UserUpdater>
                          const std::vector<std::int32_t> &newRoleIds,
                          const std::int32_t userId,
                          const std::int32_t updatedBy) const;
+
+  private:
+    DeptVerifierPtr deptVerifier_{
+        drogon::DrClassMap::getSingleInstance<DeptVerifier>()};
 };
 
 using UserUpdaterPtr = std::shared_ptr<UserUpdater>;

@@ -26,6 +26,13 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
      */
     drogon::Task<> verifyRoleCodeNotDuplicated(const std::string &code) const;
 
+    /**
+     * @brief 验证指定部门是否可用所有角色
+     */
+    drogon::Task<> verifyRolesBelongToDept(
+        const std::int32_t deptId,
+        const std::vector<std::int32_t> &roleIds) const;
+
   private:
     RoleRepositoryPtr roleRepository_{
         drogon::DrClassMap::getSingleInstance<RoleRepository>()};

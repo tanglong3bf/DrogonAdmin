@@ -54,7 +54,6 @@ class DeptService : public DrAdminObject<DeptService>
         drogon::DrClassMap::getSingleInstance<DeptAssembler>()};
     DeptHandlerPtr deptHandler_{
         drogon::DrClassMap::getSingleInstance<DeptHandler>()};
-    // 耦合
     RoleServicePtr roleService_{
         drogon::DrClassMap::getSingleInstance<RoleService>()};
 };

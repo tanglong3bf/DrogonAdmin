@@ -11,17 +11,21 @@ Task<> UserUpdater::updateUser(User &user,
                                const int32_t updatedBy) const
 {
     bool isUpdated = false;
+    bool deptIdUpdated = false;
     ENTITY_SET(user, Nickname, isUpdated = true);
     ENTITY_SET(user, Sex, isUpdated = true);
-    ENTITY_SET(user, DeptId, isUpdated = true);
+    ENTITY_SET(user, DeptId, isUpdated = true; deptIdUpdated = true);
     ENTITY_SET(user, PhoneNumber, isUpdated = true);
     ENTITY_SET(user, Email, isUpdated = true);
     ENTITY_SET(user, Status, isUpdated = true);
 
-    if (request.getRoleIds())
+    if (request.getRoleIds() || deptIdUpdated)
     {
         vector<int> roleIds = *request.getRoleIds();
         sort(roleIds.begin(), roleIds.end());
+        // 检查是否可以为指定部门分配这些角色
+        co_await deptVerifier_->verifyRoleAssignmentAllowed(user.getDeptId(),
+                                                            roleIds);
 
         updateUserRoles(const_cast<vector<UserRole> &>(user.getUserRoles()),
                         roleIds,

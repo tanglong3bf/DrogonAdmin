@@ -9,6 +9,7 @@
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/utils/coroutine.h>
 #include <memory>
+#include <vector>
 
 /**
  * @brief 角色仓库
@@ -64,7 +65,16 @@ class RoleRepository : public DrAdminObject<RoleRepository>
      */
     drogon::Task<Role> getById(const std::int32_t roleId) const;
 
+    /**
+     * @brief 根据id列表获取角色
+     */
+    drogon::Task<std::vector<Role>> getByIds(
+        const std::vector<std::int32_t> &roleIds,
+        const bool withRelation) const;
+
   protected:
+    std::vector<Role> buildRoleList(
+        const std::vector<SysRole> &sysRoleList) const;
     std::vector<RoleDept> buildRoleDeptList(
         const std::vector<SysRoleDept> &sysRoleDeptList) const;
 

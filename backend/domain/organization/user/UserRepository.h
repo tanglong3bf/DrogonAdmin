@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/utils/coroutine.h>
 #include "SqlGenerator/src/SqlGenerator.h"
@@ -54,6 +55,12 @@ class UserRepository : public DrAdminObject<UserRepository>
      */
     drogon::Task<User> getById(const std::int32_t userId,
                                bool withRelation = false) const;
+    /**
+     * @brief 统计指定部门下指定角色的用户数量
+     */
+    drogon::Task<std::unordered_map<std::int32_t, std::size_t>>
+    countByDeptAndRoles(const std::int32_t deptId,
+                        const std::vector<std::int32_t> &roleIds) const;
 
   protected:
     std::vector<UserRole> buildUserRoleList(
