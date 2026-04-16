@@ -36,5 +36,6 @@ Task<Role> RoleAssembler::fromCreateRequest(const RoleCreateRequest request,
             role.addRoleDept(RoleDept{deptId, createdBy});
         }
     }
+    role.toNew();
     co_return role;
 }

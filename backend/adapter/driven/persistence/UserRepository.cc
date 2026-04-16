@@ -187,8 +187,9 @@ Task<unordered_map<std::int32_t, size_t>> UserRepository::
     countUsersWithRolePerDepartment(const std::int32_t roleId) const
 {
     const auto sql =
-        sqlGenerator()->getSql("count_users_with_role_per_department");
-    const auto dbResult = co_await dbClient()->execSqlCoro(sql, roleId);
+        sqlGenerator()->getSql("count_users_with_role_per_department",
+                               {{"role_id", roleId}});
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
     unordered_map<int32_t, size_t> result;
     for (const auto &row : dbResult)
     {

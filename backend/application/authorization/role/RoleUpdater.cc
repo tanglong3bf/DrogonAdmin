@@ -15,8 +15,18 @@ Task<> RoleUpdater::updateRole(Role &role,
     const Role oldData = role;
     bool isUpdated = false;
     bool isQuotaUpdated = false;
-    ENTITY_SET(role, Name, isUpdated = true);
-    ENTITY_SET(role, Code, isUpdated = true);
+    if (request.getName() && role.getName() != *request.getName())
+    {
+        co_await roleVerifier_->verifyRoleNameNotDuplicated(*request.getName());
+        role.setName(*request.getName());
+        isUpdated = true;
+    }
+    if (request.getCode() && role.getCode() != *request.getCode())
+    {
+        co_await roleVerifier_->verifyRoleCodeNotDuplicated(*request.getCode());
+        role.setCode(*request.getCode());
+        isUpdated = true;
+    }
     ENTITY_SET(role, Description, isUpdated = true);
     ENTITY_SET(role, QuotaType, isUpdated = true; isQuotaUpdated = true);
     ENTITY_SET(role, UserQuota, isUpdated = true; isQuotaUpdated = true);
@@ -60,6 +70,7 @@ Task<> RoleUpdater::updateRole(Role &role,
     if (isUpdated)
     {
         role.setUpdatedBy(updatedBy);
+        role.toUpdate();
     }
     else
     {

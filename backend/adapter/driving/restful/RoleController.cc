@@ -35,6 +35,7 @@ Task<HttpResponsePtr> RoleController::updateRole(
 {
     const auto updatedBy =
         fromString<std::int32_t>(req->getParameter("userId"));
+    LOG_TRACE << "更新角色，roleId=" << roleId << ", updatedBy=" << updatedBy;
     co_await roleService_->updateRole(roleId, request, updatedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

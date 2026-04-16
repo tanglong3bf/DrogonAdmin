@@ -38,10 +38,14 @@ const addChildCount = (node: Department): void => {
   }
 }
 
-onMounted(async () => {
+const getDeptData = async () => {
   deptTree.value = await getDeptTree()
   deptTree.value.forEach(node => addChildCount(node))
   deptShow.value = deptTree.value
+}
+
+onMounted(async () => {
+  await getDeptData()
 })
 
 /**
@@ -189,7 +193,7 @@ const handleAddDept = async (dept: DeptFormData): Promise<boolean> => {
   }
   await newDept(dept.name, dept.parent_id)
   dialogVisible.value = false
-  deptTree.value = await getDeptTree()
+  await getDeptData()
   resetQuery()
   return true
 }
@@ -329,9 +333,7 @@ const sortSubmit = async () => {
   await sortDept(currentParentId.value, deptIds)
 
   ElMessage.success('排序成功')
-  deptTree.value = await getDeptTree()
-  deptTree.value.forEach(node => addChildCount(node))
-  deptShow.value = deptTree.value
+  await getDeptData()
   sortDialogVisible.value = false
 }
 
@@ -363,9 +365,7 @@ const deleteDeptBtn = async (deptId: number) => {
     async () => {
       await deleteDept(deptToDelete.dept_id)
 
-      deptTree.value = await getDeptTree()
-      deptTree.value.forEach(node => addChildCount(node))
-      deptShow.value = deptTree.value
+      await getDeptData()
       queryParams.name = ''
     }
   )

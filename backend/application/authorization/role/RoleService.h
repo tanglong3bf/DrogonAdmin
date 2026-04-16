@@ -28,7 +28,6 @@ class RoleService : public DrAdminObject<RoleService>
      */
     drogon::Task<> deleteExcludingDept(
         const std::int32_t deptId,
-        const std::int32_t deletedBy,
         const drogon::orm::DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**

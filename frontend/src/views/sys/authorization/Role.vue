@@ -2,7 +2,12 @@
 import dgCard from '@/components/dg-card.vue'
 import { Department } from '@/types/department'
 import { Search, Refresh } from '@element-plus/icons-vue'
-import { ElMessageBox, FormInstance, FormRules } from 'element-plus/es'
+import {
+  ElMessage,
+  ElMessageBox,
+  FormInstance,
+  FormRules
+} from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
 import { getDeptTree } from '@/api/department'
 import { deleteRole, getRoleList, newRole, updateRole } from '@/api/role'
@@ -180,9 +185,7 @@ const submit = async (form?: FormInstance) => {
     await handleQuery()
     dialogVisible.value = false
     resetRoleForm()
-  }
-  // UPDATE TODO:
-  else {
+  } else {
     const oldRole = roleList.value.find(
       item => item.role_id === roleOriginalId.value
     )
@@ -212,6 +215,7 @@ const submit = async (form?: FormInstance) => {
     }
 
     await updateRole(role.role_id!, data)
+    ElMessage.success('更新成功')
     await handleQuery()
     dialogVisible.value = false
   }

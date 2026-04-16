@@ -87,8 +87,8 @@ drogon::Task<> RoleVerifier::verifyRolesBelongToDept(
 // UserQuota // 数量
 // RelationType // 所有部门、白名单、黑名单
 // RoleDepts // 具体的部门列表
-drogon::Task<> RoleVerifier::checkQuota(const Role &role,
-                                        const Role & /* ignore */) const
+Task<> RoleVerifier::checkQuota(const Role &role,
+                                const Role & /* ignore */) const
 {
     const auto deptIds = role.getRoleDepts() |
                          views::transform([](const RoleDept &roleDept) {

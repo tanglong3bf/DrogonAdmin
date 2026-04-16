@@ -433,7 +433,7 @@
             "where": "WHERE u.deleted_by = NULL AND ur.role_id = ${role_id}"
           },
           "count_users_with_role_per_department": {
-            "main": "SELECT @fields FROM public.sys_user u @inner_join() WHERE ur.role_id = $1 GROUP BY u.dept_id ORDER BY u.dept_id",
+            "main": "SELECT @fields() FROM public.sys_user u @inner_join() WHERE ur.role_id = ${role_id} GROUP BY u.dept_id ORDER BY u.dept_id",
             "fields": "u.dept_id, COUNT(*) AS user_count",
             "inner_join": "INNER JOIN public.sys_user_role ur ON u.user_id = ur.user_id"
           }

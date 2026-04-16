@@ -5,7 +5,6 @@ using namespace drogon;
 using namespace drogon::orm;
 
 Task<> RoleService::deleteExcludingDept(const std::int32_t deptId,
-                                        const std::int32_t deletedBy,
                                         const DbClientPtr &dbClient) const
 {
     auto roleDepts =
@@ -48,7 +47,6 @@ Task<> RoleService::createRole(const RoleCreateRequest &request,
                                const std::int32_t createdBy) const
 {
     auto role = co_await roleAssembler_->fromCreateRequest(request, createdBy);
-    role.toNew();
     co_await roleRepository_->save(role);
 }
 
@@ -56,9 +54,9 @@ Task<> RoleService::updateRole(const std::int32_t roleId,
                                const RoleUpdateRequest request,
                                const std::int32_t updatedBy) const
 {
+    LOG_TRACE << "更新角色，roleId=" << roleId << ", updatedBy=" << updatedBy;
     auto role = co_await roleRepository_->getById(roleId);
     co_await roleUpdater_->updateRole(role, request, updatedBy);
-    role.toUpdate();
     co_await roleRepository_->save(role);
 }
 
@@ -67,7 +65,6 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
 {
     auto role = co_await roleRepository_->getById(roleId);
     co_await roleHandler_->deleteRole(role, deletedBy);
-    role.toDelete();
     co_await roleRepository_->save(role);
 }
 
