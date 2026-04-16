@@ -118,6 +118,11 @@ const rules = reactive<FormRules<UserFormData>>({
       required: true,
       message: '请输入用户名',
       trigger: 'blur'
+    },
+    {
+      pattern: /^[a-zA-Z0-9_]+$/,
+      message: '用户名只能包含字母、数字和下划线',
+      trigger: 'blur'
     }
   ],
   nickname: [
@@ -187,7 +192,6 @@ const dialogVisible = ref(false)
 watch(
   () => user.dept_id, // getter 函数，监听 dept_id 的变化
   async (newVal, oldVal) => {
-    console.log('dept_id 已变更:', { oldVal, newVal })
     if (newVal !== oldVal) {
       // 部门id发生切换时，重新获取可用角色
       const newRoles = await getAssignableRoles(newVal)
