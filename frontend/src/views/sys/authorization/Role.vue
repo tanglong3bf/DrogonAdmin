@@ -104,7 +104,14 @@ const roleForm = ref<FormInstance>()
  */
 const rules = reactive<FormRules<RoleFormData>>({
   name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入角色代码', trigger: 'blur' }],
+  code: [
+    { required: true, message: '请输入角色代码', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9_]+$/,
+      message: '只能包含字母、数字和下划线',
+      trigger: 'blur'
+    }
+  ],
   quota_type: [
     { required: true, message: '请选择限制类型', trigger: 'change' }
   ],
