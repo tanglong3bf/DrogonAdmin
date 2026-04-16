@@ -285,6 +285,7 @@ const submit = (form?: FormInstance) => {
 const newUserBtn = () => {
   resetUserForm()
   dialogVisible.value = true
+  dialogType.value = DialogType.ADD
 }
 
 /**
