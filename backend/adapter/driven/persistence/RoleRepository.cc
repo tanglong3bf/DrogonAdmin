@@ -81,13 +81,15 @@ Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList,
 
 Task<size_t> RoleRepository::countByName(const string &name) const
 {
-    Criteria criteria{SysRole::Cols::_name, name};
+    Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysRole::Cols::_name, name};
     co_return co_await roleMapper().count(criteria);
 }
 
 Task<size_t> RoleRepository::countByCode(const string &name) const
 {
-    Criteria criteria{SysRole::Cols::_code, name};
+    Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysRole::Cols::_name, name};
     co_return co_await roleMapper().count(criteria);
 }
 
