@@ -175,6 +175,40 @@ Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
     co_return result;
 }
 
+Task<size_t> UserRepository::countByRoleId(const std::int32_t roleId) const
+{
+    co_return co_await userRoleMapper().count(
+        Criteria{SysUserRole::Cols::_role_id, roleId});
+}
+
+Task<unordered_map<std::int32_t, size_t>> UserRepository::
+    countUsersWithRolePerDepartment(const std::int32_t roleId) const
+{
+    const auto sql =
+        sqlGenerator()->getSql("count_users_with_role_per_department");
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql, roleId);
+    unordered_map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["dept_id"].as<int32_t>()] = row["user_count"].as<size_t>();
+    }
+    co_return result;
+}
+
+Task<vector<std::int32_t>> UserRepository::getDeptIdsByRoleId(
+    const std::int32_t roleId) const
+{
+    const auto sql = sqlGenerator()->getSql("get_dept_ids_by_role_id",
+                                            {{"role_id", roleId}});
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    vector<int32_t> deptIds;
+    for (const auto &row : dbResult)
+    {
+        deptIds.push_back(row["dept_id"].as<int32_t>());
+    }
+    co_return deptIds;
+}
+
 vector<UserRole> UserRepository::buildUserRoleList(
     const vector<SysUserRole> &sysUserRoles) const
 {

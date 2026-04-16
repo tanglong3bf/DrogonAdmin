@@ -2,6 +2,7 @@
 
 #include "common/exception/BusinessException.h"
 #include <ranges>
+#include <unordered_map>
 
 using namespace std;
 using namespace drogon;
@@ -78,6 +79,69 @@ drogon::Task<> RoleVerifier::verifyRolesBelongToDept(
         if (std::find(deptIds.begin(), deptIds.end(), deptId) != deptIds.end())
         {
             throw BusinessException("指定部门在角色的黑名单中");
+        }
+    }
+}
+
+// QuotaType // 无数量限制、总量限制、每部门限制
+// UserQuota // 数量
+// RelationType // 所有部门、白名单、黑名单
+// RoleDepts // 具体的部门列表
+drogon::Task<> RoleVerifier::checkQuota(const Role &role,
+                                        const Role & /* ignore */) const
+{
+    const auto deptIds = role.getRoleDepts() |
+                         views::transform([](const RoleDept &roleDept) {
+                             return roleDept.getDeptId();
+                         }) |
+                         ranges::to<vector>();
+    if (role.getQuotaType() == QuotaType::TotalLimit)
+    {
+        // 检查所有使用当前角色的用户数量是否超过限制
+        const auto count =
+            co_await userRepository_->countByRoleId(*role.getRoleId());
+        if (count > *role.getUserQuota())
+        {
+            throw BusinessException("使用当前角色的用户数量已达限制");
+        }
+    }
+    else if (role.getQuotaType() == QuotaType::PerDeptLimit)
+    {
+        // 检查每个部门使用当前角色的用户数量是否超过限制
+        const std::unordered_map<std::int32_t, std::size_t> count =
+            co_await userRepository_->countUsersWithRolePerDepartment(
+                *role.getRoleId());
+        for (const auto &[deptId, deptCount] : count)
+        {
+            if (deptCount > *role.getUserQuota())
+            {
+                throw BusinessException("使用当前角色的用户数量已达限制");
+            }
+        }
+    }
+    // 使用当前角色的用户所在的部门id列表
+    const std::vector<std::int32_t> usedDeptIds =
+        co_await userRepository_->getDeptIdsByRoleId(*role.getRoleId());
+    if (role.getRelationType() == RelationType::Whitelist)
+    {
+        // 检查所有使用当前角色的用户是否都在白名单部门中
+        for (const auto &deptId : usedDeptIds)
+        {
+            if (find(deptIds.begin(), deptIds.end(), deptId) == deptIds.end())
+            {
+                throw BusinessException("使用当前角色的用户不在白名单部门中");
+            }
+        }
+    }
+    else if (role.getRelationType() == RelationType::Blacklist)
+    {
+        // 检查所有使用当前角色的用户是否都不在黑名单部门中
+        for (const auto &deptId : usedDeptIds)
+        {
+            if (find(deptIds.begin(), deptIds.end(), deptId) != deptIds.end())
+            {
+                throw BusinessException("使用当前角色的用户在黑名单部门中");
+            }
         }
     }
 }

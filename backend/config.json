@@ -426,6 +426,15 @@
               "where": "WHERE u.dept_id = ${dept_id} AND ur.role_id IN @id_list(role_ids)",
               "id_list": "(@for(id in role_ids, separator='),(') ${id} @endfor)",
               "group_and_order": "GROUP BY ur.role_id ORDER BY ur.role_id"
+            },
+            "get_dept_ids_by_role_id": {
+              "main": "SELECT DISTINCT u.dept_id FROM sys_user u LEFT JOIN sys_user_role ur ON u.user_id = ur.user_id @where(role_id) ORDER BY u.dept_id",
+              "where": "WHERE u.deleted_by = NULL AND ur.role_id = ${role_id}"
+            },
+            "count_users_with_role_per_department": {
+              "main": "SELECT @fields FROM public.sys_user u @inner_join() WHERE ur.role_id = $1 GROUP BY u.dept_id ORDER BY u.dept_id",
+              "fields": "u.dept_id, COUNT(*) AS user_count",
+              "inner_join": "INNER JOIN public.sys_user_role ur ON u.user_id = ur.user_id"
             }
           }
         }

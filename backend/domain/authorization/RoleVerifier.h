@@ -4,6 +4,7 @@
 #include <drogon/utils/coroutine.h>
 #include "common/framework/DrAdminObject.hpp"
 #include "RoleRepository.h"
+#include "domain/organization/user/UserRepository.h"
 
 /**
  * @brief 角色校验器
@@ -33,9 +34,16 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
         const std::int32_t deptId,
         const std::vector<std::int32_t> &roleIds) const;
 
+    /**
+     * @brief 验证角色的用户数量限制是否满足要求
+     */
+    drogon::Task<> checkQuota(const Role &role, const Role &oldData) const;
+
   private:
     RoleRepositoryPtr roleRepository_{
         drogon::DrClassMap::getSingleInstance<RoleRepository>()};
+    UserRepositoryPtr userRepository_{
+        drogon::DrClassMap::getSingleInstance<UserRepository>()};
 };
 
 using RoleVerifierPtr = std::shared_ptr<RoleVerifier>;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "domain/authorization/RoleVerifier.h"
 #include "dto/RoleUpdateRequest.h"
 #include "domain/authorization/Role.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -25,6 +26,10 @@ class RoleUpdater : public DrAdminObject<RoleUpdater>
                          const std::vector<std::int32_t> &newDeptIds,
                          const int32_t roleId,
                          const int32_t updatedBy) const;
+
+  private:
+    RoleVerifierPtr roleVerifier_{
+        drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
 };
 
 using RoleUpdaterPtr = std::shared_ptr<RoleUpdater>;

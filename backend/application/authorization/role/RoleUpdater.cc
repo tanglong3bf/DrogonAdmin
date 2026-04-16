@@ -12,13 +12,15 @@ Task<> RoleUpdater::updateRole(Role &role,
                                const RoleUpdateRequest &request,
                                const int32_t updatedBy) const
 {
+    const Role oldData = role;
     bool isUpdated = false;
+    bool isQuotaUpdated = false;
     ENTITY_SET(role, Name, isUpdated = true);
     ENTITY_SET(role, Code, isUpdated = true);
     ENTITY_SET(role, Description, isUpdated = true);
-    ENTITY_SET(role, QuotaType, isUpdated = true);
-    ENTITY_SET(role, UserQuota, isUpdated = true);
-    ENTITY_SET(role, RelationType, isUpdated = true);
+    ENTITY_SET(role, QuotaType, isUpdated = true; isQuotaUpdated = true);
+    ENTITY_SET(role, UserQuota, isUpdated = true; isQuotaUpdated = true);
+    ENTITY_SET(role, RelationType, isUpdated = true; isQuotaUpdated = true);
 
     if (request.getDeptIds())
     {
@@ -31,32 +33,32 @@ Task<> RoleUpdater::updateRole(Role &role,
                         updatedBy);
 
         isUpdated = true;
+        isQuotaUpdated = true;
     }
 
-    if (role.getQuotaType() == QuotaType::Unlimited)
+    if (role.getQuotaType() == QuotaType::Unlimited &&
+        role.getUserQuota() != nullopt)
     {
-        if (role.getUserQuota() != nullopt)
-        {
-            role.setUserQuotaToNullOpt();
-            isUpdated = true;
-        }
-    }
-    if (role.getRelationType() == RelationType::All)
-    {
-        if (role.getRoleDepts().size() != 0)
-        {
-            for (auto &dept : role.getRoleDepts())
-            {
-                const_cast<RoleDept &>(dept).toDelete();
-            }
-            isUpdated = true;
-        }
+        role.setUserQuotaToNullOpt();
+        isUpdated = true;
     }
 
+    if (role.getRelationType() == RelationType::All &&
+        role.getRoleDepts().size() != 0)
+    {
+        for (auto &dept : role.getRoleDepts())
+        {
+            const_cast<RoleDept &>(dept).toDelete();
+        }
+        isUpdated = true;
+    }
+
+    if (isQuotaUpdated)
+    {
+        co_await roleVerifier_->checkQuota(role, oldData);
+    }
     if (isUpdated)
     {
-        // TODO: 黑白名单和数量限制
-        LOG_WARN << "TODO: 用户管理完成后，检查用户表数据";
         role.setUpdatedBy(updatedBy);
     }
     else
