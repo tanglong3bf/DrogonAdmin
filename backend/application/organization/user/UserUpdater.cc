@@ -21,13 +21,43 @@ Task<> UserUpdater::updateUser(User &user,
     ENTITY_SET(user, Email, isUpdated = true);
     ENTITY_SET(user, Status, isUpdated = true);
 
-    if (request.getRoleIds() || deptIdUpdated)
+    // 用户现有的角色id列表
+    const auto oldRoleIds =
+        user.getUserRoles() |
+        views::transform([](const UserRole &ur) { return ur.getRoleId(); }) |
+        ranges::to<vector>();
+    // 需要新增的角色id列表
+    const auto needInsertRoleIds =
+        *request.getRoleIds() | views::filter([&](int32_t id) {
+            return find(oldRoleIds.begin(), oldRoleIds.end(), id) ==
+                   oldRoleIds.end();
+        }) |
+        ranges::to<vector>();
+    // 需要删除的角色id列表
+    const auto needDeleteRoleIds =
+        oldRoleIds | views::filter([&](int32_t id) {
+            return find(request.getRoleIds()->begin(),
+                        request.getRoleIds()->end(),
+                        id) == request.getRoleIds()->end();
+        }) |
+        ranges::to<vector>();
+
+    if (deptIdUpdated || needInsertRoleIds.size() > 0 ||
+        needDeleteRoleIds.size() > 0)
     {
         vector<int> roleIds = *request.getRoleIds();
         sort(roleIds.begin(), roleIds.end());
         // 检查是否可以为指定部门分配这些角色
-        co_await deptVerifier_->verifyRoleAssignmentAllowed(user.getDeptId(),
-                                                            roleIds);
+        if (deptIdUpdated)
+        {
+            co_await deptVerifier_->verifyRoleAssignmentAllowed(
+                user.getDeptId(), roleIds);
+        }
+        else if (needInsertRoleIds.size() > 0)
+        {
+            co_await deptVerifier_->verifyRoleAssignmentAllowed(
+                user.getDeptId(), needInsertRoleIds);
+        }
 
         updateUserRoles(const_cast<vector<UserRole> &>(user.getUserRoles()),
                         roleIds,
