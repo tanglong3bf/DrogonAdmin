@@ -10,6 +10,8 @@ Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
                                const int32_t updatedBy) const
 {
+    LOG_TRACE << "更新用户，userId=" << *user.getUserId()
+              << ", updatedBy=" << updatedBy;
     bool isUpdated = false;
     bool deptIdUpdated = false;
     ENTITY_SET(user, Nickname, isUpdated = true);
@@ -38,6 +40,7 @@ Task<> UserUpdater::updateUser(User &user,
     if (isUpdated)
     {
         user.setUpdatedBy(updatedBy);
+        user.toUpdate();
     }
     else
     {
@@ -51,6 +54,10 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
                                   const int32_t userId,
                                   const int32_t updatedBy) const
 {
+    LOG_TRACE << "更新用户角色，userId=" << userId
+              << ", updatedBy=" << updatedBy;
+    LOG_TRACE << "原角色列表: " << userRoles.size() << "个角色";
+    LOG_TRACE << "新角色列表: " << newRoleIds.size() << "个角色";
     unordered_set<int32_t> newRoleSet(newRoleIds.begin(), newRoleIds.end());
 
     for (auto &ur : userRoles)

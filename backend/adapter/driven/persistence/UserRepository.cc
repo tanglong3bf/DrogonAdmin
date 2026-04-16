@@ -155,6 +155,8 @@ Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
     const std::int32_t deptId,
     const vector<std::int32_t> &roleIds) const
 {
+    LOG_TRACE << "统计部门下角色的用户数量，deptId=" << deptId
+              << ", roleIds=" << roleIds.size() << "个角色";
     ParamList param;
     param["dept_id"] = deptId;
     Json::Value roleIdsJson(Json::arrayValue);

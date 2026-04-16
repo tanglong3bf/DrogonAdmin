@@ -45,6 +45,8 @@ Task<> DeptVerifier::verifyRoleAssignmentAllowed(
     const int32_t deptId,
     const vector<int32_t> roleIds) const
 {
+    LOG_TRACE << "验证部门分配角色是否合法，deptId=" << deptId
+              << ", roleIds=" << roleIds.size() << "个角色";
     // 检查黑白名单
     co_await roleVerifier_->verifyRolesBelongToDept(deptId, roleIds);
     // 获取当前部门已经分配的每种角色的用户数量

@@ -48,6 +48,8 @@ drogon::Task<HttpResponsePtr> UserController::updateUser(
 {
     const auto updatedBy =
         fromString<std::int32_t>(req->getParameter("userId"));
+    LOG_TRACE << "/user/" << userId << "(PUT)";
+    LOG_TRACE << "更新用户，userId=" << userId << ", updatedBy=" << updatedBy;
     co_await userService_->updateUser(userId, request, updatedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

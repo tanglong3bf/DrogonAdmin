@@ -37,6 +37,7 @@ Task<> UserService::updateUser(const std::int32_t userId,
                                const UserUpdateRequest &request,
                                const int32_t updatedBy) const
 {
+    LOG_TRACE << "更新用户，userId=" << userId << ", updatedBy=" << updatedBy;
     auto user = co_await userRepository_->getById(userId, true);
     co_await userUpdater_->updateUser(user, request, updatedBy);
     co_await userRepository_->save(user);

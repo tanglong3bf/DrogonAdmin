@@ -328,6 +328,7 @@ const sortSubmit = async () => {
   })
   await sortDept(currentParentId.value, deptIds)
 
+  ElMessage.success('排序成功')
   deptTree.value = await getDeptTree()
   deptTree.value.forEach(node => addChildCount(node))
   deptShow.value = deptTree.value
