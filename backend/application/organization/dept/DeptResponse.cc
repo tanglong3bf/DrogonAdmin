@@ -6,7 +6,7 @@ using namespace std;
 
 Json::Value toJsonArray(const vector<DeptResponse> &data)
 {
-    Json::Value array;
+    Json::Value array(Json::arrayValue);
     for (const auto &item : data)
     {
         array.append(item.toJson());
