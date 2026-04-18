@@ -61,29 +61,69 @@ const queryParams = reactive<{ name: string }>({
 })
 
 /**
- * 根据关键词来过滤数据，为了保证各种按钮正常显示，所以需要有child_count字段
- * 该字段已在mounted中处理
- *
- * @param nodes
- * @param keyword
+ * 过滤部门树：返回包含 keyword 的节点及其所有父级（路径上所有祖先），并维持树结构
+ * @param nodes 原始部门树（扁平或嵌套均可，但此处按嵌套树设计）
+ * @param keyword 搜索关键词（模糊匹配 name 字段）
+ * @returns 过滤后的部门树（只含匹配节点 + 必要祖先 + 必要后代子树）
  */
-const filterDeptTree = (nodes: Department[], keyword: string): Department[] => {
-  return nodes
-    .map(node => {
-      const isCurrentMatch = node.name.includes(keyword)
-      const filteredChildren = node.children
-        ? filterDeptTree(node.children, keyword)
-        : []
+function filterDeptTree(nodes: Department[], keyword: string): Department[] {
+  if (!keyword.trim())
+    return nodes.map(dept => ({
+      ...dept,
+      children: dept.children ? dept.children.map(c => ({ ...c })) : undefined
+    }))
 
-      const newNode = {
-        ...node,
-        ...(filteredChildren.length > 0 && { children: filteredChildren })
-      }
+  const collectNodes = (
+    depts: Department[],
+    keyword: string
+  ): {
+    allNodes: Map<number, Department>
+    matchedNodes: Department[]
+  } => {
+    const flatten = (nodes: Department[]): Department[] =>
+      nodes.flatMap(dept => [
+        dept,
+        ...(dept.children?.length ? flatten(dept.children) : [])
+      ])
 
-      const shouldKeep = isCurrentMatch || filteredChildren.length > 0
-      return shouldKeep ? newNode : null
-    })
-    .filter((node): node is Department => node !== null)
+    const allList = flatten(depts)
+    const allNodes = new Map(allList.map(d => [d.dept_id, d] as const))
+    const matchedNodes = allList.filter(d =>
+      d.name.toLowerCase().includes(keyword)
+    )
+
+    return { allNodes, matchedNodes }
+  }
+  const { allNodes, matchedNodes } = collectNodes(nodes, keyword)
+
+  if (matchedNodes.length === 0) return []
+
+  const includedIds = new Set<number>()
+  const ancestors = (node: Department): void => {
+    let curr: Department | undefined = node
+    while (curr) {
+      includedIds.add(curr.dept_id)
+      curr = allNodes.get(curr.parent_id!) || undefined
+    }
+  }
+  matchedNodes.forEach(ancestors)
+
+  const nodeMap = new Map<number, Department>(
+    Array.from(includedIds, id => [id, { ...allNodes.get(id)! }] as const)
+  )
+
+  nodeMap.forEach((node, id) => {
+    const original = allNodes.get(id)
+    if (original?.children?.length) {
+      node.children = original.children
+        .filter(child => includedIds.has(child.dept_id))
+        .map(child => nodeMap.get(child.dept_id)!)
+    }
+  })
+
+  return Array.from(nodeMap.values()).filter(
+    node => node.parent_id == null || !includedIds.has(node.parent_id)
+  )
 }
 
 /**
@@ -412,7 +452,7 @@ const deleteDeptBtn = async (deptId: number) => {
       </el-col>
     </el-row>
     <!-- 表格 -->
-    <el-table :data="deptShow" row-key="name" default-expand-all>
+    <el-table :data="deptShow" row-key="dept_id" default-expand-all>
       <el-table-column prop="name" label="部门名称" min-width="120px" />
       <el-table-column fixed="right" label="操作">
         <template v-slot="{ row }">
