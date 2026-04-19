@@ -322,6 +322,7 @@ const deleteUserBtn = async (userId: number) => {
       }
     )
     await deleteUser(userId)
+    ElMessage.success('删除成功')
     queryParams.page = 1
     resetQuery()
     await handleQuery()
@@ -469,7 +470,7 @@ const deleteUserBtn = async (userId: number) => {
   />
   <!-- 新增/更新 对话框 -->
   <el-dialog
-    :title="dialogType ? '更新用户' : '新增用户'"
+    :title="dialogType === DialogType.UPDATE ? '更新用户' : '新增用户'"
     v-model="dialogVisible"
     width="650px"
   >
@@ -491,14 +492,19 @@ const deleteUserBtn = async (userId: number) => {
         </el-col>
       </el-row>
       <!-- 来一个tag，提示默认密码为123456 -->
-
+      <el-tag
+        v-if="dialogType === DialogType.ADD"
+        type="warning"
+        style="margin-left: 100px; margin-bottom: 15px"
+        >默认密码为123456，用户首次登录后请及时修改密码</el-tag
+      >
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="性别" prop="sex">
             <el-radio-group v-model="user.sex">
-              <el-radio :label="0">保密</el-radio>
-              <el-radio :label="1">男</el-radio>
-              <el-radio :label="2">女</el-radio>
+              <el-radio :value="0">保密</el-radio>
+              <el-radio :value="1">男</el-radio>
+              <el-radio :value="2">女</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -541,8 +547,8 @@ const deleteUserBtn = async (userId: number) => {
         <el-col :span="12">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="user.status">
-              <el-radio :label="0">正常</el-radio>
-              <el-radio :label="1">禁用</el-radio>
+              <el-radio :value="0">正常</el-radio>
+              <el-radio :value="1">禁用</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>

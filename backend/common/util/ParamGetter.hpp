@@ -229,7 +229,7 @@ class ParamGetter
         if (array.empty())
         {
             // 允许返回空数组
-            return {};
+            return std::make_optional(D{});
         }
 
         for (const auto &element : array)

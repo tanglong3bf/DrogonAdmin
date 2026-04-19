@@ -14,7 +14,7 @@ const instance = axios.create({
  */
 const ElMessageList = (
   message: string | string[],
-  type: 'info' | 'warning' | 'error'
+  type: 'success' | 'info' | 'warning' | 'error'
 ) => {
   if (typeof message === 'string') {
     ElMessage({ message, type })
@@ -82,14 +82,14 @@ instance.interceptors.response.use(
       // 201 默认提示创建成功
       if (response.status === 201) {
         if (message === undefined) {
-          ElMessage({ message: '创建成功', type: 'info' })
+          ElMessage({ message: '创建成功', type: 'success' })
         } else {
-          ElMessageList(message, 'info')
+          ElMessageList(message, 'success')
         }
       } else {
         // 其他2xx状态码
         if (message !== undefined) {
-          ElMessageList(message, 'info')
+          ElMessageList(message, 'success')
         } else if (warning !== undefined) {
           ElMessageList(warning, 'warning')
         }

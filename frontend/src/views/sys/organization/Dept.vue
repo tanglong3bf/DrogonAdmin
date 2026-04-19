@@ -259,6 +259,7 @@ const handleUpdateDept = async (
   }
 
   await updateDept(original.dept_id!, dept.name)
+  ElMessage.success('更新成功')
   original.name = dept.name // 仍需修改原对象（业务逻辑要求）
   dialogVisible.value = false
   return true
@@ -404,7 +405,7 @@ const deleteDeptBtn = async (deptId: number) => {
   ElMessageBox.confirm(`请确认是否要删除 ${deptToDelete.name} 部门`).then(
     async () => {
       await deleteDept(deptToDelete.dept_id)
-
+      ElMessage.success('删除成功')
       await getDeptData()
       queryParams.name = ''
     }
@@ -510,11 +511,7 @@ const deleteDeptBtn = async (deptId: number) => {
         />
       </el-form-item>
       <el-form-item label="部门名称" prop="name">
-        <el-input
-          v-model="department.name"
-          placeholder="请输入部门名称"
-          clearable
-        />
+        <el-input v-model="department.name" placeholder="请输入部门名称" />
       </el-form-item>
     </el-form>
     <template #footer>

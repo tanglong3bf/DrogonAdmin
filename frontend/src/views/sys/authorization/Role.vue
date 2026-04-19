@@ -436,9 +436,9 @@ const deleteRoleBtn = async (role_id: number) => {
       </el-form-item>
       <el-form-item label="限制类型" prop="quota_type">
         <el-radio-group v-model="role.quota_type">
-          <el-radio :label="QuotaType.Unlimited">不限制</el-radio>
-          <el-radio :label="QuotaType.TotalLimit">总量限制</el-radio>
-          <el-radio :label="QuotaType.PerDeptLimit">部门限制</el-radio>
+          <el-radio :value="QuotaType.Unlimited">不限制</el-radio>
+          <el-radio :value="QuotaType.TotalLimit">总量限制</el-radio>
+          <el-radio :value="QuotaType.PerDeptLimit">部门限制</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item
@@ -450,11 +450,11 @@ const deleteRoleBtn = async (role_id: number) => {
       </el-form-item>
       <el-form-item label="生效部门" prop="relation_type">
         <el-radio-group v-model="role.relation_type">
-          <el-radio :label="RelationType.All">全部部门</el-radio>
-          <el-radio :label="RelationType.Whitelist"
+          <el-radio :value="RelationType.All">全部部门</el-radio>
+          <el-radio :value="RelationType.Whitelist"
             >仅以下部门（白名单）</el-radio
           >
-          <el-radio :label="RelationType.Blacklist"
+          <el-radio :value="RelationType.Blacklist"
             >除以下部门外（黑名单）</el-radio
           >
         </el-radio-group>

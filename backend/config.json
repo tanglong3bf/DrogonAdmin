@@ -422,7 +422,7 @@
             }
           },
           "count_user_by_dept_and_roles": {
-            "main": "SELECT COUNT(*) AS used_count, ur.role_id FROM sys_user u @inner_join() @where(dept_id, role_ids) @group_and_order()",
+            "main": "SELECT COUNT(*) AS used_count, ur.role_id AS role_id FROM sys_user u @inner_join() @where(dept_id, role_ids) @group_and_order()",
             "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id",
             "where": "WHERE u.dept_id = ${dept_id} AND ur.role_id IN @id_list(role_ids)",
             "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
