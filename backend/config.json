@@ -201,7 +201,7 @@
       "max_files": 0,
       //log_level: "DEBUG" by default,options:"TRACE","DEBUG","INFO","WARN"
       //The TRACE level is only valid when built in DEBUG mode.
-      "log_level": "TRACE",
+      "log_level": "DEBUG",
       //display_local_time: false by default, if true, the log time is displayed in local time
       "display_local_time": false
     },

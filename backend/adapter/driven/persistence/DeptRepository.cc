@@ -5,6 +5,7 @@
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/orm/Criteria.h>
 #include <drogon/HttpAppFramework.h>
+#include <optional>
 
 using namespace std;
 using namespace drogon;
@@ -12,7 +13,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<std::int32_t> DeptRepository::getMaxSubDeptSortNum(
+Task<std::optional<std::int32_t>> DeptRepository::getMaxSubDeptSortNum(
     const optional<std::int32_t> parentId,
     const DbClientPtr &dbClient) const
 {
@@ -26,6 +27,10 @@ Task<std::int32_t> DeptRepository::getMaxSubDeptSortNum(
         sqlGenerator()->getSql("get_max_sub_dept_sort_num", paramList);
 
     const auto dbResult = co_await dbClient->execSqlCoro(sql);
+    if (dbResult[0][0].isNull())
+    {
+        co_return std::nullopt;
+    }
     co_return dbResult[0][0].as<std::int32_t>();
 }
 

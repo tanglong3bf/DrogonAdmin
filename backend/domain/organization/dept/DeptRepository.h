@@ -23,7 +23,7 @@ class DeptRepository : public DrAdminObject<DeptRepository>
     /**
      * @brief 指定父部门id，获取最大的sort_num，传空表示根
      */
-    drogon::Task<std::int32_t> getMaxSubDeptSortNum(
+    drogon::Task<std::optional<std::int32_t>> getMaxSubDeptSortNum(
         const std::optional<std::int32_t> parentId,
         const DbClientPtr & = drogon::app().getDbClient()) const;
 

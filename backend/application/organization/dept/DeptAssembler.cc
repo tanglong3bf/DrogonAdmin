@@ -19,7 +19,7 @@ Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
     const auto maxSortNum =
         co_await deptRepository_->getMaxSubDeptSortNum(request.getParentId());
 
-    Dept dept{request.getName(), maxSortNum + 1, createdBy};
+    Dept dept{request.getName(), maxSortNum ? *maxSortNum + 1 : 0, createdBy};
 
     // 可选参数
     if (request.getParentId())
