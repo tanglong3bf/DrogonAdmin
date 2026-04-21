@@ -1,9 +1,9 @@
 #pragma once
 
-#include <memory>
-#include "common/framework/DrAdminObject.hpp"
+#include "Role.h"
 #include "domain/organization/user/UserVerifier.h"
-#include "RoleRepository.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <memory>
 
 class RoleHandler : public DrAdminObject<RoleHandler>
 {
@@ -14,8 +14,6 @@ class RoleHandler : public DrAdminObject<RoleHandler>
     drogon::Task<> deleteRole(Role &role, int32_t deletedBy) const;
 
   private:
-    RoleRepositoryPtr roleRepository_{
-        drogon::DrClassMap::getSingleInstance<RoleRepository>()};
     UserVerifierPtr userVerifier_{
         drogon::DrClassMap::getSingleInstance<UserVerifier>()};
 };

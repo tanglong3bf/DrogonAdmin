@@ -31,9 +31,9 @@ class DeptHandler : public DrAdminObject<DeptHandler>
      * @brief 排序部门
      */
     drogon::Task<std::vector<Dept>> sortDept(
-        const std::vector<std::int32_t> &deptIds,
-        const std::vector<Dept> &allDepts,
-        const std::int32_t updatedBy) const;
+        const std::optional<std::int32_t> &parentId,
+        const std::vector<int32_t> &deptIds,
+        const int32_t updatedBy) const;
 
   private:
     /// @brief 验证部门id列表都在部门列表中
@@ -41,6 +41,8 @@ class DeptHandler : public DrAdminObject<DeptHandler>
                                    const std::vector<Dept> &allDepts) const;
 
   private:
+    DeptRepositoryPtr deptRepository_{
+        drogon::DrClassMap::getSingleInstance<DeptRepository>()};
     DeptVerifierPtr deptVerifier_{
         drogon::DrClassMap::getSingleInstance<DeptVerifier>()};
     UserVerifierPtr userVerifier_{

@@ -65,11 +65,10 @@ Task<> DeptService::sortDept(const DeptSortRequest &request,
                              const std::int32_t updatedBy) const
 {
     const auto parentId = request.getParentId();
-    const auto allDepts = co_await deptRepository_->getByParentId(parentId);
     const auto deptIds = request.getDeptIds();
 
     auto sortResult =
-        co_await deptHandler_->sortDept(deptIds, allDepts, updatedBy);
+        co_await deptHandler_->sortDept(parentId, deptIds, updatedBy);
 
     co_await deptRepository_->multiSave(sortResult);
 }

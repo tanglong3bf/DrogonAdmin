@@ -38,10 +38,19 @@ Task<> DeptHandler::deleteDept(Dept &dept, const int32_t deletedBy) const
     dept.toDelete();
 }
 
-Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
-                                         const vector<Dept> &allDepts,
+Task<vector<Dept>> DeptHandler::sortDept(const optional<std::int32_t> &parentId,
+                                         const vector<int32_t> &deptIds,
                                          const int32_t updatedBy) const
 {
+    const auto allDepts = co_await deptRepository_->getByParentId(parentId);
+    if (parentId)
+    {
+        const auto parent = co_await deptRepository_->getById(*parentId);
+        if (!parent)
+        {
+            throw BusinessException{"父部门不存在"};
+        }
+    }
     // 验证
     validateDeptIdsInAllDepts(deptIds, allDepts);
 
