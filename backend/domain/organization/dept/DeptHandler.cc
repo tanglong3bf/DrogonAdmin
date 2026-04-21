@@ -11,8 +11,12 @@ Task<> DeptHandler::updateDept(Dept &dept,
                                const string &newName,
                                const int32_t updatedBy) const
 {
-    // 校验
-    validateNameNotSame(dept.getName(), newName);
+    // 验证
+    if (dept.getName() != newName)
+    {
+        // 新旧名称相同，无需更新
+        co_return;
+    }
     co_await deptVerifier_->verifyDeptNameNotDuplicated(newName,
                                                         dept.getParentId());
 
@@ -38,7 +42,7 @@ Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
                                          const vector<Dept> &allDepts,
                                          const int32_t updatedBy) const
 {
-    // 校验
+    // 验证
     validateDeptIdsInAllDepts(deptIds, allDepts);
 
     // 部门id到allDepts索引的映射
@@ -96,15 +100,6 @@ Task<vector<Dept>> DeptHandler::sortDept(const vector<int32_t> &deptIds,
         }
     }
     co_return sortResult;
-}
-
-void DeptHandler::validateNameNotSame(const string &oldName,
-                                      const string &newName) const
-{
-    if (oldName == newName)
-    {
-        throw BusinessException{"部门新名称和旧名称相同"};
-    }
 }
 
 void DeptHandler::validateDeptIdsInAllDepts(const vector<int32_t> &deptIds,

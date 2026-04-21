@@ -50,7 +50,6 @@ Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
             co_await mapper.update(sysDept);
             break;
         case ChangingStatus::UNCHANGED:
-            LOG_WARN << "无需修改的数据调用了save，请检查代码逻辑";
             break;
     }
 }

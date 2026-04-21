@@ -36,10 +36,6 @@ class DeptHandler : public DrAdminObject<DeptHandler>
         const std::int32_t updatedBy) const;
 
   private:
-    /// @brief 验证新旧名称是否相同
-    void validateNameNotSame(const std::string &oldName,
-                             const std::string &newName) const;
-
     /// @brief 验证部门id列表都在部门列表中
     void validateDeptIdsInAllDepts(const std::vector<std::int32_t> &deptIds,
                                    const std::vector<Dept> &allDepts) const;
