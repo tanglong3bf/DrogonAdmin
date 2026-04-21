@@ -9,11 +9,8 @@ using namespace drogon::orm;
 
 Task<> DeptVerifier::verifyDepartmentExists(const int32_t deptId) const
 {
-    try
-    {
-        const auto dept = co_await deptRepository_->getById(deptId);
-    }
-    catch (const UnexpectedRows &e)
+    const auto dept = co_await deptRepository_->getById(deptId);
+    if (!dept)
     {
         throw BusinessException("指定的部门id不存在");
     }
