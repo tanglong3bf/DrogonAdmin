@@ -37,7 +37,7 @@ class DeptRepository : public DrAdminObject<DeptRepository>
     /**
      * @brief 根据部门id获取数据
      */
-    drogon::Task<Dept> getById(const std::int32_t deptId) const;
+    drogon::Task<std::optional<Dept>> getById(const std::int32_t deptId) const;
 
     /**
      * @brief 统计指定父部门id下指定名称的数量

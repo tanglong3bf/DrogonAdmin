@@ -54,13 +54,20 @@ Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
     }
 }
 
-Task<Dept> DeptRepository::getById(const std::int32_t deptId) const
+Task<optional<Dept>> DeptRepository::getById(const std::int32_t deptId) const
 {
     Criteria criteria{SysDept::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysDept::Cols::_dept_id, deptId};
 
-    const auto sysDept = co_await deptMapper().findOne(criteria);
-    co_return static_cast<Dept>(sysDept);
+    try
+    {
+        const auto sysDept = co_await deptMapper().findOne(criteria);
+        co_return static_cast<Dept>(sysDept);
+    }
+    catch (const orm::UnexpectedRows & /*ignore*/)
+    {
+        co_return nullopt;
+    }
 }
 
 Task<std::int32_t> DeptRepository::countNameByParentId(

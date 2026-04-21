@@ -26,46 +26,38 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
                                const DeptUpdateRequest &request,
                                const std::int32_t updatedBy) const
 {
-    try
+    auto dept = co_await deptRepository_->getById(deptId);
+    if (dept == nullopt)
     {
-        auto dept = co_await deptRepository_->getById(deptId);
-
-        co_await deptHandler_->updateDept(dept, request.getName(), updatedBy);
-        co_await deptRepository_->save(dept);
-    }
-    catch (const orm::UnexpectedRows &e)
-    {
-        LOG_ERROR << e.what();
         throw BusinessException{"指定id的部门不存在"};
     }
+    co_await deptHandler_->updateDept(*dept, request.getName(), updatedBy);
+    co_await deptRepository_->save(*dept);
 }
 
 Task<> DeptService::deleteDept(const std::int32_t deptId,
                                const std::int32_t deletedBy) const
 {
+    optional<Dept> dept = co_await deptRepository_->getById(deptId);
+    if (dept == nullopt)
+    {
+        // 没有数据，无需操作
+        co_return;
+    }
+
+    co_await deptHandler_->deleteDept(*dept, deletedBy);
+
+    const auto trans = co_await app().getDbClient()->newTransactionCoro();
     try
     {
-        auto dept = co_await deptRepository_->getById(deptId);
-
-        co_await deptHandler_->deleteDept(dept, deletedBy);
-
-        const auto trans = co_await app().getDbClient()->newTransactionCoro();
-        try
-        {
-            co_await deptRepository_->save(dept, trans);
-            co_await roleService_->deleteExcludingDept(deptId, trans);
-        }
-        catch (const drogon::orm::DrogonDbException &e)
-        {
-            LOG_ERROR << e.base().what();
-            trans->rollback();
-            throw e;
-        }
+        co_await deptRepository_->save(*dept, trans);
+        co_await roleService_->deleteExcludingDept(deptId, trans);
     }
-    catch (const orm::UnexpectedRows &e)
+    catch (const drogon::orm::DrogonDbException &e)
     {
-        LOG_ERROR << e.what();
-        throw BusinessException{"指定id的部门不存在"};
+        LOG_ERROR << e.base().what();
+        trans->rollback();
+        throw e;
     }
 }
 
