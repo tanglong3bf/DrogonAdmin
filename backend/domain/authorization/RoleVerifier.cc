@@ -12,7 +12,7 @@ Task<> RoleVerifier::verifyNoRolesBelongToDept(const int32_t deptId) const
     const auto count = co_await roleRepository_->countBelongDept(deptId);
     if (count > 0)
     {
-        throw BusinessException("指定部门包含角色");
+        throw BusinessException("指定部门包含在角色的白名单中，无法删除");
     }
 }
 

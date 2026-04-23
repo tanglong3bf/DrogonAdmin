@@ -1,0 +1,418 @@
+dept_cases:
+  # 查询类接口 {{{
+  - name: 查询部门树-没有部门
+    sql_file: empty_dept_tree.sql
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data: []
+    validate_schema: dept_tree.yaml
+  - name: 查询部门树-1000层深部门树
+    sql_file: deep_dept_tree.sql
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+    validate_schema: dept_tree.yaml
+  - name: 查询部门树-多个根节点
+    sql_file: multi_root_dept_tree.sql
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2 # 断言2个根节点
+    validate_schema: dept_tree.yaml
+  - name: 查询部门树-软删除数据不应被展示
+    sql_file: have_deleted_data_dept_tree.sql
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[0].children[2].children: 2 # 三个数据，软删除一个
+    validate_schema: dept_tree.yaml
+  # }}}
+  # 新增部门 {{{
+  - name: 新增部门-正常新增
+    sql_file: multi_root_dept_tree.sql # 基本结构
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: 技术部
+      parent_id: 8
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增部门-新增同名部门
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: 技术部
+      parent_id: 8
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部门名称冲突
+  - name: 新增部门-不存在的父部门
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: 财务部
+      parent_id: 233
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 新增部门-xx项目开发组
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: xx项目开发组
+      parent_id: 10
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增部门-yy项目开发组
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: yy项目开发组
+      parent_id: 10
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增部门-不指定parent_id
+    url: http://localhost:8000/dept
+    method: POST
+    json:
+      name: 分公司
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增部门-缺少必备参数
+    url: http://localhost:8000/dept
+    method: POST
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：name
+  - name: 新增部门-检查所有的新增效果
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 3
+        len:$.data[1].children[1].children: 2
+        $.data[1].children[1].name: 技术部
+        $.data[1].children[1].children[0].name: xx项目开发组
+        $.data[1].children[1].children[1].name: yy项目开发组
+        $.data[2].name: 分公司
+    validate_schema: dept_tree.yaml
+  # }}}
+  # 更新部门 {{{
+  - name: 更新部门名称-正常更新
+    sql_file: multi_root_dept_tree.sql
+    url: http://localhost:8000/dept/8
+    method: PUT
+    json:
+      name: 分公司
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新部门名称-同名但不同层级应该允许
+    url: http://localhost:8000/dept/9
+    method: PUT
+    json:
+      name: 财务部 # 和主公司存在同名部门，但不在同一层级，应该允许
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新部门名称-检查更新结果
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        $.data[1].name: 分公司
+        $.data[1].children[0].name: 财务部
+    validate_schema: dept_tree.yaml
+  - name: 更新部门名称-缺少必备参数
+    url: http://localhost:8000/dept/2
+    method: PUT
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：name
+  - name: 更新部门名称-名称冲突
+    url: http://localhost:8000/dept/3
+    method: PUT
+    json:
+      name: 人事部
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部门名称冲突
+  - name: 更新部门名称-不存在的部门id
+    url: http://localhost:8000/dept/233
+    method: PUT
+    json:
+      name: 财务部
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  # }}}
+  # 排序部门 {{{
+  - name: 排序部门-正常排序
+    sql_file: multi_root_dept_tree.sql
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      parent_id: 1
+      dept_ids: [3, 2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序部门-检查排序结果
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        $.data[0].children[0].name: 财务部
+        $.data[0].children[1].name: 人事部
+        $.data[0].children[2].name: 技术部
+  - name: 排序部门-排序根部门
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      dept_ids: [8, 1]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序部门-检查排序结果2
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        $.data[0].name: 永不有限加班公司
+        $.data[1].name: 钱途无量有限公司
+  - name: 排序部门-指定部分子部门id
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      parent_id: 1
+      dept_ids: [4, 2] # 不全
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序部门-检查排序结果3
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        # 公司被排序过
+        $.data[1].children[0].name: 技术部
+        $.data[1].children[1].name: 人事部
+        $.data[1].children[2].name: 财务部
+  - name: 排序部门-不存在的父部门id
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      parent_id: 233
+      dept_ids: [1, 8]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 父部门不存在
+  - name: 排序部门-子部门不是指定父部门的子部门
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      dept_ids: [2, 4, 3]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分部门不是指定部门的子部门
+  - name: 排序部门-缺少必备参数
+    url: http://localhost:8000/dept/sort
+    method: PUT
+    json:
+      parent_id: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：dept_ids
+  # }}}
+  # 删除部门 {{{
+  - name: 删除部门-正常删除
+    sql_file: dept_with_user_and_role.sql
+    url: http://localhost:8000/dept/2
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-检查删除结果
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[0].children: 2
+  - name: 删除部门-重复删除
+    url: http://localhost:8000/dept/2
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-不存在的部门id
+    url: http://localhost:8000/dept/233
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-包含子部门不能删除
+    url: http://localhost:8000/dept/8
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门包含子部门
+  - name: 删除部门-检查删除结果2
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+  - name: 删除部门-正常删除2
+    url: http://localhost:8000/dept/9
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-检查删除结果3
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[1].children: 0
+  - name: 删除部门-再次删除
+    url: http://localhost:8000/dept/8
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-检查删除结果4
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 1
+  - name: 删除部门-有用户的部门不能删除
+    url: http://localhost:8000/dept/6
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门包含用户
+  - name: 删除部门-有角色白名单的部门不能删除
+    url: http://localhost:8000/dept/5
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门包含在角色的白名单中，无法删除
+  - name: 删除部门-有角色黑名单的部门可以删除
+    url: http://localhost:8000/dept/7
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除部门-检查删除结果5
+    url: http://localhost:8000/dept/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 1
+        len:$.data[0].children[1].children: 2
+        $.data[0].children[1].children[0].dept_id: 5
+        $.data[0].children[1].children[1].dept_id: 6
+  # }}}
+# vim: set foldmethod=marker foldlevel=0

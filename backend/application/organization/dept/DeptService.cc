@@ -29,7 +29,7 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
     auto dept = co_await deptRepository_->getById(deptId);
     if (!dept)
     {
-        throw BusinessException{"指定id的部门不存在"};
+        throw BusinessException{"指定的部门id不存在"};
     }
     co_await deptHandler_->updateDept(*dept, request.getName(), updatedBy);
     co_await deptRepository_->save(*dept);

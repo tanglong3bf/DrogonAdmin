@@ -12,7 +12,7 @@ Task<> DeptHandler::updateDept(Dept &dept,
                                const int32_t updatedBy) const
 {
     // 验证
-    if (dept.getName() != newName)
+    if (dept.getName() == newName)
     {
         // 新旧名称相同，无需更新
         co_return;
@@ -124,8 +124,7 @@ void DeptHandler::validateDeptIdsInAllDepts(const vector<int32_t> &deptIds,
     {
         if (allDeptIds.count(deptId) == 0)
         {
-            throw BusinessException{"部门ID " + to_string(deptId) +
-                                    " 不是指定部门的子部门"};
+            throw BusinessException{"部分部门不是指定部门的子部门"};
         }
     }
 }
