@@ -439,6 +439,10 @@
           }
         }
       }
+    },
+    {
+      // 纯头文件插件，未被使用时可能会报错，无影响
+      "name": "tl::sql::RelationQuery"
     }
   ],
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.

@@ -4,3 +4,6 @@
 [submodule "backend/common/util/plugins/SqlGenerator"]
 	path = backend/common/util/plugins/SqlGenerator
 	url = https://github.com/tanglong3bf/SqlGenerator.git
+[submodule "backend/common/util/plugins/RelationQuery"]
+	path = backend/common/util/plugins/RelationQuery
+	url = https://github.com/tanglong3bf/RelationQuery
