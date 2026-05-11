@@ -1032,5 +1032,5 @@ INSERT INTO "public"."sys_dept" VALUES (1000, '钱途无量有限公司', 999, 9
 
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 100, true);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 1000, true);
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");

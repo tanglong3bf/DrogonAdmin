@@ -77,3 +77,13 @@ Task<> DeptVerifier::verifyRoleAssignmentAllowed(
         }
     }
 }
+
+Task<> DeptVerifier::verifyDeptIdsExist(
+    const vector<std::int32_t> deptIds) const
+{
+    const auto dept = co_await deptRepository_->getByIds(deptIds);
+    if (dept.size() != deptIds.size())
+    {
+        throw BusinessException("部分部门id不存在");
+    }
+}

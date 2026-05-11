@@ -36,6 +36,12 @@ class DeptVerifier : public DrAdminObject<DeptVerifier>
         const std::int32_t deptId,
         const std::vector<std::int32_t> roleIds) const;
 
+    /**
+     * @brief 验证指定部门id列表都存在
+     */
+    drogon::Task<> verifyDeptIdsExist(
+        const std::vector<std::int32_t> deptIds) const;
+
   private:
     DeptRepositoryPtr deptRepository_{
         drogon::DrClassMap::getSingleInstance<DeptRepository>()};

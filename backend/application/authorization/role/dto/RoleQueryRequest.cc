@@ -2,12 +2,14 @@
 
 #include <drogon/utils/Utilities.h>
 
+using namespace std;
 using namespace drogon::utils;
 
 RoleQueryRequest::RoleQueryRequest(std::string name,
                                    std::string deptId,
                                    std::string page,
                                    std::string pageSize)
+    : name_{nullopt}, deptId_{nullopt}, page_{1}, pageSize_{10}
 {
     if (name.size() > 0)
     {
@@ -21,7 +23,7 @@ RoleQueryRequest::RoleQueryRequest(std::string name,
     {
         page_ = fromString<int32_t>(page);
     }
-    if (page_ <= 0)
+    if (page_ == 0)
     {
         page_ = 1;
     }
@@ -29,7 +31,7 @@ RoleQueryRequest::RoleQueryRequest(std::string name,
     {
         pageSize_ = fromString<int32_t>(pageSize);
     }
-    if (pageSize_ <= 0)
+    if (pageSize_ == 0)
     {
         pageSize_ = 10;
     }

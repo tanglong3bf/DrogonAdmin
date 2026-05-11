@@ -1,0 +1,177 @@
+role_cases:
+  # 分页查询角色 {{{
+  - name: 分页查询角色-正常查询
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=10'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-正常查询-最后一页
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=11&page_size=10'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+  - name: 分页查询角色-页码为0
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=0&page_size=10'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 查询页码超出范围，已自动调整到第一页
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-页码为-1
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=-1&page_size=10'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 查询页码超出范围，已自动调整到第一页
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-查询超过最后一页
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=233&page_size=10'
+    expect:
+      status_code: 200
+      # 自动调整到最后一页
+      assert_jsonpath:
+        # $.warn: 查询页码超出范围，已自动调整到最后一页
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-无参
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-size调整
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=5'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size调整2
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=15'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size调整3
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=25'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 20
+        $.data.total: 101
+        len:$.data.list: 20
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size调整4
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=40'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 30
+        $.data.total: 101
+        len:$.data.list: 30
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size调整5
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=75'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 50
+        $.data.total: 101
+        len:$.data.list: 50
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size调整6
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: 'page=1&page_size=999'
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        # $.warn: 不支持的分页大小，已自动调整
+        $.data.page: 1
+        $.data.page_size: 100
+        $.data.total: 101
+        len:$.data.list: 100
+    validate_schema: role_paginated.yaml
+  # }}}

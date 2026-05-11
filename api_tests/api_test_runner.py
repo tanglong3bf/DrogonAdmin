@@ -109,13 +109,16 @@ def run_sql_file(sql_file: str):
             conn.close()
 
 
-datas: dict = read_yaml("cases/dept_test_case.yaml")
+dept_datas: dict = read_yaml("cases/dept_test_case.yaml")
 # 提取用例 name 做展示名
-case_names = [case_item["name"] for case_item in datas["dept_cases"]]
+case_names = [case_item["name"] for case_item in dept_datas["dept_cases"]]
 dic = {}
 
+role_datas: dict = read_yaml("cases/role_test_case.yaml")
+case_names += [case_item["name"] for case_item in role_datas["role_cases"]]
 
-@pytest.mark.parametrize("case_item", datas["dept_cases"], ids=case_names)
+
+@pytest.mark.parametrize("case_item", dept_datas["dept_cases"] + role_datas["role_cases"], ids=case_names)
 def test_dept_cases(case_item):
     # 部分接口需要提前准备数据
     if "sql_file" in case_item:
