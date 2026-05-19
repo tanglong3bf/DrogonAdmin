@@ -1,3 +1,48 @@
+DROP TABLE IF EXISTS "public"."sys_dept";
+DROP SEQUENCE IF EXISTS "public"."sys_dept_dept_id_seq";
+CREATE SEQUENCE "public"."sys_dept_dept_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+CACHE 1;
+CREATE TABLE "public"."sys_dept" (
+  "dept_id" int4 NOT NULL DEFAULT nextval('sys_dept_dept_id_seq'::regclass),
+  "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "sort_num" int4 NOT NULL,
+  "parent_id" int4,
+  "created_by" int4 NOT NULL,
+  "created_time" timestamp(6) NOT NULL,
+  "updated_by" int4 NOT NULL,
+  "updated_time" timestamp(6) NOT NULL,
+  "deleted_by" int4,
+  "deleted_time" timestamp(6)
+)
+;
+COMMENT ON COLUMN "public"."sys_dept"."name" IS '部门名称';
+COMMENT ON COLUMN "public"."sys_dept"."sort_num" IS '部门排序';
+COMMENT ON COLUMN "public"."sys_dept"."parent_id" IS '父部门id';
+COMMENT ON COLUMN "public"."sys_dept"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_dept"."created_time" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_dept"."updated_by" IS '最新一次更新者';
+COMMENT ON COLUMN "public"."sys_dept"."updated_time" IS '最新一次更新时间';
+COMMENT ON COLUMN "public"."sys_dept"."deleted_by" IS '删除者';
+COMMENT ON COLUMN "public"."sys_dept"."deleted_time" IS '删除时间';
+
+-- 无黑白名单
+INSERT INTO "public"."sys_dept" VALUES (1, '部门1', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+-- 有白名单
+INSERT INTO "public"."sys_dept" VALUES (2, '部门2', 1, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+-- 有黑名单
+INSERT INTO "public"."sys_dept" VALUES (3, '部门3', 2, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+-- 既有白名单也有黑名单
+INSERT INTO "public"."sys_dept" VALUES (4, '部门4', 3, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+
+ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
+OWNED BY "public"."sys_dept"."dept_id";
+SELECT setval('"public"."sys_dept_dept_id_seq"', 4, true);
+ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");
+
 DROP TABLE IF EXISTS "public"."sys_role";
 DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
 CREATE SEQUENCE "public"."sys_role_role_id_seq" 
@@ -134,11 +179,31 @@ INSERT INTO "public"."sys_role" VALUES (95, '管理员-95', 'admin-95', NULL, 0,
 INSERT INTO "public"."sys_role" VALUES (96, '管理员-96', 'admin-96', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 INSERT INTO "public"."sys_role" VALUES (97, '管理员-97', 'admin-97', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 INSERT INTO "public"."sys_role" VALUES (98, '管理员-98', 'admin-98', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (99, '管理员-99', 'admin-99', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (100, '管理员-100', 'admin-100', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (101, '管理员-101', 'admin-101', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (99, '关联测试数据-1', 'relation-role-1', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (100, '关联测试数据-2', 'relation-role-2', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (101, '关联测试数据-3', 'relation-role-3', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
 SELECT setval('"public"."sys_role_role_id_seq"', 101, true);
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
+
+DROP TABLE IF EXISTS "public"."sys_role_dept";
+CREATE TABLE "public"."sys_role_dept" (
+  "role_id" int4 NOT NULL,
+  "dept_id" int4 NOT NULL,
+  "created_by" int4 NOT NULL,
+  "created_time" timestamp(6) NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."sys_role_dept"."role_id" IS '角色id';
+COMMENT ON COLUMN "public"."sys_role_dept"."dept_id" IS '部门id';
+COMMENT ON COLUMN "public"."sys_role_dept"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_role_dept"."created_time" IS '创建时间';
+
+INSERT INTO "public"."sys_role_dept" VALUES (100, 2, 1, '2026-04-02 21:53:40.210895');
+INSERT INTO "public"."sys_role_dept" VALUES (100, 4, 1, '2026-04-02 21:53:40.210895');
+INSERT INTO "public"."sys_role_dept" VALUES (101, 3, 1, '2026-04-02 21:53:40.210895');
+INSERT INTO "public"."sys_role_dept" VALUES (101, 4, 1, '2026-04-02 21:53:40.210895');
+
+ALTER TABLE "public"."sys_role_dept" ADD CONSTRAINT "sys_role_dept_pkey" PRIMARY KEY ("role_id", "dept_id");

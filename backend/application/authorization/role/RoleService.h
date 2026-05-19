@@ -34,7 +34,8 @@ class RoleService : public DrAdminObject<RoleService>
      * @brief 带条件分页查询角色列表
      */
     drogon::Task<PaginatedResponse<RoleResponse>> getRoleList(
-        const RoleQueryRequest &request) const;
+        const RoleQueryRequest &request,
+        const drogon::AttributesPtr &attr) const;
 
     /**
      * @brief 创建角色

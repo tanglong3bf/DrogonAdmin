@@ -1,77 +1,6 @@
 role_cases:
   # 分页查询角色 {{{
-  - name: 分页查询角色-正常查询
-    sql_file: role.sql
-    url: http://localhost:8000/role
-    method: GET
-    json: {}
-    params: 'page=1&page_size=10'
-    expect:
-      status_code: 200
-      assert_jsonpath:
-        $.data.page: 1
-        $.data.page_size: 10
-        $.data.total: 101
-        len:$.data.list: 10
-    validate_schema: role_paginated.yaml
-  - name: 分页查询角色-正常查询-最后一页
-    sql_file: role.sql
-    url: http://localhost:8000/role
-    method: GET
-    json: {}
-    params: 'page=11&page_size=10'
-    expect:
-      status_code: 200
-      assert_jsonpath:
-        $.data.page: 11
-        $.data.page_size: 10
-        $.data.total: 101
-        len:$.data.list: 1
-  - name: 分页查询角色-页码为0
-    sql_file: role.sql
-    url: http://localhost:8000/role
-    method: GET
-    json: {}
-    params: 'page=0&page_size=10'
-    expect:
-      status_code: 200
-      assert_jsonpath:
-        # $.warn: 查询页码超出范围，已自动调整到第一页
-        $.data.page: 1
-        $.data.page_size: 10
-        $.data.total: 101
-        len:$.data.list: 10
-  - name: 分页查询角色-页码为-1
-    sql_file: role.sql
-    url: http://localhost:8000/role
-    method: GET
-    json: {}
-    params: 'page=-1&page_size=10'
-    expect:
-      status_code: 200
-      assert_jsonpath:
-        # $.warn: 查询页码超出范围，已自动调整到第一页
-        $.data.page: 1
-        $.data.page_size: 10
-        $.data.total: 101
-        len:$.data.list: 10
-  - name: 分页查询角色-查询超过最后一页
-    sql_file: role.sql
-    url: http://localhost:8000/role
-    method: GET
-    json: {}
-    params: 'page=233&page_size=10'
-    expect:
-      status_code: 200
-      # 自动调整到最后一页
-      assert_jsonpath:
-        # $.warn: 查询页码超出范围，已自动调整到最后一页
-        $.data.page: 11
-        $.data.page_size: 10
-        $.data.total: 101
-        len:$.data.list: 1
-    validate_schema: role_paginated.yaml
-  - name: 分页查询角色-无参
+  - name: 分页查询角色-默认参数
     sql_file: role.sql
     url: http://localhost:8000/role
     method: GET
@@ -84,94 +13,333 @@ role_cases:
         $.data.page_size: 10
         $.data.total: 101
         len:$.data.list: 10
-  - name: 分页查询角色-size调整
-    sql_file: role.sql
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-page为0
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=5'
+    params: page=0
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
+        $.warn: 查询页码超出范围，已自动调整到第一页
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-最后一页
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=11
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+  - name: 分页查询角色-页码超出最后一页
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=233
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 查询页码超出范围，已自动调整到最后一页
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+  - name: 分页查询角色-page为非数字
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=abc
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 页码格式错误，已自动使用第一页
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
         len:$.data.list: 10
     validate_schema: role_paginated.yaml
-  - name: 分页查询角色-size调整2
-    sql_file: role.sql
+  - name: 分页查询角色-size为5
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=15'
+    params: page=1&page_size=5
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
+        $.warn: 不支持的分页大小，已自动调整为10
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-size为15
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=15
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
         len:$.data.list: 10
     validate_schema: role_paginated.yaml
-  - name: 分页查询角色-size调整3
-    sql_file: role.sql
+  - name: 分页查询角色-size为20
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=25'
+    params: page=1&page_size=20
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
         $.data.page: 1
         $.data.page_size: 20
         $.data.total: 101
         len:$.data.list: 20
     validate_schema: role_paginated.yaml
-  - name: 分页查询角色-size调整4
-    sql_file: role.sql
+  - name: 分页查询角色-size为25
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=40'
+    params: page=1&page_size=25
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
+        $.warn: 不支持的分页大小，已自动调整为20
+        $.data.page: 1
+        $.data.page_size: 20
+        $.data.total: 101
+        len:$.data.list: 20
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为30
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=30
+    expect:
+      status_code: 200
+      assert_jsonpath:
         $.data.page: 1
         $.data.page_size: 30
         $.data.total: 101
         len:$.data.list: 30
     validate_schema: role_paginated.yaml
-  - name: 分页查询角色-size调整5
-    sql_file: role.sql
+  - name: 分页查询角色-size为40
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=75'
+    params: page=1&page_size=40
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
+        $.warn: 不支持的分页大小，已自动调整为30
+        $.data.page: 1
+        $.data.page_size: 30
+        $.data.total: 101
+        len:$.data.list: 30
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为50
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=50
+    expect:
+      status_code: 200
+      assert_jsonpath:
         $.data.page: 1
         $.data.page_size: 50
         $.data.total: 101
         len:$.data.list: 50
     validate_schema: role_paginated.yaml
-  - name: 分页查询角色-size调整6
-    sql_file: role.sql
+  - name: 分页查询角色-size为75
     url: http://localhost:8000/role
     method: GET
     json: {}
-    params: 'page=1&page_size=999'
+    params: page=1&page_size=75
     expect:
       status_code: 200
       assert_jsonpath:
-        # $.warn: 不支持的分页大小，已自动调整
+        $.warn: 不支持的分页大小，已自动调整为50
+        $.data.page: 1
+        $.data.page_size: 50
+        $.data.total: 101
+        len:$.data.list: 50
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为100
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=100
+    expect:
+      status_code: 200
+      assert_jsonpath:
         $.data.page: 1
         $.data.page_size: 100
         $.data.total: 101
         len:$.data.list: 100
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为999
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=999
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为100
+        $.data.page: 1
+        $.data.page_size: 100
+        $.data.total: 101
+        len:$.data.list: 100
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为非数字
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=abc
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 分页大小格式错误，已自动调整为10
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name为空串
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name=
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name为'0'
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name=0
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 9
+        len:$.data.list: 9
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name='+OR+1=1+--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=';drop+table;--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=';drop+table;--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-dept_id为非数字
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=abc
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部门id格式错误
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询1
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 2
+        len:$.data.list: 2
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=2
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 3
+        len:$.data.list: 3
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询3
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=3
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 1
+        len:$.data.list: 1
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询4
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=4
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 2
+        len:$.data.list: 2
     validate_schema: role_paginated.yaml
   # }}}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/util/Utilities.hpp"
+#include <drogon/Attribute.h>
 #include <optional>
 #include <string>
 #include <cstdint>
@@ -16,7 +17,8 @@ class RoleQueryRequest
     RoleQueryRequest(std::string name,
                      std::string deptId,
                      std::string page,
-                     std::string pageSize);
+                     std::string pageSize,
+                     const drogon::AttributesPtr &attr);
 
     OPT_SETTER(name, Name)
     OPT_SETTER(deptId, DeptId)
