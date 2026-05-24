@@ -86,10 +86,10 @@ Task<size_t> RoleRepository::countByName(const string &name) const
     co_return co_await roleMapper().count(criteria);
 }
 
-Task<size_t> RoleRepository::countByCode(const string &name) const
+Task<size_t> RoleRepository::countByCode(const string &code) const
 {
     Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysRole::Cols::_name, name};
+    criteria = criteria && Criteria{SysRole::Cols::_code, code};
     co_return co_await roleMapper().count(criteria);
 }
 

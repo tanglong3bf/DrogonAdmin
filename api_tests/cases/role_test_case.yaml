@@ -343,3 +343,409 @@ role_cases:
         len:$.data.list: 2
     validate_schema: role_paginated.yaml
   # }}}
+  # 新增角色 {{{
+  - name: 新增角色-正常新增
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-正常
+      code: new-role-normal
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-不传name
+    url: http://localhost:8000/role
+    method: post
+    json:
+      code: new-role-name_none
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：name
+        $.code: lt 0
+  - name: 新增角色-name为空
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: ''
+      code: new-role-name_empty
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: name参数长度过短
+        $.code: lt 0
+  - name: 新增角色-不传code
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-code_none
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：code
+        $.code: lt 0
+  - name: 新增角色-code为空
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-code_empty
+      code: ''
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: code参数长度过短
+        $.code: lt 0
+  - name: 新增角色-设置描述
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-有描述
+      code: new-role-with_description
+      description: 这是一个测试角色
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为0应无视数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-无限制
+      code: new-role-quota_type_0
+      quota_type: 0
+      user_quota: 999
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为-1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型-1
+      code: new-role-quota_type_-1
+      quota_type: -1
+      user_quota: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: quota_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1
+      code: new-role-quota_type_1
+      quota_type: 1
+      user_quota: 3
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为1应有数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1无数值
+      code: new-role-quota_type_1_no_value
+      quota_type: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：user_quota
+        $.code: lt 0
+  - name: 新增角色-限制类型为1时，数值至少为一
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1数值为0
+      code: new-role-quota_type_1_value_0
+      quota_type: 1
+      user_quota: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: user_quota的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为2
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2
+      code: new-role-quota_type_2
+      quota_type: 2
+      user_quota: 5
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为2应有数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2无数值
+      code: new-role-quota_type_2_no_value
+      quota_type: 2
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：user_quota
+        $.code: lt 0
+  - name: 新增角色-限制类型为2时，数值至少为一
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2数值为0
+      code: new-role-quota_type_2_value_0
+      quota_type: 2
+      user_quota: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: user_quota的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为3
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型3
+      code: new-role-quota_type_3
+      quota_type: 3
+      user_quota: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: quota_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-关联关系为-1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联-1
+      code: new-role-t-1
+      quota_type: 0
+      relation_type: -1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: relation_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-关联关系为1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1
+      code: new-role-t1
+      quota_type: 0
+      relation_type: 1
+      dept_ids:
+        - 1
+        - 2
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-关联关系为1但部分dept_id不存在
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门125
+      code: new-role-t1d125
+      quota_type: 0
+      relation_type: 1
+      dept_ids:
+        - 1
+        - 2
+        - 5
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部分部门id不存在
+        $.code: lt 0
+  - name: 新增角色-关联关系为1但缺少dept_ids
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1无部门
+      code: new-role-r1_no_d
+      quota_type: 0
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：dept_ids
+        $.code: lt 0
+  - name: 新增角色-关联关系为1,有dept_ids但格式错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门格式错误
+      code: new-role-r1d_format_e
+      quota_type: 0
+      relation_type: 1
+      dept_ids: 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: dept_ids必须是一个数组
+        $.code: lt 0
+  - name: 新增角色-关联关系为1,有dept_ids但类型错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门类型错误
+      code: new-role-r1d_type_e
+      quota_type: 0
+      relation_type: 1
+      dept_ids:
+        - 1
+        - 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 数组元素必须是整数
+        $.code: lt 0
+  - name: 新增角色-关联关系为2
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2
+      code: new-role-r2
+      quota_type: 0
+      relation_type: 2
+      dept_ids:
+        - 1
+        - 2
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-关联关系为2但部分dept_id不存在
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门125
+      code: new-role-r2d125
+      quota_type: 0
+      relation_type: 1
+      dept_ids:
+        - 1
+        - 2
+        - 5
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部分部门id不存在
+        $.code: lt 0
+  - name: 新增角色-关联关系为2但缺少dept_ids
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2无部门
+      code: new-role-r2_no_d
+      quota_type: 0
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：dept_ids
+        $.code: lt 0
+  - name: 新增角色-关联关系为2,有dept_ids但格式错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门格式错误
+      code: new-role-r2d_format_e
+      quota_type: 0
+      relation_type: 2
+      dept_ids: 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: dept_ids必须是一个数组
+        $.code: lt 0
+  - name: 新增角色-关联关系为2,有dept_ids但类型错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门类型错误
+      code: new-role-r2d_type_e
+      quota_type: 0
+      relation_type: 2
+      dept_ids:
+        - 1
+        - 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 数组元素必须是整数
+        $.code: lt 0
+  - name: 新增角色-关联关系为3
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联3
+      code: new-role-r3
+      quota_type: 0
+      relation_type: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: relation_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-检查数据新增是否成功
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=新增角色
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 7
+        len:$.data.list: 7
+        $.data.list[1].description: 这是一个测试角色
+        $.data.list[3].user_quota: 3
+        $.data.list[4].user_quota: 5
+        len:$.data.list[5].depts: 2
+        len:$.data.list[6].depts: 2
+    validate_schema: role_paginated.yaml
+  # }}}
+# vim: set foldmethod=marker foldlevel=0:
