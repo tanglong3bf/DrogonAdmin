@@ -19,7 +19,7 @@ class UserController : public drogon::HttpController<UserController>
                   drogon::Options);
     ADD_METHOD_TO(UserController::updateUser,
                   "/user/{id}",
-                  drogon::Put,
+                  drogon::Patch,
                   drogon::Options);
     ADD_METHOD_TO(UserController::deleteUser,
                   "/user/{id}",

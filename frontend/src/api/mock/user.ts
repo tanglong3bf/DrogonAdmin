@@ -10,7 +10,7 @@ import { UploadAvatarResponse, User } from '@/types/user'
  */
 if (mockConfig.user.update_basic_info) {
   mock
-    .onPut(/^http:\/\/localhost:8000\/user$/)
+    .onPatch(/^http:\/\/localhost:8000\/user$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {
@@ -32,9 +32,9 @@ if (mockConfig.user.update_basic_info) {
 /**
  * 更新用户密码mock
  */
-if (mockConfig.user.update_password) {
+if (mockConfig.user.change_password) {
   mock
-    .onPut(/^http:\/\/localhost:8000\/user\/password$/)
+    .onPost(/^http:\/\/localhost:8000\/user\/change-password$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {
@@ -137,7 +137,7 @@ if (mockConfig.user.new_user) {
  */
 if (mockConfig.user.update_user) {
   mock
-    .onPut(/^\/user\/[1-9]\d*$/)
+    .onPatch(/^\/user\/[1-9]\d*$/)
     .reply((config: AxiosRequestConfig): [number] => {
       const data = JSON.parse(config.data)
       console.log('更新用户', data)

@@ -134,7 +134,7 @@ dept_cases:
   - name: 更新部门名称-正常更新
     sql_file: multi_root_dept_tree.sql
     url: http://localhost:8000/dept/8
-    method: PUT
+    method: PATCH
     json:
       name: 分公司
     params: ''
@@ -142,7 +142,7 @@ dept_cases:
       status_code: 204
   - name: 更新部门名称-同名但不同层级应该允许
     url: http://localhost:8000/dept/9
-    method: PUT
+    method: PATCH
     json:
       name: 财务部 # 和主公司存在同名部门，但不在同一层级，应该允许
     params: ''
@@ -162,7 +162,7 @@ dept_cases:
     validate_schema: dept_tree.yaml
   - name: 更新部门名称-缺少必备参数
     url: http://localhost:8000/dept/2
-    method: PUT
+    method: PATCH
     json: {}
     params: ''
     expect:
@@ -172,7 +172,7 @@ dept_cases:
         $.error: 缺少必备参数：name
   - name: 更新部门名称-名称冲突
     url: http://localhost:8000/dept/3
-    method: PUT
+    method: PATCH
     json:
       name: 人事部
     params: ''
@@ -183,7 +183,7 @@ dept_cases:
         $.error: 部门名称冲突
   - name: 更新部门名称-不存在的部门id
     url: http://localhost:8000/dept/233
-    method: PUT
+    method: PATCH
     json:
       name: 财务部
     params: ''
@@ -197,7 +197,7 @@ dept_cases:
   - name: 排序部门-正常排序
     sql_file: multi_root_dept_tree.sql
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       parent_id: 1
       dept_ids: [3, 2, 4]
@@ -218,7 +218,7 @@ dept_cases:
         $.data[0].children[2].name: 技术部
   - name: 排序部门-排序根部门
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       dept_ids: [8, 1]
     params: ''
@@ -237,7 +237,7 @@ dept_cases:
         $.data[1].name: 钱途无量有限公司
   - name: 排序部门-指定部分子部门id
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       parent_id: 1
       dept_ids: [4, 2] # 不全
@@ -259,7 +259,7 @@ dept_cases:
         $.data[1].children[2].name: 财务部
   - name: 排序部门-不存在的父部门id
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       parent_id: 233
       dept_ids: [1, 8]
@@ -271,7 +271,7 @@ dept_cases:
         $.error: 父部门不存在
   - name: 排序部门-子部门不是指定父部门的子部门
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       dept_ids: [2, 4, 3]
     params: ''
@@ -282,7 +282,7 @@ dept_cases:
         $.error: 部分部门不是指定部门的子部门
   - name: 排序部门-缺少必备参数
     url: http://localhost:8000/dept/sort
-    method: PUT
+    method: POST
     json:
       parent_id: 1
     params: ''

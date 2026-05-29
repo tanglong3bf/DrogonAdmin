@@ -35,7 +35,7 @@ export const newUser = (data: UserFormData) => {
  * 更新一个用户
  */
 export const updateUser = (user_id: number, user: UserFormData) => {
-  return request.put(`/user/${user_id}`, { ...user, user_id: undefined })
+  return request.patch(`/user/${user_id}`, { ...user, user_id: undefined })
 }
 
 /**
@@ -51,7 +51,7 @@ export const deleteUser = (user_id: number) => {
 export const updateUserInfo = (
   userInfoUpdateRequest: UserInfoUpdateRequest
 ): Promise<undefined> => {
-  return request.put('/user', {
+  return request.patch('/user', {
     ...userInfoUpdateRequest
   })
 }
@@ -59,10 +59,10 @@ export const updateUserInfo = (
 /**
  * 更新用户密码接口
  */
-export const updatePassword = (
+export const changePassword = (
   userPasswordUpdateRequest: UserPasswordUpdateRequest
 ): Promise<undefined> => {
-  return request.put('/user/password', {
+  return request.post('/user/change-password', {
     ...userPasswordUpdateRequest
   })
 }

@@ -80,7 +80,7 @@ if (mockConfig.dept.new_dept) {
  */
 if (mockConfig.dept.update_dept) {
   mock
-    .onPut(/^\/dept\/[1-9]\d*$/)
+    .onPatch(/^\/dept\/[1-9]\d*$/)
     .reply((config: AxiosRequestConfig): [number] => {
       console.log(config)
       return [204]
@@ -103,7 +103,7 @@ if (mockConfig.dept.delete_dept) {
  * 排序部门接口mock
  */
 if (mockConfig.dept.sort_dept) {
-  mock.onPut('/dept/sort').reply((config: AxiosRequestConfig): [number] => {
+  mock.onPost('/dept/sort').reply((config: AxiosRequestConfig): [number] => {
     console.log(config)
     return [204]
   })

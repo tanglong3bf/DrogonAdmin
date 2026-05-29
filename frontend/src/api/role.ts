@@ -37,7 +37,7 @@ export const newRole = (data: RoleFormData) => {
  * 更新角色
  */
 export const updateRole = (role_id: number, role: RoleFormData) => {
-  return request.put(`/role/${role_id}`, { ...role, role_id: undefined })
+  return request.patch(`/role/${role_id}`, { ...role, role_id: undefined })
 }
 
 /**

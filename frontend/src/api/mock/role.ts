@@ -76,7 +76,7 @@ if (mockConfig.role.new_role) {
 
 if (mockConfig.role.update_role) {
   mock
-    .onPut(/^\/role\/[1-9]\d*$/)
+    .onPatch(/^\/role\/[1-9]\d*$/)
     .reply((config: AxiosRequestConfig): [number] => {
       console.log(config)
       return [204]

@@ -6,7 +6,7 @@ import type {
   Value
 } from 'async-validator/dist-types/interface.d.ts'
 import { UserPasswordUpdateRequest } from '@/types/user'
-import { updatePassword } from '@/api/user'
+import { changePassword } from '@/api/user'
 
 /**
  * 更新密码表单数据
@@ -117,7 +117,7 @@ const checkUpdatable = (): boolean => {
 /**
  * 更新密码按钮，校验表单数据并提交请求
  */
-const updatePasswordBtn = async (formEl?: FormInstance) => {
+const changePasswordBtn = async (formEl?: FormInstance) => {
   const isValid = formEl?.validate()
   if (isValid) {
     const request: UserPasswordUpdateRequest = {
@@ -125,7 +125,7 @@ const updatePasswordBtn = async (formEl?: FormInstance) => {
       newPassword: formData.newPassword
     }
 
-    await updatePassword(request)
+    await changePassword(request)
   }
 }
 </script>
@@ -161,7 +161,7 @@ const updatePasswordBtn = async (formEl?: FormInstance) => {
     </el-form-item>
   </el-form>
   <div class="update-btn">
-    <el-button :disabled="!checkUpdatable()" @click="updatePasswordBtn(formRef)"
+    <el-button :disabled="!checkUpdatable()" @click="changePasswordBtn(formRef)"
       >修改密码</el-button
     >
   </div>

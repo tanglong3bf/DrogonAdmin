@@ -19,7 +19,7 @@ class RoleController : public drogon::HttpController<RoleController>
                   drogon::Options);
     ADD_METHOD_VIA_REGEX(RoleController::updateRole,
                          "/role/([1-9]\\d*)",
-                         drogon::Put,
+                         drogon::Patch,
                          drogon::Options);
     ADD_METHOD_VIA_REGEX(RoleController::deleteRole,
                          "/role/([1-9]\\d*)",

@@ -20,7 +20,7 @@ export const newDept = (name: string, parent_id?: number) => {
  * 更新指定部门名称
  */
 export const updateDept = (dept_id: number, name: string) => {
-  return request.put(`/dept/${dept_id}`, { name })
+  return request.patch(`/dept/${dept_id}`, { name })
 }
 
 /**
@@ -34,5 +34,5 @@ export const deleteDept = (dept_id: number) => {
  * 排序部门
  */
 export const sortDept = (parent_id: number | undefined, dept_ids: number[]) => {
-  return request.put('/dept/sort', { parent_id, dept_ids })
+  return request.post('/dept/sort', { parent_id, dept_ids })
 }

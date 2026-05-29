@@ -8,7 +8,7 @@
     "update_user": true,
     "delete_user": true,
     "update_basic_info": true,
-    "update_password": true,
+    "change_password": true,
     "upload_avatar": true
   },
   "dept": {
