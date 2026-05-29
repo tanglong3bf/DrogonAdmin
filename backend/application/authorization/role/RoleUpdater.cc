@@ -2,7 +2,6 @@
 
 #include <unordered_set>
 #include "common/util/Utilities.hpp"
-#include "common/exception/BusinessException.h"
 #include "domain/authorization/RoleDept.h"
 
 using namespace std;
@@ -27,9 +26,36 @@ Task<> RoleUpdater::updateRole(Role &role,
         role.setCode(*request.getCode());
         isUpdated = true;
     }
-    ENTITY_SET(role, Description, isUpdated = true);
+    // 更新为新值
+    if (request.getDescription() &&
+        role.getDescription() != *request.getDescription())
+    {
+        role.setDescription(*request.getDescription());
+        isUpdated = true;
+    }
+    // 更新为空
+    else if (request.getDescription().isNull() &&
+             role.getDescription() != nullopt)
+    {
+        role.setDescriptionToNullOpt();
+        isUpdated = true;
+    }
     ENTITY_SET(role, QuotaType, isUpdated = true; isQuotaUpdated = true);
-    ENTITY_SET(role, UserQuota, isUpdated = true; isQuotaUpdated = true);
+    // 更新为新值
+    if (request.getUserQuota() &&
+        role.getUserQuota() != *request.getUserQuota())
+    {
+        role.setUserQuota(*request.getUserQuota());
+        isUpdated = true;
+        isQuotaUpdated = true;
+    }
+    // 更新为空
+    else if (request.getUserQuota().isNull() && role.getUserQuota() != nullopt)
+    {
+        role.setUserQuotaToNullOpt();
+        isUpdated = true;
+        isQuotaUpdated = true;
+    }
     ENTITY_SET(role, RelationType, isUpdated = true; isQuotaUpdated = true);
 
     if (request.getDeptIds())
@@ -51,6 +77,14 @@ Task<> RoleUpdater::updateRole(Role &role,
     {
         role.setUserQuotaToNullOpt();
         isUpdated = true;
+        isQuotaUpdated = true;
+    }
+
+    if (role.getQuotaType() != QuotaType::Unlimited &&
+        role.getUserQuota() == nullopt)
+    {
+        throw BusinessException(
+            "当quota_type不为unlimited时，user_quota不能为空");
     }
 
     if (role.getRelationType() == RelationType::All &&
@@ -71,10 +105,6 @@ Task<> RoleUpdater::updateRole(Role &role,
     {
         role.setUpdatedBy(updatedBy);
         role.toUpdate();
-    }
-    else
-    {
-        throw BusinessException("角色数据无更新");
     }
     co_return;
 }
