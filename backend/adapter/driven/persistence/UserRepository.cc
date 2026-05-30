@@ -212,6 +212,42 @@ Task<vector<std::int32_t>> UserRepository::getDeptIdsByRoleId(
     co_return deptIds;
 }
 
+Task<size_t> UserRepository::countByRoleNotInDepts(
+    const std::int32_t roleId,
+    const vector<std::int32_t> &deptIds) const
+{
+    ParamList param;
+    param["role_id"] = roleId;
+    Json::Value deptIdsJson(Json::arrayValue);
+    for (const auto &id : deptIds)
+    {
+        deptIdsJson.append(id);
+    }
+    param["dept_ids"] = deptIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_user_by_role_not_in_depts", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    co_return dbResult[0][0].as<size_t>();
+}
+
+Task<size_t> UserRepository::countByRoleInDepts(
+    const std::int32_t roleId,
+    const vector<std::int32_t> &deptIds) const
+{
+    ParamList param;
+    param["role_id"] = roleId;
+    Json::Value deptIdsJson(Json::arrayValue);
+    for (const auto &id : deptIds)
+    {
+        deptIdsJson.append(id);
+    }
+    param["dept_ids"] = deptIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_user_by_role_in_depts", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    co_return dbResult[0][0].as<size_t>();
+}
+
 vector<UserRole> UserRepository::buildUserRoleList(
     const vector<SysUserRole> &sysUserRoles) const
 {

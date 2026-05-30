@@ -20,7 +20,7 @@
       //port: Server port, 5432 by default
       "port": 5432,
       //dbname: Database name
-      "dbname": "drogon_admin_db",
+      "dbname": "da_test_db",
       //user: 'postgres' by default
       "user": "admin",
       //passwd: '' by default
@@ -440,6 +440,18 @@
             "main": "SELECT @fields() FROM public.sys_user u @inner_join() WHERE ur.role_id = ${role_id} GROUP BY u.dept_id ORDER BY u.dept_id",
             "fields": "u.dept_id, COUNT(*) AS user_count",
             "inner_join": "INNER JOIN public.sys_user_role ur ON u.user_id = ur.user_id"
+          },
+          "count_user_by_role_not_in_depts": {
+            "main": "SELECT COUNT(*) FROM sys_user u @inner_join(role_id) @where(dept_ids)",
+            "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = ${role_id}",
+            "where": "WHERE (u.dept_id IS NULL OR u.dept_id NOT IN @id_list(dept_ids))",
+            "id_list": "(@for(id in dept_ids, separator=',') ${id} @endfor)"
+          },
+          "count_user_by_role_in_depts": {
+            "main": "SELECT COUNT(*) FROM sys_user u @inner_join(role_id) @where(dept_ids)",
+            "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = ${role_id}",
+            "where": "WHERE (u.dept_id IS NULL OR u.dept_id IN @id_list(dept_ids))",
+            "id_list": "(@for(id in dept_ids, separator=',') ${id} @endfor)"
           }
         }
       }

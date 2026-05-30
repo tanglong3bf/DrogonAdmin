@@ -79,6 +79,20 @@ class UserRepository : public DrAdminObject<UserRepository>
     drogon::Task<std::vector<std::int32_t>> getDeptIdsByRoleId(
         const std::int32_t roleId) const;
 
+    /**
+     * @brief 统计分配了指定角色但不属于指定部门的用户数量
+     */
+    drogon::Task<std::size_t> countByRoleNotInDepts(
+        const std::int32_t roleId,
+        const std::vector<std::int32_t> &deptIds) const;
+
+    /**
+     * @brief 统计分配了指定角色且属于指定部门的用户数量
+     */
+    drogon::Task<std::size_t> countByRoleInDepts(
+        const std::int32_t roleId,
+        const std::vector<std::int32_t> &deptIds) const;
+
   protected:
     std::vector<UserRole> buildUserRoleList(
         const std::vector<SysUserRole> &sysUserRoles) const;

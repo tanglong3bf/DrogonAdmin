@@ -62,6 +62,7 @@ Task<> RoleUpdater::updateRole(Role &role,
     {
         vector<int> deptIds = *request.getDeptIds();
         sort(deptIds.begin(), deptIds.end());
+        co_await deptVerifier_->verifyDeptIdsExist(deptIds);
 
         updateRoleDepts(const_cast<vector<RoleDept> &>(role.getRoleDepts()),
                         deptIds,
@@ -95,6 +96,39 @@ Task<> RoleUpdater::updateRole(Role &role,
             const_cast<RoleDept &>(dept).toDelete();
         }
         isUpdated = true;
+    }
+
+    if (role.getRelationType() != RelationType::All)
+    {
+        if (role.getRoleDepts().size() == 0)
+        {
+            throw BusinessException("当relation_type不为0时，dept_ids不能为空");
+        }
+        else
+        {
+            vector<int32_t> deptIds;
+            if (request.getDeptIds())
+            {
+                deptIds = *request.getDeptIds();
+            }
+            else
+            {
+                for (const auto &rd : role.getRoleDepts())
+                {
+                    deptIds.push_back(rd.getDeptId());
+                }
+            }
+            if (role.getRelationType() == RelationType::Whitelist)
+            {
+                co_await userVerifier_->verifyUsersWithRoleBelongToDepts(
+                    *role.getRoleId(), deptIds);
+            }
+            else
+            {
+                co_await userVerifier_->verifyUsersWithRoleNotBelongToDepts(
+                    *role.getRoleId(), deptIds);
+            }
+        }
     }
 
     if (isQuotaUpdated)

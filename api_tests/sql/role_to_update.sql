@@ -33,6 +33,7 @@ INSERT INTO "public"."sys_dept" VALUES (1, '部门-1', 0, NULL, 1, '2026-01-10 2
 INSERT INTO "public"."sys_dept" VALUES (2, '部门-2', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
 INSERT INTO "public"."sys_dept" VALUES (3, '部门-3', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
 INSERT INTO "public"."sys_dept" VALUES (4, '部门-4', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (5, '部门-5', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', 1, '2026-01-10  21:47:30');
 
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
@@ -106,6 +107,24 @@ INSERT INTO "public"."sys_role" VALUES (26, '管理员-26', 'admin-26', NULL, 2,
 INSERT INTO "public"."sys_role" VALUES (27, '管理员-27', 'admin-27', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 INSERT INTO "public"."sys_role" VALUES (28, '管理员-28', 'admin-28', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 INSERT INTO "public"."sys_role" VALUES (29, '管理员-29', 'admin-29', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (30, '管理员-30', 'admin-30', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (31, '管理员-31', 'admin-31', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (32, '管理员-32', 'admin-32', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (33, '管理员-33', 'admin-33', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (34, '管理员-34', 'admin-34', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (35, '管理员-35', 'admin-35', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (36, '管理员-36', 'admin-36', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (37, '管理员-37', 'admin-37', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (38, '管理员-38', 'admin-38', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (39, '管理员-39', 'admin-39', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (40, '管理员-40', 'admin-40', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (41, '管理员-41', 'admin-41', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (42, '管理员-42', 'admin-42', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (43, '管理员-43', 'admin-43', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (44, '管理员-44', 'admin-44', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (45, '管理员-45', 'admin-45', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (46, '管理员-46', 'admin-46', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (47, '管理员-47', 'admin-47', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
@@ -126,6 +145,23 @@ COMMENT ON COLUMN "public"."sys_role_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role_dept"."created_time" IS '创建时间';
 
 ALTER TABLE "public"."sys_role_dept" ADD CONSTRAINT "sys_role_dept_pkey" PRIMARY KEY ("role_id", "dept_id");
+
+INSERT INTO "public"."sys_role_dept" VALUES (40, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (40, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (41, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (41, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (42, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (42, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (43, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (43, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (44, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (44, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (45, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (45, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (46, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (46, 2, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (47, 1, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_role_dept" VALUES (47, 2, 1, '2026-04-02 21:53:40');
 
 DROP TABLE IF EXISTS "public"."sys_user_role";
 CREATE TABLE "public"."sys_user_role" (
@@ -199,6 +235,14 @@ INSERT INTO "public"."sys_user_role" VALUES (3, 29, 1, '2026-04-02 21:53:40');
 INSERT INTO "public"."sys_user_role" VALUES (4, 29, 1, '2026-04-02 21:53:40');
 INSERT INTO "public"."sys_user_role" VALUES (5, 29, 1, '2026-04-02 21:53:40');
 INSERT INTO "public"."sys_user_role" VALUES (7, 29, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (3, 34, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (1, 39, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (1, 41, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (1, 42, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (2, 43, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (3, 45, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (4, 46, 1, '2026-04-02 21:53:40');
+INSERT INTO "public"."sys_user_role" VALUES (3, 47, 1, '2026-04-02 21:53:40');
 
 ALTER TABLE "public"."sys_user_role" ADD CONSTRAINT "sys_user_role_pkey" PRIMARY KEY ("user_id", "role_id");
 

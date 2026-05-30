@@ -33,6 +33,19 @@ class UserVerifier : public DrAdminObject<UserVerifier>
     drogon::Task<> verifyNicknameNotDuplicated(
         const std::string &nickname) const;
 
+    /**
+     * @brief 验证被分配指定角色的用户都属于指定部门
+     */
+    drogon::Task<> verifyUsersWithRoleBelongToDepts(
+        const std::int32_t roleId,
+        const std::vector<int32_t> deptIds) const;
+
+    /**
+     * @brief 验证被分配指定角色的用户都不属于指定部门
+     */
+    drogon::Task<> verifyUsersWithRoleNotBelongToDepts(
+        const std::int32_t roleId,
+        const std::vector<int32_t> deptIds) const;
   private:
     UserRepositoryPtr userRepository_{
         drogon::DrClassMap::getSingleInstance<UserRepository>()};

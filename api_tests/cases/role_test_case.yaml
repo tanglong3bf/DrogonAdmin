@@ -1141,7 +1141,6 @@ role_cases:
       assert_jsonpath:
         $.data.list[7].quota_type: 2
         $.data.list[7].user_quota: 5
-  ############################################################################
   - name: 更新角色-限制类型1->2数量3->1
     url: http://localhost:8000/role/19
     method: put
@@ -1347,6 +1346,380 @@ role_cases:
       assert_jsonpath:
         $.data.list[8].quota_type: 2
         $.data.list[8].user_quota: 3
+    # }}}
+    # 部门黑白名单相关测试 {{{
+  - name: 更新角色-关联关系0->1缺少dept_ids
+    url: http://localhost:8000/role/30
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当relation_type不为0时，dept_ids不能为空
+  - name: 更新角色-检查数据31
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].relation_type: 0
+        len:$.data.list[9].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids但类型错误
+    url: http://localhost:8000/role/31
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 数组dept_ids的元素必须是整数
+  - name: 更新角色-检查数据32
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].relation_type: 0
+        len:$.data.list[0].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids但部分部门软删除
+    url: http://localhost:8000/role/32
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分部门id不存在
+  - name: 更新角色-检查数据33
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].relation_type: 0
+        len:$.data.list[1].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids
+    url: http://localhost:8000/role/33
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据34
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].relation_type: 1
+        len:$.data.list[2].depts: 2
+  - name: 更新角色-关联关系0->1有dept_ids但部分用户不在指定部门
+    url: http://localhost:8000/role/34
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据35
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].relation_type: 0
+        len:$.data.list[3].depts: 0
+  - name: 更新角色-关联关系0->2缺少dept_ids
+    url: http://localhost:8000/role/35
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当relation_type不为0时，dept_ids不能为空
+  - name: 更新角色-检查数据36
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].relation_type: 0
+        len:$.data.list[4].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids但类型错误
+    url: http://localhost:8000/role/36
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 数组dept_ids的元素必须是整数
+  - name: 更新角色-检查数据37
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].relation_type: 0
+        len:$.data.list[5].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids但部分部门软删除
+    url: http://localhost:8000/role/37
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分部门id不存在
+  - name: 更新角色-检查数据38
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].relation_type: 0
+        len:$.data.list[6].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids
+    url: http://localhost:8000/role/38
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据39
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[7].relation_type: 2
+        len:$.data.list[7].depts: 2
+  - name: 更新角色-关联关系0->2有dept_ids但部分用户在指定部门
+    url: http://localhost:8000/role/39
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据40
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].relation_type: 0
+        len:$.data.list[8].depts: 0
+  - name: 更新角色-关联关系1->2无dept_ids且无用户
+    url: http://localhost:8000/role/40
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据41
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].relation_type: 2
+        len:$.data.list[9].depts: 2
+  - name: 更新角色-关联关系1->2无dept_ids但有用户
+    url: http://localhost:8000/role/41
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据42
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].relation_type: 1
+        len:$.data.list[0].depts: 2
+  - name: 更新角色-关联关系1->2dept_ids1,2->2,4(1)
+    url: http://localhost:8000/role/42
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据43
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].relation_type: 2
+        len:$.data.list[1].depts: 2
+  - name: 更新角色-关联关系1->2dept_ids1,2->2,4(2)
+    url: http://localhost:8000/role/43
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据44
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].relation_type: 1
+        len:$.data.list[2].depts: 2
+  - name: 更新角色-关联关系2->1无dept_ids且无用户
+    url: http://localhost:8000/role/44
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据45
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].relation_type: 1
+        len:$.data.list[3].depts: 2
+  - name: 更新角色-关联关系2->1无dept_ids但有用户
+    url: http://localhost:8000/role/45
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据46
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].relation_type: 2
+        len:$.data.list[4].depts: 2
+  - name: 更新角色-关联关系2->1dept_ids3,4->2,4(4)
+    url: http://localhost:8000/role/46
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据47
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].relation_type: 1
+        len:$.data.list[5].depts: 2
+  - name: 更新角色-关联关系2->1dept_ids3,4->2,4(3)
+    url: http://localhost:8000/role/47
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据48
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].relation_type: 2
+        len:$.data.list[6].depts: 2
     # }}}
   # }}}
 # vim: set foldmethod=marker foldlevel=0:
