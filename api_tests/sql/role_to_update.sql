@@ -37,7 +37,7 @@ INSERT INTO "public"."sys_dept" VALUES (5, '部门-5', 0, NULL, 1, '2026-01-10 2
 
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 4, true);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 5, true);
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");
 
 DROP TABLE IF EXISTS "public"."sys_role";
@@ -128,7 +128,7 @@ INSERT INTO "public"."sys_role" VALUES (47, '管理员-47', 'admin-47', NULL, 0,
 
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 101, true);
+SELECT setval('"public"."sys_role_role_id_seq"', 47, true);
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
 
 DROP TABLE IF EXISTS "public"."sys_role_dept";
@@ -303,5 +303,5 @@ INSERT INTO "public"."sys_user" VALUES (11, 'user-11', '123456', '用户-11', '#
 
 ALTER SEQUENCE "public"."sys_user_user_id_seq"
 OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 3, true);
+SELECT setval('"public"."sys_user_user_id_seq"', 11, true);
 ALTER TABLE "public"."sys_user" ADD CONSTRAINT "sys_user_pkey" PRIMARY KEY ("user_id");
