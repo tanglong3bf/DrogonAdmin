@@ -1722,4 +1722,74 @@ role_cases:
         len:$.data.list[6].depts: 2
     # }}}
   # }}}
+  # 删除角色 {{{
+  - name: 删除角色-正常删除
+    sql_file: role_to_delete.sql
+    url: http://localhost:8000/role/1
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据1-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-删除已被软删除的角色
+    url: http://localhost:8000/role/1
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据2-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-已经分配给用户的角色
+    url: http://localhost:8000/role/2
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定角色被用户使用
+  - name: 删除角色-检查数据3-角色不应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-有部门关联的角色
+    url: http://localhost:8000/role/3
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据4-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data.list: 1
+  # }}}
 # vim: set foldmethod=marker foldlevel=0:
