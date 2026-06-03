@@ -3,6 +3,7 @@
 #include "RoleDeptResponse.h"
 #include "domain/authorization/DeptScopeType.h"
 #include "domain/authorization/Role.h"
+#include "common/util/Utilities.hpp"
 #include <drogon/orm/Result.h>
 #include <jsoncpp/json/value.h>
 
@@ -16,10 +17,7 @@ struct RoleResponse
 
     Json::Value toJson() const;
 
-    const auto &roleId() const
-    {
-        return roleId_;
-    }
+    GETTER(roleId)
 
     void addRoleDept(const RoleDeptResponse &roleDept);
 

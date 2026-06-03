@@ -60,7 +60,6 @@ vector<DeptResponse> DeptCqrsRepo::buildTree(const Result &dbResult) const
         if (item.parentId())
         {
             auto *parent = findById(result, *item.parentId());
-            item.setParent(parent);
             parent->addChild(item);
         }
         else

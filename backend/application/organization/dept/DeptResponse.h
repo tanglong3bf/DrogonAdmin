@@ -22,25 +22,9 @@ class DeptResponse
      */
     Json::Value toJson() const;
 
-    const auto &deptId() const noexcept
-    {
-        return deptId_;
-    }
-
-    const auto &parentId() const noexcept
-    {
-        return parentId_;
-    }
-
-    void setParent(DeptResponse *parent) noexcept
-    {
-        parent_ = parent;
-    }
-
-    const auto children() const noexcept
-    {
-        return children_;
-    }
+    GETTER(deptId)
+    GETTER(parentId)
+    GETTER(children)
 
     /**
      * @brief 新增一个子节点
