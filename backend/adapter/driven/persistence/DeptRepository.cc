@@ -40,7 +40,7 @@ Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
 
     auto mapper = deptMapper(dbClient);
 
-    switch (dept.getChangingStatus())
+    switch (dept.changingStatus())
     {
         case ChangingStatus::NEW:
             co_await mapper.insert(sysDept);
@@ -134,7 +134,7 @@ Task<> DeptRepository::multiSave(const vector<Dept> &depts,
     toUpdate.reserve(depts.size());
     for (const auto &dept : depts)
     {
-        if (dept.getChangingStatus() == ChangingStatus::UPDATED)
+        if (dept.changingStatus() == ChangingStatus::UPDATED)
         {
             toUpdate.push_back(static_cast<SysDept>(dept));
         }

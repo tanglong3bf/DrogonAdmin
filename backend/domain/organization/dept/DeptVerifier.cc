@@ -55,16 +55,16 @@ Task<> DeptVerifier::verifyRoleAssignmentAllowed(
     unordered_map<int32_t, size_t> roleLimitMap =
         roleList | views::transform([](const Role &role) {
             size_t limit = 0;
-            if (role.getQuotaType() == QuotaType::Unlimited)
+            if (role.quotaType == QuotaType::Unlimited)
             {
                 limit = SIZE_MAX;
             }
             else
             {
                 // 总量限制不会超，这里不做区分
-                limit = *role.getUserQuota();
+                limit = *role.userQuota;
             }
-            return make_pair(*role.getRoleId(), limit);
+            return make_pair(*role.roleId, limit);
         }) |
         ranges::to<unordered_map>();
 

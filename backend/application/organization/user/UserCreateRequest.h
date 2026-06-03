@@ -15,8 +15,29 @@
  * @note 密码默认为 123456
  * @note 头像默认为 #
  */
-class UserCreateRequest
+struct UserCreateRequest
 {
+    UserCreateRequest() = default;
+    UserCreateRequest(const Json::Value &json);
+
+    std::string_view username() const
+    {
+        return username_;
+    }
+
+    std::string_view nickname() const
+    {
+        return nickname_;
+    }
+
+    GETTER(sex)
+    GETTER(deptId)
+    GETTER(phoneNumber)
+    GETTER(email)
+    GETTER(status)
+    GETTER(roleIds)
+
+  private:
     std::string username_;                              ///< 用户名
     std::string nickname_;                              ///< 昵称
     Sex sex_;                                           ///< 性别
@@ -25,17 +46,4 @@ class UserCreateRequest
     std::optional<Email> email_;                        ///< 邮箱
     Status status_;                                     ///< 状态
     std::optional<std::vector<std::int32_t>> roleIds_;  ///< 拥有的角色
-
-  public:
-    void setByJson(const Json::Value &json);
-
-    // getters
-    GETTER(username, Username)
-    GETTER(nickname, Nickname)
-    GETTER(sex, Sex)
-    GETTER(deptId, DeptId)
-    OPT_GETTER(phoneNumber, PhoneNumber)
-    OPT_GETTER(email, Email)
-    GETTER(status, Status)
-    OPT_GETTER(roleIds, RoleIds)
 };

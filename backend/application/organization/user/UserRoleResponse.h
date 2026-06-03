@@ -8,14 +8,10 @@
  *
  * @see UserResponse
  */
-class UserRoleResponse
+struct UserRoleResponse
 {
-    std::int32_t userId_;  ///< 用户ID
-    std::int32_t roleId_;  ///< 角色ID
-
-  public:
     UserRoleResponse(const UserRole &entity)
-        : userId_{*entity.getUserId()}, roleId_{entity.getRoleId()}
+        : userId_{*entity.userId}, roleId_{entity.roleId()}
     {
     }
 
@@ -26,4 +22,8 @@ class UserRoleResponse
         json["role_id"] = roleId_;
         return json;
     }
+
+  private:
+    std::int32_t userId_;  ///< 用户ID
+    std::int32_t roleId_;  ///< 角色ID
 };

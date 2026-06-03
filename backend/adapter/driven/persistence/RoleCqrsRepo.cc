@@ -37,17 +37,17 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
 {
     ParamList params;
     const std::int32_t page =
-        maxPage < request.getPage() ? maxPage : request.getPage();
+        maxPage < request.page() ? maxPage : request.page();
     params["offset"] =
-        static_cast<std::int32_t>(request.getPageSize() * (page - 1));
-    params["limit"] = static_cast<std::int32_t>(request.getPageSize());
-    if (request.getDeptId())
+        static_cast<std::int32_t>(request.pageSize() * (page - 1));
+    params["limit"] = static_cast<std::int32_t>(request.pageSize());
+    if (request.deptId())
     {
-        params["dept_id"] = *request.getDeptId();
+        params["dept_id"] = *request.deptId();
     }
-    if (request.getName())
+    if (request.name())
     {
-        params["name"] = *request.getName();
+        params["name"] = *request.name();
     }
     const auto sql = sqlGenerator()->getSql("get_role_list", params);
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
@@ -56,7 +56,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     vector<std::int32_t> roleIds{};
     for (const auto &role : roleList)
     {
-        roleIds.push_back(role.getRoleId());
+        roleIds.push_back(role.roleId());
     }
 
     auto roleDeptList = co_await roleDeptMapper().findBy(
@@ -66,7 +66,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     {
         for (auto &role : roleList)
         {
-            if (role.getRoleId() == roleDept.getValueOfRoleId())
+            if (role.roleId() == roleDept.getValueOfRoleId())
             {
                 role.addRoleDept(RoleDept{roleDept});
             }

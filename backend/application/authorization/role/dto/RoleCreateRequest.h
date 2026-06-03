@@ -10,24 +10,33 @@
  *
  * @see Role
  */
-class RoleCreateRequest
+struct RoleCreateRequest
 {
+    RoleCreateRequest() = default;
+    RoleCreateRequest(const Json::Value &json);
+
+    std::string_view name() const
+    {
+        return name_;
+    }
+
+    std::string_view code() const
+    {
+        return code_;
+    }
+
+    GETTER(description)
+    GETTER(quotaType)
+    GETTER(userQuota)
+    GETTER(relationType)
+    GETTER(deptIds)
+
+  private:
     std::string name_;                        ///< 角色名称
     std::string code_;                        ///< 角色代码
     std::optional<std::string> description_;  ///< 角色描述
     QuotaType quotaType_;                     ///< 限制类型
-    std::optional<int> userQuota_;            ///< 限制数量
+    std::optional<int32_t> userQuota_;        ///< 限制数量
     RelationType relationType_;               ///< 关联类型
-    std::vector<int> deptIds_;                ///< 关联部门
-
-  public:
-    void setByJson(const Json::Value &json);
-
-    GETTER(name, Name)
-    GETTER(code, Code)
-    OPT_GETTER(description, Description)
-    GETTER(quotaType, QuotaType)
-    OPT_GETTER(userQuota, UserQuota)
-    GETTER(relationType, RelationType)
-    GETTER(deptIds, DeptIds)
+    std::vector<std::int32_t> deptIds_;       ///< 关联部门
 };

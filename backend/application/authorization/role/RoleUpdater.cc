@@ -15,50 +15,48 @@ Task<> RoleUpdater::updateRole(Role &role,
     const Role oldData = role;
     bool isUpdated = false;
     bool isQuotaUpdated = false;
-    if (request.getName() && role.getName() != *request.getName())
+    if (request.name() && role.name != *request.name())
     {
-        co_await roleVerifier_->verifyRoleNameNotDuplicated(*request.getName());
-        role.setName(*request.getName());
+        co_await roleVerifier_->verifyRoleNameNotDuplicated(*request.name());
+        role.name = *request.name();
         isUpdated = true;
     }
-    if (request.getCode() && role.getCode() != *request.getCode())
+    if (request.code() && role.code != *request.code())
     {
-        co_await roleVerifier_->verifyRoleCodeNotDuplicated(*request.getCode());
-        role.setCode(*request.getCode());
+        co_await roleVerifier_->verifyRoleCodeNotDuplicated(*request.code());
+        role.code = *request.code();
         isUpdated = true;
     }
-    ENTITY_SET(role, Description, isUpdated = true);
-    ENTITY_SET(role, QuotaType, isUpdated = true; isQuotaUpdated = true);
-    ENTITY_SET(role, UserQuota, isUpdated = true; isQuotaUpdated = true);
-    ENTITY_SET(role, RelationType, isUpdated = true; isQuotaUpdated = true);
+    ENTITY_SET(role, description, isUpdated = true);
+    ENTITY_SET(role, quotaType, isUpdated = true; isQuotaUpdated = true);
+    ENTITY_SET(role, userQuota, isUpdated = true; isQuotaUpdated = true);
+    ENTITY_SET(role, relationType, isUpdated = true; isQuotaUpdated = true);
 
-    if (request.getDeptIds())
+    if (request.deptIds())
     {
-        vector<int> deptIds = *request.getDeptIds();
+        vector<int> deptIds = *request.deptIds();
         sort(deptIds.begin(), deptIds.end());
 
-        updateRoleDepts(const_cast<vector<RoleDept> &>(role.getRoleDepts()),
+        updateRoleDepts(const_cast<vector<RoleDept> &>(role.roleDepts),
                         deptIds,
-                        *role.getRoleId(),
+                        *role.roleId,
                         updatedBy);
 
         isUpdated = true;
         isQuotaUpdated = true;
     }
 
-    if (role.getQuotaType() == QuotaType::Unlimited &&
-        role.getUserQuota() != nullopt)
+    if (role.quotaType == QuotaType::Unlimited && role.userQuota != nullopt)
     {
-        role.setUserQuotaToNullOpt();
+        role.userQuota = nullopt;
         isUpdated = true;
     }
 
-    if (role.getRelationType() == RelationType::All &&
-        role.getRoleDepts().size() != 0)
+    if (role.relationType == RelationType::All && role.roleDepts.size() != 0)
     {
-        for (auto &dept : role.getRoleDepts())
+        for (auto &dept : role.roleDepts)
         {
-            const_cast<RoleDept &>(dept).toDelete();
+            const_cast<RoleDept &>(dept).markDeleted();
         }
         isUpdated = true;
     }
@@ -69,8 +67,8 @@ Task<> RoleUpdater::updateRole(Role &role,
     }
     if (isUpdated)
     {
-        role.setUpdatedBy(updatedBy);
-        role.toUpdate();
+        role.markUpdatedBy(updatedBy);
+        role.markUpdated();
     }
     else
     {
@@ -88,16 +86,16 @@ void RoleUpdater::updateRoleDepts(vector<RoleDept> &roleDepts,
 
     for (auto &rd : roleDepts)
     {
-        if (newDeptSet.find(rd.getDeptId()) == newDeptSet.end())
+        if (newDeptSet.find(rd.deptId()) == newDeptSet.end())
         {
-            rd.toDelete();
+            rd.markDeleted();
         }
     }
 
     unordered_set<int32_t> existingDeptIds;
     for (const auto &rd : roleDepts)
     {
-        existingDeptIds.insert(rd.getDeptId());
+        existingDeptIds.insert(rd.deptId());
     }
 
     for (int32_t deptId : newDeptSet)
@@ -105,8 +103,8 @@ void RoleUpdater::updateRoleDepts(vector<RoleDept> &roleDepts,
         if (existingDeptIds.find(deptId) == existingDeptIds.end())
         {
             RoleDept newRD(deptId, updatedBy);
-            newRD.setRoleId(roleId);
-            newRD.toNew();
+            newRD.roleId = roleId;
+            newRD.markNew();
             roleDepts.push_back(std::move(newRD));
         }
     }

@@ -33,13 +33,13 @@ DeptResponse *DeptCqrsRepo::findById(const vector<DeptResponse> &tree,
 {
     for (auto &item : tree)
     {
-        if (item.getDeptId() == deptId)
+        if (item.deptId() == deptId)
         {
             return const_cast<DeptResponse *>(&item);
         }
-        else if (item.getChildren().size() > 0)
+        else if (item.children().size() > 0)
         {
-            auto result = findById(item.getChildren(), deptId);
+            auto result = findById(item.children(), deptId);
             if (result != nullptr)
             {
                 return result;
@@ -57,9 +57,9 @@ vector<DeptResponse> DeptCqrsRepo::buildTree(const Result &dbResult) const
     for (const auto &row : dbResult)
     {
         DeptResponse item{Dept{SysDept{row}}};
-        if (item.getParentId())
+        if (item.parentId())
         {
-            auto *parent = findById(result, *item.getParentId());
+            auto *parent = findById(result, *item.parentId());
             item.setParent(parent);
             parent->addChild(item);
         }

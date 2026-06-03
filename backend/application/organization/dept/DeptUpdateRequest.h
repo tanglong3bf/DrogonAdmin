@@ -1,19 +1,20 @@
 #pragma once
 
-#include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>
 #include <string>
 
 /**
  * @brief 更新部门参数
  */
-class DeptUpdateRequest
+struct DeptUpdateRequest
 {
+    DeptUpdateRequest() = default;
+    DeptUpdateRequest(const Json::Value &json);
+
+    std::string_view name() const
+    {
+        return name_;
+    }
+
     std::string name_;  ///< 部门名称
-
-  public:
-    void setByJson(const Json::Value &json);
-
-    // getters
-    GETTER(name, Name)
 };

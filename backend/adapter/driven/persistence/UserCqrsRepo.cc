@@ -24,17 +24,17 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     Criteria criteria = buildCriteria(request);
 
     const std::int32_t page =
-        maxPage < request.getPage() ? maxPage : request.getPage();
+        maxPage < request.page() ? maxPage : request.page();
     const auto sysUserList = co_await userMapper()
                                  .orderBy(SysUser::Cols::_user_id)
-                                 .paginate(page, request.getPageSize())
+                                 .paginate(page, request.pageSize())
                                  .findBy(criteria);
     auto userList = buildUserList(sysUserList);
     // 获取用户id列表
     vector<std::int32_t> userIdList{};
     for (const auto &user : userList)
     {
-        userIdList.push_back(*user.getUserId());
+        userIdList.push_back(*user.userId);
     }
 
     auto userRolesList = co_await userRoleMapper().findBy(
@@ -43,7 +43,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     {
         for (const auto &userRole : userRolesList)
         {
-            if (userRole.getValueOfUserId() == user.getUserId())
+            if (userRole.getValueOfUserId() == user.userId)
             {
                 user.addUserRole(UserRole{userRole});
             }
@@ -55,46 +55,45 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
 Criteria UserCqrsRepo::buildCriteria(const UserQueryRequest &request) const
 {
     Criteria criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull};
-    if (request.getUsername())
+    if (request.username())
     {
         criteria = criteria && Criteria{SysUser::Cols::_username,
                                         CompareOperator::Like,
-                                        "%" + *request.getUsername() + "%"};
+                                        "%" + *request.username() + "%"};
     }
-    if (request.getNickname())
+    if (request.nickname())
     {
         criteria = criteria && Criteria{SysUser::Cols::_nickname,
                                         CompareOperator::Like,
-                                        "%" + *request.getNickname() + "%"};
+                                        "%" + *request.nickname() + "%"};
     }
-    if (request.getSex())
+    if (request.sex())
+    {
+        criteria = criteria && Criteria{SysUser::Cols::_sex,
+                                        static_cast<int16_t>(*request.sex())};
+    }
+    if (request.deptId())
     {
         criteria =
-            criteria && Criteria{SysUser::Cols::_sex,
-                                 static_cast<int16_t>(*request.getSex())};
+            criteria && Criteria{SysUser::Cols::_dept_id, *request.deptId()};
     }
-    if (request.getDeptId())
-    {
-        criteria =
-            criteria && Criteria{SysUser::Cols::_dept_id, *request.getDeptId()};
-    }
-    if (request.getPhoneNumber())
+    if (request.phoneNumber())
     {
         criteria = criteria && Criteria{SysUser::Cols::_phone_number,
                                         CompareOperator::Like,
-                                        "%" + *request.getPhoneNumber() + "%"};
+                                        "%" + *request.phoneNumber() + "%"};
     }
-    if (request.getEmail())
+    if (request.email())
     {
         criteria = criteria && Criteria{SysUser::Cols::_email,
                                         CompareOperator::Like,
-                                        "%" + *request.getEmail() + "%"};
+                                        "%" + *request.email() + "%"};
     }
-    if (request.getStatus())
+    if (request.status())
     {
         criteria =
             criteria && Criteria{SysUser::Cols::_status,
-                                 static_cast<int16_t>(*request.getStatus())};
+                                 static_cast<int16_t>(*request.status())};
     }
     return criteria;
 }

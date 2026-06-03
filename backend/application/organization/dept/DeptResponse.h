@@ -11,13 +11,6 @@
  */
 class DeptResponse
 {
-    std::int32_t deptId_;                   ///< 部门id
-    std::string name_;                      ///< 部门名称
-    std::int32_t sortNum_;                  ///< 排序
-    std::optional<std::int32_t> parentId_;  ///< 父部门id
-    DeptResponse *parent_;                  ///< 父部门
-    std::vector<DeptResponse> children_;    ///< 子部门列表
-
   public:
     /**
      * @brief 实体类转当前类
@@ -29,21 +22,41 @@ class DeptResponse
      */
     Json::Value toJson() const;
 
-    // setters
-    SETTER(parent, Parent)
+    const auto &deptId() const noexcept
+    {
+        return deptId_;
+    }
+
+    const auto &parentId() const noexcept
+    {
+        return parentId_;
+    }
+
+    void setParent(DeptResponse *parent) noexcept
+    {
+        parent_ = parent;
+    }
+
+    const auto children() const noexcept
+    {
+        return children_;
+    }
 
     /**
      * @brief 新增一个子节点
      *
-     * 内部为子节点设置parent_
+     * 内部为子节点设置parent
      */
     void addChild(DeptResponse &child);
 
-    // getters
-    GETTER(deptId, DeptId)
-    OPT_GETTER(parentId, ParentId)
-    GETTER(children, Children)
-
   private:
     bool isChildIdExist(const std::int32_t id) noexcept;
+
+  private:
+    const std::int32_t deptId_;                   ///< 部门id
+    const std::string name_;                      ///< 部门名称
+    const std::int32_t sortNum_;                  ///< 排序
+    const std::optional<std::int32_t> parentId_;  ///< 父部门id
+    DeptResponse *parent_;                        ///< 父部门
+    std::vector<DeptResponse> children_;          ///< 子部门列表
 };

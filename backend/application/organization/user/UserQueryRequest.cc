@@ -6,66 +6,50 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
-UserQueryRequest::UserQueryRequest(string username,
-                                   string nickname,
-                                   string sex,
-                                   string deptId,
-                                   string phoneNumber,
-                                   string email,
-                                   string status,
-                                   string page,
-                                   string pageSize)
+UserQueryRequest::UserQueryRequest(const string &username,
+                                   const string &nickname,
+                                   const string &sex,
+                                   const string &deptId,
+                                   const string &phoneNumber,
+                                   const string &email,
+                                   const string &status,
+                                   const string &page,
+                                   const string &pageSize)
 {
-    if (username.size() > 0)
+    if (!username.empty())
     {
         username_ = username;
     }
-    if (nickname.size() > 0)
+    if (!nickname.empty())
     {
         nickname_ = nickname;
     }
-    if (sex.size() == 1)
+    if (sex.size() == 1 && fromString<int32_t>(sex) >= 0 &&
+        fromString<int32_t>(sex) <= 2)
     {
-        const auto sexInt = fromString<int32_t>(sex);
-        if (sexInt >= 0 && sexInt <= 2)
-        {
-            sex_ = static_cast<Sex>(sexInt);
-        }
+        sex_ = static_cast<Sex>(fromString<int32_t>(sex));
     }
-    if (deptId.size() > 0)
+    if (!deptId.empty())
     {
         deptId_ = fromString<int32_t>(deptId);
     }
-    if (phoneNumber.size() > 0)
+    if (!phoneNumber.empty())
     {
         phoneNumber_ = phoneNumber;
     }
-    if (email.size() > 0)
+    if (!email.empty())
     {
         email_ = email;
     }
-    if (status.size() > 0)
+    if (status.size() == 1 && fromString<int32_t>(status) >= 0 &&
+        fromString<int32_t>(status) <= 2)
     {
-        const auto statusInt = fromString<int32_t>(status);
-        if (statusInt >= 0 && statusInt <= 2)
-        {
-            status_ = static_cast<Status>(statusInt);
-        }
+        status_ = static_cast<Status>(fromString<int32_t>(status));
     }
-    if (page.size() > 0)
-    {
-        page_ = fromString<int32_t>(page);
-    }
-    if (page_ <= 0)
-    {
-        page_ = 1;
-    }
-    if (pageSize.size() > 0)
-    {
-        pageSize_ = fromString<int32_t>(pageSize);
-    }
-    if (pageSize_ <= 0)
-    {
-        pageSize_ = 10;
-    }
+    page_ = (!page.empty() && fromString<int32_t>(page) > 0)
+                ? fromString<int32_t>(page)
+                : 1;
+    pageSize_ = (!pageSize.empty() && fromString<int32_t>(pageSize) > 0)
+                    ? fromString<int32_t>(pageSize)
+                    : 10;
 }

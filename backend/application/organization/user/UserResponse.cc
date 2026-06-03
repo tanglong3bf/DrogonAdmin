@@ -14,21 +14,21 @@ HttpResponsePtr toResponse(const UserResponse &response)
 };  // namespace drogon
 
 UserResponse::UserResponse(const User &user)
-    : userId_{*user.getUserId()},
-      username_{user.getUsername()},
-      nickname_{user.getNickname()},
-      avatar_{user.getAvatar()},
-      sex_{user.getSex()},
-      deptId_{user.getDeptId()},
-      phoneNumber_{user.getPhoneNumber()},
-      email_{user.getEmail()},
-      status_{user.getStatus()}
+    : userId_{*user.userId},
+      username_{user.username()},
+      nickname_{user.nickname},
+      avatar_{user.avatar},
+      sex_{user.sex},
+      deptId_{user.deptId},
+      phoneNumber_{user.phoneNumber},
+      email_{user.email},
+      status_{user.status}
 {
-    if (user.getUserRoles().size() > 0)
+    if (user.userRoles.size() > 0)
     {
-        userRoles_.reserve(user.getUserRoles().size());
+        userRoles_.reserve(user.userRoles.size());
 
-        for (const auto &userRole : user.getUserRoles())
+        for (const auto &userRole : user.userRoles)
         {
             userRoles_.push_back(UserRoleResponse{userRole});
         }

@@ -1,26 +1,36 @@
 #include "ChangeableEntity.h"
 
-ChangeableEntity::ChangeableEntity()
-    : changingStatus_{ChangingStatus::UNCHANGED}
-{
-}
-
-ChangingStatus ChangeableEntity::getChangingStatus() const
+ChangingStatus ChangeableEntity::changingStatus() const noexcept
 {
     return changingStatus_;
 }
 
-void ChangeableEntity::toNew()
+bool ChangeableEntity::isNew() const noexcept
+{
+    return changingStatus_ == ChangingStatus::NEW;
+}
+
+bool ChangeableEntity::isUpdated() const noexcept
+{
+    return changingStatus_ == ChangingStatus::UPDATED;
+}
+
+bool ChangeableEntity::isDeleted() const noexcept
+{
+    return changingStatus_ == ChangingStatus::DELETED;
+}
+
+void ChangeableEntity::markNew()
 {
     changingStatus_ = ChangingStatus::NEW;
 }
 
-void ChangeableEntity::toUpdate()
+void ChangeableEntity::markUpdated()
 {
     changingStatus_ = ChangingStatus::UPDATED;
 }
 
-void ChangeableEntity::toDelete()
+void ChangeableEntity::markDeleted()
 {
     changingStatus_ = ChangingStatus::DELETED;
 }

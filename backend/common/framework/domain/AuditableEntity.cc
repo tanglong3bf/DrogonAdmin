@@ -15,13 +15,13 @@ AuditableEntity::AuditableEntity(std::optional<std::uint32_t> createdBy,
 {
 }
 
-void AuditableEntity::setUpdatedBy(std::uint32_t updatedBy)
+void AuditableEntity::markUpdatedBy(std::uint32_t updatedBy)
 {
     updatedBy_ = updatedBy;
     updatedTime_ = trantor::Date::now();
 }
 
-void AuditableEntity::setDeletedBy(std::uint32_t deletedBy)
+void AuditableEntity::markDeletedBy(std::uint32_t deletedBy)
 {
     deletedBy_ = deletedBy;
     deletedTime_ = trantor::Date::now();

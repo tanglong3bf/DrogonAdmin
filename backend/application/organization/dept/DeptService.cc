@@ -31,7 +31,9 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
     {
         throw BusinessException{"指定的部门id不存在"};
     }
-    co_await deptHandler_->updateDept(*dept, request.getName(), updatedBy);
+    co_await deptHandler_->updateDept(*dept,
+                                      static_cast<string>(request.name()),
+                                      updatedBy);
     co_await deptRepository_->save(*dept);
 }
 
@@ -64,11 +66,9 @@ Task<> DeptService::deleteDept(const std::int32_t deptId,
 Task<> DeptService::sortDept(const DeptSortRequest &request,
                              const std::int32_t updatedBy) const
 {
-    const auto parentId = request.getParentId();
-    const auto deptIds = request.getDeptIds();
-
-    auto sortResult =
-        co_await deptHandler_->sortDept(parentId, deptIds, updatedBy);
+    auto sortResult = co_await deptHandler_->sortDept(request.parentId(),
+                                                      request.deptIds(),
+                                                      updatedBy);
 
     co_await deptRepository_->multiSave(sortResult);
 }

@@ -10,12 +10,15 @@ RoleDept::RoleDept(const int32_t deptId) : deptId_{deptId}
 }
 
 RoleDept::RoleDept(const int32_t deptId, int32_t createdBy)
-    : deptId_{deptId}, createdBy_{createdBy}, createdTime_{Date::now()}
+    : deptId_{deptId}, createdBy{createdBy}, createdTime{Date::now()}
 {
 }
 
 RoleDept::RoleDept(const SysRoleDept &model)
-    : INIT(roleId, RoleId), INIT(deptId, DeptId)
+    : INIT(roleId, RoleId),
+      INIT(deptId_, DeptId),
+      OPT_INIT(createdBy, CreatedBy),
+      OPT_INIT(createdTime, CreatedTime)
 {
 }
 
@@ -23,7 +26,7 @@ RoleDept::operator SysRoleDept() const
 {
     SysRoleDept model;
     SET_OPT(roleId, RoleId);
-    SET_VAL(deptId, DeptId);
+    SET_VAL(deptId_, DeptId);
     SET_OPT(createdBy, CreatedBy);
     SET_OPT(createdTime, CreatedTime);
     return model;

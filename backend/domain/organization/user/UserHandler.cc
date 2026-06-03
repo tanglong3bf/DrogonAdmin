@@ -5,7 +5,7 @@ using namespace drogon;
 
 Task<> UserHandler::deleteUser(User &user, const int32_t deletedBy) const
 {
-    user.setDeletedBy(deletedBy);
-    user.toDelete();
+    user.markDeletedBy(deletedBy);
+    user.markDeleted();
     co_return;
 }

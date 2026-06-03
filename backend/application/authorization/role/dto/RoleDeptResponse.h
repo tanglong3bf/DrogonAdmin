@@ -4,13 +4,12 @@
 #include <jsoncpp/json/value.h>
 #include <cstdint>
 
-class RoleDeptResponse
+struct RoleDeptResponse
 {
-    std::int32_t roleId_;
-    std::int32_t deptId_;
-
-  public:
     RoleDeptResponse(const RoleDept &roleDept);
-
     Json::Value toJson() const;
+
+  private:
+    const std::int32_t roleId_;
+    const std::int32_t deptId_;
 };

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <drogon/utils/coroutine.h>
-#include "common/framework/DrAdminObject.hpp"
 #include "Dept.h"
 #include "DeptVerifier.h"
 #include "domain/organization/user/UserVerifier.h"
 #include "domain/authorization/RoleVerifier.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <drogon/utils/coroutine.h>
+#include <memory>
+#include <cstdint>
 
 /**
  * @brief 部门处理器

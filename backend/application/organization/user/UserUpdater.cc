@@ -10,25 +10,25 @@ Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
                                const int32_t updatedBy) const
 {
-    LOG_TRACE << "更新用户，userId=" << *user.getUserId()
+    LOG_TRACE << "更新用户，userId=" << *user.userId
               << ", updatedBy=" << updatedBy;
     bool isUpdated = false;
     bool deptIdUpdated = false;
-    ENTITY_SET(user, Nickname, isUpdated = true);
-    ENTITY_SET(user, Sex, isUpdated = true);
-    ENTITY_SET(user, DeptId, isUpdated = true; deptIdUpdated = true);
-    ENTITY_SET(user, PhoneNumber, isUpdated = true);
-    ENTITY_SET(user, Email, isUpdated = true);
-    ENTITY_SET(user, Status, isUpdated = true);
+    ENTITY_SET(user, nickname, isUpdated = true);
+    ENTITY_SET(user, sex, isUpdated = true);
+    ENTITY_SET(user, deptId, isUpdated = true; deptIdUpdated = true);
+    ENTITY_SET(user, phoneNumber, isUpdated = true);
+    ENTITY_SET(user, email, isUpdated = true);
+    ENTITY_SET(user, status, isUpdated = true);
 
     // 用户现有的角色id列表
     const auto oldRoleIds =
-        user.getUserRoles() |
-        views::transform([](const UserRole &ur) { return ur.getRoleId(); }) |
+        user.userRoles |
+        views::transform([](const UserRole &ur) { return ur.roleId(); }) |
         ranges::to<vector>();
     // 需要新增的角色id列表
     const auto needInsertRoleIds =
-        *request.getRoleIds() | views::filter([&](int32_t id) {
+        *request.roleIds() | views::filter([&](int32_t id) {
             return find(oldRoleIds.begin(), oldRoleIds.end(), id) ==
                    oldRoleIds.end();
         }) |
@@ -36,32 +36,32 @@ Task<> UserUpdater::updateUser(User &user,
     // 需要删除的角色id列表
     const auto needDeleteRoleIds =
         oldRoleIds | views::filter([&](int32_t id) {
-            return find(request.getRoleIds()->begin(),
-                        request.getRoleIds()->end(),
-                        id) == request.getRoleIds()->end();
+            return find(request.roleIds()->begin(),
+                        request.roleIds()->end(),
+                        id) == request.roleIds()->end();
         }) |
         ranges::to<vector>();
 
     if (deptIdUpdated || needInsertRoleIds.size() > 0 ||
         needDeleteRoleIds.size() > 0)
     {
-        vector<int> roleIds = *request.getRoleIds();
+        vector<int> roleIds = *request.roleIds();
         sort(roleIds.begin(), roleIds.end());
         // 检查是否可以为指定部门分配这些角色
         if (deptIdUpdated)
         {
-            co_await deptVerifier_->verifyRoleAssignmentAllowed(
-                user.getDeptId(), roleIds);
+            co_await deptVerifier_->verifyRoleAssignmentAllowed(user.deptId,
+                                                                roleIds);
         }
         else if (needInsertRoleIds.size() > 0)
         {
             co_await deptVerifier_->verifyRoleAssignmentAllowed(
-                user.getDeptId(), needInsertRoleIds);
+                user.deptId, needInsertRoleIds);
         }
 
-        updateUserRoles(const_cast<vector<UserRole> &>(user.getUserRoles()),
+        updateUserRoles(const_cast<vector<UserRole> &>(user.userRoles),
                         roleIds,
-                        *user.getUserId(),
+                        *user.userId,
                         updatedBy);
 
         isUpdated = true;
@@ -69,8 +69,8 @@ Task<> UserUpdater::updateUser(User &user,
 
     if (isUpdated)
     {
-        user.setUpdatedBy(updatedBy);
-        user.toUpdate();
+        user.markUpdatedBy(updatedBy);
+        user.markUpdated();
     }
     else
     {
@@ -92,16 +92,16 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
 
     for (auto &ur : userRoles)
     {
-        if (newRoleSet.find(ur.getRoleId()) == newRoleSet.end())
+        if (newRoleSet.find(ur.roleId()) == newRoleSet.end())
         {
-            ur.toDelete();
+            ur.markDeleted();
         }
     }
 
     unordered_set<int32_t> existingRoleIds;
     for (const auto &rd : userRoles)
     {
-        existingRoleIds.insert(rd.getRoleId());
+        existingRoleIds.insert(rd.roleId());
     }
 
     for (int32_t roleId : newRoleIds)
@@ -109,8 +109,8 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
         if (existingRoleIds.find(roleId) == existingRoleIds.end())
         {
             UserRole newUR(roleId, updatedBy);
-            newUR.setUserId(userId);
-            newUR.toNew();
+            newUR.userId = userId;
+            newUR.markNew();
             userRoles.push_back(std::move(newUR));
         }
     }
