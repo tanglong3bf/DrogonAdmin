@@ -1792,4 +1792,61 @@ role_cases:
       assert_jsonpath:
         len:$.data.list: 1
   # }}}
+  # 部门可用角色 {{{
+  - name: 部门可用角色-不存在的部门
+    sql_file: role_dept_to_query.sql
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=6
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        error: 指定的部门id不存在
+  - name: 部门可用角色-软删除的部门
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=5
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        error: 指定的部门id不存在
+  - name: 部门可用角色-正常查询1
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 2
+  - name: 部门可用角色-正常查询2
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=2
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 3
+  - name: 部门可用角色-正常查询3
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=3
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 1
+  - name: 部门可用角色-正常查询4
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=4
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 2
+  # }}}
 # vim: set foldmethod=marker foldlevel=0:

@@ -73,5 +73,6 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
 Task<vector<AssignableRoleResponse>> RoleService::getAssignableRoles(
     const std::int32_t deptId) const
 {
+    co_await deptVerifier_->verifyDepartmentExists(deptId);
     co_return co_await roleCqrsRepo_->getAssignableRoles(deptId);
 }
