@@ -14,10 +14,10 @@ class RoleQueryRequest
     std::size_t pageSize_;                ///< 每页数量
 
   public:
-    RoleQueryRequest(std::string name,
-                     std::string deptId,
-                     std::string page,
-                     std::string pageSize,
+    RoleQueryRequest(const std::string &name,
+                     const std::string &deptId,
+                     const std::string &page,
+                     const std::string &pageSize,
                      const drogon::AttributesPtr &attr);
 
     OPT_SETTER(name, Name)

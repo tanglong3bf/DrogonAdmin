@@ -26,7 +26,7 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
 
     if (count == 0)
     {
-        co_return PaginatedResponse<RoleResponse>{request.getPage(),
+        co_return PaginatedResponse<RoleResponse>{1,
                                                   request.getPageSize(),
                                                   0,
                                                   {}};

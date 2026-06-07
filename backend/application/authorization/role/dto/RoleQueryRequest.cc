@@ -10,10 +10,10 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
-RoleQueryRequest::RoleQueryRequest(std::string name,
-                                   std::string deptId,
-                                   std::string page,
-                                   std::string pageSize,
+RoleQueryRequest::RoleQueryRequest(const std::string &name,
+                                   const std::string &deptId,
+                                   const std::string &page,
+                                   const std::string &pageSize,
                                    const AttributesPtr &attr)
     : name_{nullopt}, deptId_{nullopt}, page_{1}, pageSize_{10}
 {
