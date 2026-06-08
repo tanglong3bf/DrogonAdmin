@@ -125,8 +125,8 @@ def test_dept_cases(case_item):
         schema_file = case_item.get("validate_schema")
         if schema_file:
             full_schema = load_schema("schemas/" + schema_file)
-            if isinstance(full_schema, dict) and "response" in full_schema:
-                validate_schema(res_json, full_schema["response"], full_schema)
+            if isinstance(full_schema, dict):
+                validate_schema(res_json, full_schema, full_schema)
 
     # 根据jsonpath检查响应体
     if "assert_jsonpath" in case_item["expect"]:

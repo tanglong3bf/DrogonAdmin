@@ -1,93 +1,96 @@
-# /role/list 接口响应体结构
-response:
-  type: object
-  properties:
-    code:
-      type: integer
-      nullable: true
-    message:
-      type: [string, array]
-      nullable: true
-      items:
-        type: string
-    warning:
-      type: [string, array]
-      nullable: true
-      items:
-        type: string
-    error:
-      type: [string, array]
-      nullable: true
-      items:
-        type: string
-    data:
-      nullable: true
-      $ref: '#/PaginatedResponse'
-
-# 分页查询结果
-PaginatedResponse:
-  type: object
-  required:
-    - page
-    - page_size
-    - total
-    - list
-  properties:
-    page:
-      type: integer
-      minimum: 1
-    page_size:
-      type: integer
-      minimum: 1
-      maximum: 1000
-    total:
-      type: integer
-      minimum: 0
-    list:
-      type: array
-      items:
-        $ref: '#/Role'
-
-# 角色
-Role:
-  type: object
-  required:
-    - role_id
-    - name
-    - code
-    - quota_type
-    - relation_type
-  properties:
-    role_id:
-      type: integer
-      minimum: 1
-    name:
+# /role 接口响应体结构
+type: object
+properties:
+  code:
+    type: integer
+    nullable: true
+  message:
+    type: [string, array]
+    nullable: true
+    items:
       type: string
-    code:
+  warning:
+    type: [string, array]
+    nullable: true
+    items:
       type: string
-    description:
+  error:
+    type: [string, array]
+    nullable: true
+    items:
       type: string
-    quota_type:
-      type: integer
-    user_quota:
-      type: integer
-      nullable: true
-    relation_type:
-      type: integer
-    depts:
-      type: array
-      nullable: true
-      items:
-        $ref: '#/RoleDept'
+  data:
+    nullable: true
+    $ref: '#/components/schemas/PaginatedResponse'
 
-# 角色部门关联数据
-RoleDept:
-  type: object
-  required:
-    - role_id
-    - dept_id
-  properties:
-    role_id:
-      type: integer
-    dept_id:
-      type: integer
+components:
+  schemas:
+    # 分页查询结果
+    PaginatedResponse:
+      type: object
+      required:
+        - page
+        - page_size
+        - total
+        - list
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+
+    # 角色
+    Role:
+      type: object
+      required:
+        - role_id
+        - name
+        - code
+        - quota_type
+        - relation_type
+      properties:
+        role_id:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+        quota_type:
+          type: integer
+        user_quota:
+          type: integer
+          nullable: true
+        relation_type:
+          type: integer
+        depts:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/RoleDept'
+
+    # 角色部门关联数据
+    RoleDept:
+      type: object
+      required:
+        - role_id
+        - dept_id
+      properties:
+        role_id:
+          type: integer
+          minimum: 1
+        dept_id:
+          type: integer
+          minimum: 1
