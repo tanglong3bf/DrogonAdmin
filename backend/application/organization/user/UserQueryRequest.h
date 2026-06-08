@@ -3,6 +3,7 @@
 #include "domain/organization/user/Sex.h"
 #include "domain/organization/user/Status.h"
 #include "common/util/Utilities.hpp"
+#include <drogon/Attribute.h>
 #include <optional>
 #include <string>
 #include <cstdint>
@@ -23,15 +24,16 @@ class UserQueryRequest
     std::size_t pageSize_;                    ///< 每页数据量
 
   public:
-    UserQueryRequest(std::string username,
-                     std::string nickname,
-                     std::string sex,
-                     std::string deptId,
-                     std::string phoneNumber,
-                     std::string email,
-                     std::string status,
-                     std::string page,
-                     std::string pageSize);
+    UserQueryRequest(const std::string &username,
+                     const std::string &nickname,
+                     const std::string &sex,
+                     const std::string &deptId,
+                     const std::string &phoneNumber,
+                     const std::string &email,
+                     const std::string &status,
+                     const std::string &page,
+                     const std::string &pageSize,
+                     const drogon::AttributesPtr &attr);
 
     OPT_GETTER(username, Username)
     OPT_GETTER(nickname, Nickname)

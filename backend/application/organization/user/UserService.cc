@@ -3,7 +3,8 @@
 using namespace drogon;
 
 drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
-    const UserQueryRequest &request) const
+    const UserQueryRequest &request,
+    const AttributesPtr &attr) const
 {
     const size_t count = co_await userCqrsRepo_->countByQueryReq(request);
     if (count == 0)
@@ -16,7 +17,8 @@ drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
 
     const size_t maxPage =
         (count + request.getPageSize() - 1) / request.getPageSize();
-    const auto list = co_await userCqrsRepo_->getUserList(request, maxPage);
+    const auto list =
+        co_await userCqrsRepo_->getUserList(request, maxPage, attr);
 
     co_return PaginatedResponse<UserResponse>{maxPage < request.getPage()
                                                   ? maxPage

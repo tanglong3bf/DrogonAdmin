@@ -2,6 +2,7 @@
 
 #include "domain/organization/user/UserRole.h"
 #include "domain/models/SysUser.h"
+#include "common/util/AttrUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 
@@ -19,12 +20,18 @@ Task<size_t> UserCqrsRepo::countByQueryReq(
 
 Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     const UserQueryRequest &request,
-    const std::int32_t maxPage) const
+    const std::int32_t maxPage,
+    const AttributesPtr &attr) const
 {
     Criteria criteria = buildCriteria(request);
 
     const std::int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
+    if (page != request.getPage())
+    {
+        addWarn(attr, "查询页码超出范围，已自动调整到最后一页");
+    }
+
     const auto sysUserList = co_await userMapper()
                                  .orderBy(SysUser::Cols::_user_id)
                                  .paginate(page, request.getPageSize())

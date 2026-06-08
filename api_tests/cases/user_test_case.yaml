@@ -1,0 +1,57 @@
+user_cases:
+  # 分页查询用户（未充分测试） {{{
+  - name: 分页查询用户-默认参数
+    sql_file: user.sql
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 17
+        len:$.data.list: 10
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询1
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: username=admin
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 4
+        len:$.data.list: 4
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询2
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: nickname=-
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 10
+        len:$.data.list: 10
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询3
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: sex=0&dept_id=8&phone_number=0000&email=temp&status=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 1
+        len:$.data.list: 1
+        $.data.list[0].username: guest_user
+    validate_schema: user_paginated.yaml
+  # }}}

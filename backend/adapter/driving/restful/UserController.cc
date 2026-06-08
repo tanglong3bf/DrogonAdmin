@@ -1,23 +1,25 @@
 #include "UserController.h"
 
 #include "application/organization/user/UserQueryRequest.h"
+#include "common/util/ApiResponse.hpp"
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
 // Add definition of your processing function here
-drogon::Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
-                                                   const string username,
-                                                   const string nickname,
-                                                   const string sex,
-                                                   const string deptId,
-                                                   const string phoneNumber,
-                                                   const string email,
-                                                   const string status,
-                                                   const string page,
-                                                   const string pageSize) const
+Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
+                                           const string username,
+                                           const string nickname,
+                                           const string sex,
+                                           const string deptId,
+                                           const string phoneNumber,
+                                           const string email,
+                                           const string status,
+                                           const string page,
+                                           const string pageSize) const
 {
+    const auto &attr = req->getAttributes();
     UserQueryRequest request{username,
                              nickname,
                              sex,
@@ -26,9 +28,11 @@ drogon::Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                              email,
                              status,
                              page,
-                             pageSize};
-    const auto paginated = co_await userService_->getUserList(request);
-    co_return toResponse(paginated);
+                             pageSize,
+                             attr};
+    const auto paginated = co_await userService_->getUserList(request, attr);
+    const auto response = ApiResponse{paginated, attr};
+    co_return toResponse(response);
 }
 
 Task<HttpResponsePtr> UserController::createUser(
@@ -41,7 +45,7 @@ Task<HttpResponsePtr> UserController::createUser(
     co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
 
-drogon::Task<HttpResponsePtr> UserController::updateUser(
+Task<HttpResponsePtr> UserController::updateUser(
     const HttpRequestPtr req,
     const std::int32_t userId,
     const UserUpdateRequest request) const
@@ -54,7 +58,7 @@ drogon::Task<HttpResponsePtr> UserController::updateUser(
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
 
-drogon::Task<HttpResponsePtr> UserController::deleteUser(
+Task<HttpResponsePtr> UserController::deleteUser(
     const HttpRequestPtr req,
     const std::int32_t userId) const
 {
