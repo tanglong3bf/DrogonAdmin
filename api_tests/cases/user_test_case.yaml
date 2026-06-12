@@ -55,3 +55,94 @@ user_cases:
         $.data.list[0].username: guest_user
     validate_schema: user_paginated.yaml
   # }}}
+  # 更新用户 {{{
+  - name: 更新用户-不存在的用户id
+    sql_file: user_to_update.sql
+    url: http://localhost:8000/user/1
+    method: PUT
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 用户不存在
+  - name: 更新用户-软删除的用户id
+    url: http://localhost:8000/user/2
+    method: PUT
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 用户不存在
+  - name: 更新用户-所有字段和旧值相同
+    url: http://localhost:8000/user/3
+    method: PUT
+    json:
+      nickname: 无更新测试用户
+      phone_number: '18800000003'
+      email: noupdate@test.com
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-1
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].nickname: 无更新测试用户
+        $.data.list[0].phone_number: '18800000003'
+        $.data.list[0].email: noupdate@test.com
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-除部门id和拥有角色id之外的其他字段
+    url: http://localhost:8000/user/4
+    method: PUT
+    json:
+      nickname: 新的管理员名称
+      sex: 2
+      phone_number: '18212345678'
+      email: new_admin@example.com
+      status: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-2
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].nickname: 新的管理员名称
+        $.data.list[1].sex: 2
+        $.data.list[1].phone_number: '18212345678'
+        $.data.list[1].email: new_admin@example.com
+        $.data.list[1].status: 1
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-清空字段
+    url: http://localhost:8000/user/5
+    method: PUT
+    json:
+      phone_number: null
+      email: null
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-3
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data.list[2]: 7 # user_id, username, nickname, avatar, sex, dept_id, status
+    validate_schema: user_paginated.yaml
+  # }}}
+# vim: set foldmethod=marker foldlevel=0:

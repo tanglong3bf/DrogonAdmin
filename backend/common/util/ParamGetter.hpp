@@ -82,6 +82,20 @@ class NullableValue
         return std::holds_alternative<T>(data_);
     }
 
+    template <typename D>
+    [[nodiscard]] constexpr NullableValue<D> to() const noexcept
+    {
+        if (isNull())
+        {
+            return NullableValue<D>::null();
+        }
+        else if (isAbsent())
+        {
+            return NullableValue<D>::absent();
+        }
+        return NullableValue<D>::value(std::get<T>(data_));
+    }
+
     [[nodiscard]] constexpr const T &value() const &
     {
         if (!hasValue())

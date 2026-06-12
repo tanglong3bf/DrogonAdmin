@@ -31,8 +31,11 @@ void UserUpdateRequest::setByJson(const Json::Value &json)
         sex_ = static_cast<Sex>(*sexInt);
     }
     deptId_ = getParam<int32_t>(json, "dept_id", {0, -1});
-    phoneNumber_ = getParam<string>(json, "phone_number", {11, 11});
-    email_ = getParam<string>(json, "email");
+    auto phoneNumberStr =
+        getParam<string, false, true>(json, "phone_number", {11, 11});
+    phoneNumber_ = phoneNumberStr.to<PhoneNumber>();
+    auto emailStr = getParam<string, false, true>(json, "email");
+    email_ = emailStr.to<Email>();
     const auto statusInt = getParam<int32_t>(json, "status", {0, 1});
     if (statusInt)
     {

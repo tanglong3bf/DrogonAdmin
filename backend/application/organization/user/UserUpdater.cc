@@ -1,6 +1,5 @@
 #include "UserUpdater.h"
 
-#include "common/exception/BusinessException.h"
 #include <unordered_set>
 
 using namespace std;
@@ -17,8 +16,31 @@ Task<> UserUpdater::updateUser(User &user,
     ENTITY_SET(user, Nickname, isUpdated = true);
     ENTITY_SET(user, Sex, isUpdated = true);
     ENTITY_SET(user, DeptId, isUpdated = true; deptIdUpdated = true);
-    ENTITY_SET(user, PhoneNumber, isUpdated = true);
-    ENTITY_SET(user, Email, isUpdated = true);
+    // 更新 phone_number
+    if (request.getPhoneNumber() &&
+        user.getPhoneNumber() != *request.getPhoneNumber())
+    {
+        user.setPhoneNumber(*request.getPhoneNumber());
+        isUpdated = true;
+    }
+    // 置空 phone_number
+    else if (request.getPhoneNumber().isNull() && user.getPhoneNumber())
+    {
+        user.setPhoneNumberToNullOpt();
+        isUpdated = true;
+    }
+    // 更新 email
+    if (request.getEmail() && user.getEmail() != *request.getEmail())
+    {
+        user.setEmail(*request.getEmail());
+        isUpdated = true;
+    }
+    // 置空 email
+    else if (request.getEmail().isNull() && user.getEmail())
+    {
+        user.setEmailToNullOpt();
+        isUpdated = true;
+    }
     ENTITY_SET(user, Status, isUpdated = true);
 
     // 用户现有的角色id列表
@@ -26,9 +48,14 @@ Task<> UserUpdater::updateUser(User &user,
         user.getUserRoles() |
         views::transform([](const UserRole &ur) { return ur.getRoleId(); }) |
         ranges::to<vector>();
+    vector<int> roleIds = {};
+    if (request.getRoleIds())
+    {
+        roleIds = *request.getRoleIds();
+    }
     // 需要新增的角色id列表
     const auto needInsertRoleIds =
-        *request.getRoleIds() | views::filter([&](int32_t id) {
+        roleIds | views::filter([&](int32_t id) {
             return find(oldRoleIds.begin(), oldRoleIds.end(), id) ==
                    oldRoleIds.end();
         }) |
@@ -36,16 +63,13 @@ Task<> UserUpdater::updateUser(User &user,
     // 需要删除的角色id列表
     const auto needDeleteRoleIds =
         oldRoleIds | views::filter([&](int32_t id) {
-            return find(request.getRoleIds()->begin(),
-                        request.getRoleIds()->end(),
-                        id) == request.getRoleIds()->end();
+            return find(roleIds.begin(), roleIds.end(), id) == roleIds.end();
         }) |
         ranges::to<vector>();
 
     if (deptIdUpdated || needInsertRoleIds.size() > 0 ||
         needDeleteRoleIds.size() > 0)
     {
-        vector<int> roleIds = *request.getRoleIds();
         sort(roleIds.begin(), roleIds.end());
         // 检查是否可以为指定部门分配这些角色
         if (deptIdUpdated)
@@ -71,10 +95,6 @@ Task<> UserUpdater::updateUser(User &user,
     {
         user.setUpdatedBy(updatedBy);
         user.toUpdate();
-    }
-    else
-    {
-        throw BusinessException("用户数据无更新");
     }
     co_return;
 }

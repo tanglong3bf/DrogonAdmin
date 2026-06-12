@@ -101,20 +101,20 @@ drogon::Task<> UserRepository::save(User &user) const
                         throw std::runtime_error("不支持更新用户角色");
                         break;
                 }
-                if (toInsert.size() > 0)
-                {
-                    const auto insertSql =
-                        sqlGenerator()->getSql("multi_insert_user_role",
-                                               {{"data", toInsert}});
-                    co_await trans->execSqlCoro(insertSql);
-                }
-                if (toDelete.size() > 0)
-                {
-                    const auto deleteSql =
-                        sqlGenerator()->getSql("multi_delete_user_role",
-                                               {{"data", toDelete}});
-                    co_await trans->execSqlCoro(deleteSql);
-                }
+            }
+            if (toInsert.size() > 0)
+            {
+                const auto insertSql =
+                    sqlGenerator()->getSql("multi_insert_user_role",
+                                           {{"data", toInsert}});
+                co_await trans->execSqlCoro(insertSql);
+            }
+            if (toDelete.size() > 0)
+            {
+                const auto deleteSql =
+                    sqlGenerator()->getSql("multi_delete_user_role",
+                                           {{"data", toDelete}});
+                co_await trans->execSqlCoro(deleteSql);
             }
             co_return;
         }
@@ -139,7 +139,9 @@ drogon::Task<> UserRepository::save(User &user) const
 Task<User> UserRepository::getById(const std::int32_t userId,
                                    bool withRelation) const
 {
-    const auto sysUser = co_await userMapper().findByPrimaryKey(userId);
+    const auto sysUser = co_await userMapper().findOne(
+        Criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull} &&
+        Criteria{SysUser::Cols::_user_id, userId});
     User user{sysUser};
     if (withRelation)
     {

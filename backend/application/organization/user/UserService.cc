@@ -1,5 +1,8 @@
 #include "UserService.h"
 
+#include "common/exception/BusinessException.h"
+#include <drogon/orm/Exception.h>
+
 using namespace drogon;
 
 drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
@@ -40,9 +43,16 @@ Task<> UserService::updateUser(const std::int32_t userId,
                                const int32_t updatedBy) const
 {
     LOG_TRACE << "更新用户，userId=" << userId << ", updatedBy=" << updatedBy;
-    auto user = co_await userRepository_->getById(userId, true);
-    co_await userUpdater_->updateUser(user, request, updatedBy);
-    co_await userRepository_->save(user);
+    try
+    {
+        auto user = co_await userRepository_->getById(userId, true);
+        co_await userUpdater_->updateUser(user, request, updatedBy);
+        co_await userRepository_->save(user);
+    }
+    catch (const orm::UnexpectedRows &e)
+    {
+        throw BusinessException("用户不存在");
+    }
 }
 
 drogon::Task<> UserService::deleteUser(const std::int32_t userId,
