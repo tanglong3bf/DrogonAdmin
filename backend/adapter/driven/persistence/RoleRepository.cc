@@ -93,6 +93,18 @@ Task<size_t> RoleRepository::countByCode(const string &code) const
     co_return co_await roleMapper().count(criteria);
 }
 
+Task<size_t> RoleRepository::countByIds(const vector<int32_t> &roleIds) const
+{
+    if (roleIds.size() == 0)
+    {
+        co_return 0;
+    }
+    Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria &&
+               Criteria{SysRole::Cols::_role_id, CompareOperator::In, roleIds};
+    co_return co_await roleMapper().count(criteria);
+}
+
 Task<> RoleRepository::save(Role &role) const
 {
     // 由于这里涉及到多表操作，一定需要开启事务

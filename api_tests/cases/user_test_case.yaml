@@ -256,5 +256,89 @@ user_cases:
       assert_jsonpath:
         $.data.list[8].dept_id: 1
     # }}}
+    # 更新角色 {{{
+  - name: 更新用户-不存在的角色id
+    url: http://localhost:8000/user/12
+    method: PUT
+    json:
+      role_ids: [233]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分角色不存在
+  - name: 更新用户-软删除的角色id
+    url: http://localhost:8000/user/12
+    method: PUT
+    json:
+      role_ids: [4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分角色不存在
+  - name: 更新用户-正常分配普通角色
+    url: http://localhost:8000/user/13
+    method: PUT
+    json:
+      role_ids: [5]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-清空角色
+    url: http://localhost:8000/user/14
+    method: PUT
+    json:
+      role_ids: []
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-分配白名单但不在指定部门的角色
+    url: http://localhost:8000/user/15
+    method: PUT
+    json:
+      role_ids: [1]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门不在角色的白名单中
+  - name: 更新用户-分配黑名单且在指定部门的角色
+    url: http://localhost:8000/user/16
+    method: PUT
+    json:
+      role_ids: [2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-分配角色，但超出了每部门数量限制
+    url: http://localhost:8000/user/17
+    method: PUT
+    json:
+      role_ids: [3]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-分配角色，但超出了总数量数量限制
+    url: http://localhost:8000/user/19
+    method: PUT
+    json:
+      role_ids: [6]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+    # }}}
   # }}}
 # vim: set foldmethod=marker foldlevel=0:

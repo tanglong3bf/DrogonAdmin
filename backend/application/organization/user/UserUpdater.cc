@@ -55,6 +55,7 @@ Task<> UserUpdater::updateUser(User &user,
     // 角色列表
     if (request.getRoleIds())
     {
+        co_await roleVerifier_->verifyRolesExists(*request.getRoleIds());
         updateUserRoles(const_cast<vector<UserRole> &>(user.getUserRoles()),
                         *request.getRoleIds(),
                         *user.getUserId(),

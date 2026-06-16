@@ -179,10 +179,26 @@ Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
     co_return result;
 }
 
-Task<size_t> UserRepository::countByRoleId(const std::int32_t roleId) const
+drogon::Task<std::map<std::int32_t, std::size_t>> UserRepository::
+    countByRoleList(const std::vector<std::int32_t> &roleIds) const
 {
-    co_return co_await userRoleMapper().count(
-        Criteria{SysUserRole::Cols::_role_id, roleId});
+    LOG_TRACE << "统计角色的用户数量，roleIds=" << roleIds.size() << "个角色";
+    ParamList param;
+    Json::Value roleIdsJson(Json::arrayValue);
+    for (const auto &id : roleIds)
+    {
+        roleIdsJson.append(id);
+    }
+    param["role_ids"] = roleIdsJson;
+    const auto sql = sqlGenerator()->getSql("count_user_by_role_list", param);
+    // used_count, ur.role_id
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    std::map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["role_id"].as<int32_t>()] = row["used_count"].as<size_t>();
+    }
+    co_return result;
 }
 
 Task<unordered_map<std::int32_t, size_t>> UserRepository::

@@ -97,13 +97,20 @@ INSERT INTO "public"."sys_role_dept" VALUES (2, 3, 1, '2026-04-01 00:00:00');
 -- 角色数据
 INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '白名单角色', 0, NULL, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 INSERT INTO "public"."sys_role" VALUES (2, '角色-2', 'role-2', '黑名单角色', 0, NULL, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (3, '角色-3', 'role-3', '每个部门限制用户数量为1', 2, 1, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (3, '角色-3', 'role-3', '每个部门限制用户数量为1', 2, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (4, '角色-4', 'role-4', '软删除的角色', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_role" VALUES (5, '角色-5', 'role-5', '正常的角色', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (6, '角色-6', 'role-6', '总数量限制为1', 1, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 -- 用户角色关联数据
 INSERT INTO "public"."sys_user_role" VALUES (8, 1, 1, '2026-04-01 00:00:00');
 INSERT INTO "public"."sys_user_role" VALUES (9, 2, 1, '2026-04-01 00:00:00');
 INSERT INTO "public"."sys_user_role" VALUES (10, 3, 1, '2026-04-01 00:00:00');
 INSERT INTO "public"."sys_user_role" VALUES (11, 3, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (14, 1, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (14, 2, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (14, 5, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (18, 6, 1, '2026-04-01 00:00:00');
 
 -- 用户1: 已删除
 -- 用户2: 软删除的用户
@@ -126,6 +133,22 @@ INSERT INTO "public"."sys_user" VALUES (9, 'user-9', '123456', '用户-9', '#', 
 INSERT INTO "public"."sys_user" VALUES (10, 'user-10', '123456', '用户-10', '#', 1, 3, '18800000010', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 -- 转移到已被使用角色的部门
 INSERT INTO "public"."sys_user" VALUES (11, 'user-11', '123456', '用户-11', '#', 1, 1, '18800000011', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 为其赋予不存在的角色
+INSERT INTO "public"."sys_user" VALUES (12, 'user-12', '123456', '用户-12', '#', 1, 1, '18800000012', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 正常赋予角色
+INSERT INTO "public"."sys_user" VALUES (13, 'user-13', '123456', '用户-13', '#', 1, 1, '18800000013', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 已拥有三个角色，将被清空
+INSERT INTO "public"."sys_user" VALUES (14, 'user-14', '123456', '用户-14', '#', 1, 1, '18800000014', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 分配有白名单的角色，但用户不在白名单部门里
+INSERT INTO "public"."sys_user" VALUES (15, 'user-15', '123456', '用户-15', '#', 1, 3, '18800000015', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 分配有黑名单的角色，且用户在黑名单部门里
+INSERT INTO "public"."sys_user" VALUES (16, 'user-16', '123456', '用户-16', '#', 1, 3, '18800000016', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 待分配角色，分配后超出每部门数量限制
+INSERT INTO "public"."sys_user" VALUES (17, 'user-17', '123456', '用户-17', '#', 1, 3, '18800000017', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 占位用户
+INSERT INTO "public"."sys_user" VALUES (18, 'user-18', '123456', '用户-18', '#', 1, 1, '18800000018', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 待分配角色，分配后超出总数量限制
+INSERT INTO "public"."sys_user" VALUES (19, 'user-19', '123456', '用户-19', '#', 1, 3, '18800000019', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 
 -- 设置序列起始值

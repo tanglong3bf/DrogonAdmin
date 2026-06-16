@@ -63,9 +63,10 @@ class UserRepository : public DrAdminObject<UserRepository>
                         const std::vector<std::int32_t> &roleIds) const;
 
     /**
-     * @brief 检查所有使用当前角色的用户数量是否超过限制
+     * @brief 统计指定角色列表的用户数量
      */
-    drogon::Task<std::size_t> countByRoleId(const std::int32_t roleId) const;
+    drogon::Task<std::map<std::int32_t, std::size_t>> countByRoleList(
+        const std::vector<std::int32_t> &roleIds) const;
 
     /**
      * @brief 检查每个部门使用当前角色的用户数量是否超过限制
