@@ -93,6 +93,14 @@ class UserRepository : public DrAdminObject<UserRepository>
         const std::int32_t roleId,
         const std::vector<std::int32_t> &deptIds) const;
 
+    /**
+     * @brief 分角色统计属于指定部门的用户数量
+     */
+    drogon::Task<std::map<std::int32_t, std::size_t>>
+    countUsersPerRoleInDepartment(
+        const std::int32_t deptId,
+        const std::vector<std::int32_t> &roleIds) const;
+
   protected:
     std::vector<UserRole> buildUserRoleList(
         const std::vector<SysUserRole> &sysUserRoles) const;

@@ -144,5 +144,117 @@ user_cases:
       assert_jsonpath:
         len:$.data.list[2]: 7 # user_id, username, nickname, avatar, sex, dept_id, status
     validate_schema: user_paginated.yaml
+    # 更新部门 {{{
+  - name: 更新用户-不存在的部门id
+    url: http://localhost:8000/user/6
+    method: PUT
+    json:
+      dept_id: 233
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 更新用户-软删除的部门id
+    url: http://localhost:8000/user/6
+    method: PUT
+    json:
+      dept_id: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 更新用户-数据检查-4-不应该更新
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].dept_id: 1
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-正常更新
+    url: http://localhost:8000/user/7
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-5-正常更新
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].dept_id: 3
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-白名单到其他
+    url: http://localhost:8000/user/8
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门不在角色的白名单中
+  - name: 更新用户-数据检查-6-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].dept_id: 1
+  - name: 更新用户-其他到黑名单
+    url: http://localhost:8000/user/9
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-数据检查-6-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].dept_id: 1
+  - name: 更新用户-角色数量限制
+    url: http://localhost:8000/user/11
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-数据检查-7-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].dept_id: 1
+    # }}}
   # }}}
 # vim: set foldmethod=marker foldlevel=0:

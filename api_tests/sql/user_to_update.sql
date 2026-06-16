@@ -84,6 +84,26 @@ CREATE TABLE "public"."sys_user_role" (
 
 -- 部门数据
 INSERT INTO "public"."sys_dept" VALUES (1, '技术部', 0, NULL, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 软删除
+INSERT INTO "public"."sys_dept" VALUES (2, '财务部', 1, NULL, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_dept" VALUES (3, '人事部', 2, NULL, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+
+-- 角色部门关联数据
+-- 白名单
+INSERT INTO "public"."sys_role_dept" VALUES (1, 1, 1, '2026-04-01 00:00:00');
+-- 黑名单
+INSERT INTO "public"."sys_role_dept" VALUES (2, 3, 1, '2026-04-01 00:00:00');
+
+-- 角色数据
+INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '白名单角色', 0, NULL, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (2, '角色-2', 'role-2', '黑名单角色', 0, NULL, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (3, '角色-3', 'role-3', '每个部门限制用户数量为1', 2, 1, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+
+-- 用户角色关联数据
+INSERT INTO "public"."sys_user_role" VALUES (8, 1, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (9, 2, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (10, 3, 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user_role" VALUES (11, 3, 1, '2026-04-01 00:00:00');
 
 -- 用户1: 已删除
 -- 用户2: 软删除的用户
@@ -94,12 +114,27 @@ INSERT INTO "public"."sys_user" VALUES (3, 'no_update_user', '123456', '无更�
 INSERT INTO "public"."sys_user" VALUES (4, 'update_fields_user', '123456', '更新字段测试用户', '#', 1, 1, '18800000004', 'updatefields@test.com', 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 -- 用户5: 用户用于测试清空手机和邮箱
 INSERT INTO "public"."sys_user" VALUES (5, 'clear_fields_user', '123456', '清空字段测试用户', '#', 1, 1, '18800000005', 'updaterole@test.com', 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 转移至不存在的部门
+INSERT INTO "public"."sys_user" VALUES (6, 'update_dept_user', '123456', '转移部门失败测试用户', '#', 1, 1, '18800000006', 'updatedept@test.com', 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 正常转移部门
+INSERT INTO "public"."sys_user" VALUES (7, 'user-7', '123456', '用户-7', '#', 1, 1, '18800000007', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 角色白名单到其他
+INSERT INTO "public"."sys_user" VALUES (8, 'user-8', '123456', '用户-8', '#', 1, 1, '18800000008', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 角色普通到黑名单
+INSERT INTO "public"."sys_user" VALUES (9, 'user-9', '123456', '用户-9', '#', 1, 1, '18800000009', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 占位用户
+INSERT INTO "public"."sys_user" VALUES (10, 'user-10', '123456', '用户-10', '#', 1, 3, '18800000010', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+-- 转移到已被使用角色的部门
+INSERT INTO "public"."sys_user" VALUES (11, 'user-11', '123456', '用户-11', '#', 1, 1, '18800000011', NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+
 
 -- 设置序列起始值
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq" OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 1, true);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 3, true);
+ALTER SEQUENCE "public"."sys_role_role_id_seq" OWNED BY "public"."sys_role"."role_id";
+SELECT setval('"public"."sys_role_role_id_seq"', 3, true);
 ALTER SEQUENCE "public"."sys_user_user_id_seq" OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 5, true);
+SELECT setval('"public"."sys_user_user_id_seq"', 11, true);
 
 -- 添加主键约束
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");

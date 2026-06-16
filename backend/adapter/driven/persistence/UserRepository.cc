@@ -250,6 +250,29 @@ Task<size_t> UserRepository::countByRoleInDepts(
     co_return dbResult[0][0].as<size_t>();
 }
 
+Task<map<int32_t, size_t>> UserRepository::countUsersPerRoleInDepartment(
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
+{
+    ParamList param;
+    param["dept_id"] = deptId;
+    Json::Value roleIdsJson(Json::arrayValue);
+    for (const auto &id : roleIds)
+    {
+        roleIdsJson.append(id);
+    }
+    param["role_ids"] = roleIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_users_per_role_in_department", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["role_id"].as<int32_t>()] = row["user_count"].as<size_t>();
+    }
+    co_return result;
+}
+
 vector<UserRole> UserRepository::buildUserRoleList(
     const vector<SysUserRole> &sysUserRoles) const
 {

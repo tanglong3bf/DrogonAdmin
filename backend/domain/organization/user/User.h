@@ -1,17 +1,17 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string>
+#include "Email.h"
+#include "PhoneNumber.h"
+#include "Sex.h"
+#include "Status.h"
+#include "UserRole.h"
+#include "domain/models/SysUser.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "common/util/Utilities.hpp"
-#include "domain/models/SysUser.h"
-#include "Sex.h"
-#include "Status.h"
-#include "Email.h"
-#include "PhoneNumber.h"
-#include "UserRole.h"
+#include <optional>
+#include <string>
+#include <cstdint>
 
 class User : public AuditableEntity, public ChangeableEntity
 {

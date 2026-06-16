@@ -28,16 +28,26 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
     drogon::Task<> verifyRoleCodeNotDuplicated(const std::string &code) const;
 
     /**
-     * @brief 验证指定部门是否可用所有角色
+     * @brief 验证指定部门是否可为所有角色新增用户
      */
-    drogon::Task<> verifyRolesBelongToDept(
-        const std::int32_t deptId,
-        const std::vector<std::int32_t> &roleIds) const;
+    drogon::Task<> verifyDeptRolesAllowedForNewUser(
+        const std::int32_t oldDeptId,
+        const std::int32_t newDeptId,
+        const std::vector<std::int32_t> &allRoleIds,
+        const std::vector<std::int32_t> &newRoleIds) const;
 
     /**
      * @brief 验证角色的用户数量限制是否满足要求
      */
     drogon::Task<> checkQuota(const Role &role, const Role &oldData) const;
+
+  private:
+    /**
+     * @brief 验证指定部门是否可用所有角色
+     */
+    drogon::Task<> verifyRolesBelongToDept(
+        const std::int32_t deptId,
+        const std::vector<std::int32_t> &roleIds) const;
 
   private:
     RoleRepositoryPtr roleRepository_{
