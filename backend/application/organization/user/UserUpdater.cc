@@ -63,7 +63,9 @@ Task<> UserUpdater::updateUser(User &user,
         isUpdated = true;
     }
     const auto allRoleIds =
-        user.getUserRoles() |
+        user.getUserRoles() | views::filter([](const auto &ur) {
+            return ur.getChangingStatus() != ChangingStatus::DELETED;
+        }) |
         views::transform([](const auto &ur) { return ur.getRoleId(); }) |
         ranges::to<vector<int32_t>>();
     const auto newRoleIds =
