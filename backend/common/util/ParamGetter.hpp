@@ -1,13 +1,14 @@
 #pragma once
 
-#include <algorithm>
-#include <optional>
-#include <limits>
-#include <variant>
-#include <json/value.h>
-#include <trantor/utils/Logger.h>
 #include "common/exception/BusinessException.h"
+#include "common/util/ParamUtils.hpp"
+#include <trantor/utils/Logger.h>
+#include <json/value.h>
+#include <algorithm>
+#include <limits>
+#include <optional>
 #include <type_traits>
+#include <variant>
 
 namespace drogon_admin::util
 {
@@ -331,10 +332,10 @@ class ParamGetter
         // 长度检查
         const bool isTooShort =
             length_range.first >= 0 &&
-            static_cast<int32_t>(value.length()) < length_range.first;
+            static_cast<int32_t>(utf8Length(value)) < length_range.first;
         const bool isTooLong =
             length_range.second >= 0 &&
-            static_cast<int32_t>(value.length()) > length_range.second;
+            static_cast<int32_t>(utf8Length(value)) > length_range.second;
         if constexpr (is_necessary)
         {
             if (isTooShort)
