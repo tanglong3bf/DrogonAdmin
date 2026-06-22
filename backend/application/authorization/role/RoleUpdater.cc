@@ -55,7 +55,7 @@ Task<> RoleUpdater::updateRole(Role &role,
     }
     ENTITY_SET(role, relationType, isUpdated = true; isQuotaUpdated = true);
 
-    if (request.deptIds())
+    if (request.deptIds() && request.deptIds()->size() > 0)
     {
         vector<int> deptIds = *request.deptIds();
         sort(deptIds.begin(), deptIds.end());

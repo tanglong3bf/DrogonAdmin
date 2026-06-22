@@ -23,7 +23,7 @@ RoleCreateRequest fromRequest(const HttpRequest &req)
 
 RoleCreateRequest::RoleCreateRequest(const Json::Value &json)
 {
-    name_ = getParam<string, true>(json, "name", {6, 50});
+    name_ = getParam<string, true>(json, "name", {2, 20});
     code_ = getParam<string, true>(json, "code", {2, 32});
     description_ = getParam<string>(json, "description", {1, -1});
 
