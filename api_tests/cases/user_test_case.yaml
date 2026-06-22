@@ -59,7 +59,7 @@ user_cases:
   - name: 更新用户-不存在的用户id
     sql_file: user_to_update.sql
     url: http://localhost:8000/user/1
-    method: PUT
+    method: PATCH
     json: {}
     params: ''
     expect:
@@ -69,7 +69,7 @@ user_cases:
         $.error: 用户不存在
   - name: 更新用户-软删除的用户id
     url: http://localhost:8000/user/2
-    method: PUT
+    method: PATCH
     json: {}
     params: ''
     expect:
@@ -79,7 +79,7 @@ user_cases:
         $.error: 用户不存在
   - name: 更新用户-所有字段和旧值相同
     url: http://localhost:8000/user/3
-    method: PUT
+    method: PATCH
     json:
       nickname: 无更新测试用户
       phone_number: '18800000003'
@@ -101,7 +101,7 @@ user_cases:
     validate_schema: user_paginated.yaml
   - name: 更新用户-除部门id和拥有角色id之外的其他字段
     url: http://localhost:8000/user/4
-    method: PUT
+    method: PATCH
     json:
       nickname: 新的管理员名称
       sex: 2
@@ -127,7 +127,7 @@ user_cases:
     validate_schema: user_paginated.yaml
   - name: 更新用户-清空字段
     url: http://localhost:8000/user/5
-    method: PUT
+    method: PATCH
     json:
       phone_number: null
       email: null
@@ -147,7 +147,7 @@ user_cases:
     # 更新部门 {{{
   - name: 更新用户-不存在的部门id
     url: http://localhost:8000/user/6
-    method: PUT
+    method: PATCH
     json:
       dept_id: 233
     params: ''
@@ -158,7 +158,7 @@ user_cases:
         $.error: 指定的部门id不存在
   - name: 更新用户-软删除的部门id
     url: http://localhost:8000/user/6
-    method: PUT
+    method: PATCH
     json:
       dept_id: 2
     params: ''
@@ -179,7 +179,7 @@ user_cases:
     validate_schema: user_paginated.yaml
   - name: 更新用户-正常更新
     url: http://localhost:8000/user/7
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
     params: ''
@@ -197,7 +197,7 @@ user_cases:
     validate_schema: user_paginated.yaml
   - name: 更新用户-白名单到其他
     url: http://localhost:8000/user/8
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
     params: ''
@@ -217,7 +217,7 @@ user_cases:
         $.data.list[5].dept_id: 1
   - name: 更新用户-其他到黑名单
     url: http://localhost:8000/user/9
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
     params: ''
@@ -237,7 +237,7 @@ user_cases:
         $.data.list[6].dept_id: 1
   - name: 更新用户-角色数量限制
     url: http://localhost:8000/user/11
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
     params: ''
@@ -259,7 +259,7 @@ user_cases:
     # 更新角色 {{{
   - name: 更新用户-不存在的角色id
     url: http://localhost:8000/user/12
-    method: PUT
+    method: PATCH
     json:
       role_ids: [233]
     params: ''
@@ -270,7 +270,7 @@ user_cases:
         $.error: 部分角色不存在
   - name: 更新用户-软删除的角色id
     url: http://localhost:8000/user/12
-    method: PUT
+    method: PATCH
     json:
       role_ids: [4]
     params: ''
@@ -281,7 +281,7 @@ user_cases:
         $.error: 部分角色不存在
   - name: 更新用户-正常分配普通角色
     url: http://localhost:8000/user/13
-    method: PUT
+    method: PATCH
     json:
       role_ids: [5]
     params: ''
@@ -289,7 +289,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-清空角色
     url: http://localhost:8000/user/14
-    method: PUT
+    method: PATCH
     json:
       role_ids: []
     params: ''
@@ -297,7 +297,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-分配白名单但不在指定部门的角色
     url: http://localhost:8000/user/15
-    method: PUT
+    method: PATCH
     json:
       role_ids: [1]
     params: ''
@@ -308,7 +308,7 @@ user_cases:
         $.error: 指定部门不在角色的白名单中
   - name: 更新用户-分配黑名单且在指定部门的角色
     url: http://localhost:8000/user/16
-    method: PUT
+    method: PATCH
     json:
       role_ids: [2]
     params: ''
@@ -319,7 +319,7 @@ user_cases:
         $.error: 指定部门在角色的黑名单中
   - name: 更新用户-分配角色，但超出了每部门数量限制
     url: http://localhost:8000/user/17
-    method: PUT
+    method: PATCH
     json:
       role_ids: [3]
     params: ''
@@ -330,7 +330,7 @@ user_cases:
         $.error: 使用当前角色的用户数量已达限制
   - name: 更新用户-分配角色，但超出了总数量数量限制
     url: http://localhost:8000/user/19
-    method: PUT
+    method: PATCH
     json:
       role_ids: [6]
     params: ''
@@ -343,7 +343,7 @@ user_cases:
     # 同时更新部门和角色 {{{
   - name: 更新用户-白名单->白名单
     url: http://localhost:8000/user/20
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
       role_ids: [7]
@@ -352,7 +352,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-白名单->白名单(超出数量限制)
     url: http://localhost:8000/user/22
-    method: PUT
+    method: PATCH
     json:
       dept_id: 4
       role_ids: [8]
@@ -364,7 +364,7 @@ user_cases:
         $.error: 使用当前角色的用户数量已达限制
   - name: 更新用户-白名单->普通
     url: http://localhost:8000/user/23
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
       role_ids: [5]
@@ -373,7 +373,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-白名单->黑名单
     url: http://localhost:8000/user/24
-    method: PUT
+    method: PATCH
     json:
       dept_id: 1
       role_ids: [9]
@@ -385,7 +385,7 @@ user_cases:
         $.error: 指定部门在角色的黑名单中
   - name: 更新用户-普通->白名单
     url: http://localhost:8000/user/25
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
       role_ids: [7]
@@ -394,7 +394,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-普通->白名单(超出数量限制)
     url: http://localhost:8000/user/26
-    method: PUT
+    method: PATCH
     json:
       dept_id: 4
       role_ids: [8]
@@ -406,7 +406,7 @@ user_cases:
         $.error: 使用当前角色的用户数量已达限制
   - name: 更新用户-普通->普通
     url: http://localhost:8000/user/27
-    method: PUT
+    method: PATCH
     json:
       dept_id: 3
       role_ids: [10]
@@ -415,7 +415,7 @@ user_cases:
       status_code: 204
   - name: 更新用户-普通->黑名单
     url: http://localhost:8000/user/28
-    method: PUT
+    method: PATCH
     json:
       dept_id: 1
       role_ids: [9]
