@@ -4,6 +4,7 @@
 #include "domain/organization/user/User.h"
 #include "domain/organization/user/UserVerifier.h"
 #include "domain/organization/dept/DeptVerifier.h"
+#include "domain/authorization/RoleVerifier.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <memory>
 
@@ -24,6 +25,8 @@ class UserAssembler : public DrAdminObject<UserAssembler>
         drogon::DrClassMap::getSingleInstance<UserVerifier>()};
     DeptVerifierPtr deptVerifier_{
         drogon::DrClassMap::getSingleInstance<DeptVerifier>()};
+    RoleVerifierPtr roleVerifier_{
+        drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
 };
 
 using UserAssemblerPtr = std::shared_ptr<UserAssembler>;

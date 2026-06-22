@@ -785,11 +785,14 @@ role_cases:
     url: http://localhost:8000/role/1
     method: put
     json:
-      name: short # 不符合长度的参数会被忽略
-      code: s # 不符合长度的参数会被忽略
+      name: s
+      code: s
     params: ''
     expect:
-      status_code: 204
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: name参数长度过短
   - name: 更新角色-检查数据3-name和code不应该被修改
     url: http://localhost:8000/role
     method: get
@@ -806,11 +809,14 @@ role_cases:
     url: http://localhost:8000/role/1
     method: put
     json:
-      name: this_is_a_very_long_role_name_exceeding_the_maximum_length_limit # 不符合长度的参数会被忽略
-      code: this_is_a_very_long_role_code_exceeding_the_maximum_length_limit # 不符合长度的参数会被忽略
+      name: this_is_a_very_long_role_name_exceeding_the_maximum_length_limit
+      code: this_is_a_very_long_role_code_exceeding_the_maximum_length_limit
     params: ''
     expect:
-      status_code: 204
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: name参数长度过长
   - name: 更新角色-检查数据4-name和code不应该被修改
     url: http://localhost:8000/role
     method: get

@@ -198,6 +198,18 @@ class NullableValue
 };
 
 /**
+ * @brief 默认参数验证器
+ */
+struct DefaultParamValidator
+{
+    template <typename T>
+    constexpr std::string operator()(const T &) const noexcept
+    {
+        return "";
+    }
+};
+
+/**
  * @brief 参数提取仿函数对象
  * @tparam T 期望的参数类型
  * @tparam is_necessary 是否为必填参数，默认为false
@@ -207,10 +219,15 @@ template <typename T, bool is_necessary, bool is_nullable>
 class ParamGetter
 {
   public:
+    template <typename Validator = DefaultParamValidator>
     auto operator()(const Json::Value &json,
                     const std::string &key,
-                    const std::pair<int32_t, int32_t> &range = {-1, -1})
+                    const std::pair<int32_t, int32_t> &range = {-1, -1},
+                    Validator validator = DefaultParamValidator{})
     {
+        static_assert(noexcept(validator(std::declval<const T &>())),
+                      "Validator must be a non-throwing callable! Mark it with "
+                      "`noexcept`.");
         assert(range.first < 0 || range.second < 0 ||
                range.first <= range.second);
 
@@ -259,6 +276,16 @@ class ParamGetter
 
         // 获取参数，内部会检查字符串长度、数值范围
         auto result = getParam<T>(json, key, range);
+
+        if (result)
+        {
+            // 调用验证器
+            const auto err = validator(*result);
+            if (err.length() > 0)
+            {
+                throw BusinessException{err};
+            }
+        }
 
         // 根据 is_nullable 决定返回值类型
         if constexpr (is_nullable)
@@ -336,29 +363,13 @@ class ParamGetter
         const bool isTooLong =
             length_range.second >= 0 &&
             static_cast<int32_t>(utf8Length(value)) > length_range.second;
-        if constexpr (is_necessary)
+        if (isTooShort)
         {
-            if (isTooShort)
-            {
-                throw BusinessException{key + "参数长度过短"};
-            }
-            else if (isTooLong)
-            {
-                throw BusinessException{key + "参数长度过长"};
-            }
+            throw BusinessException{key + "参数长度过短"};
         }
-        else
+        else if (isTooLong)
         {
-            if (isTooShort)
-            {
-                LOG_WARN << key + "参数长度过短，已忽略";
-                return std::nullopt;
-            }
-            else if (isTooLong)
-            {
-                LOG_WARN << key + "参数长度过长，已忽略";
-                return std::nullopt;
-            }
+            throw BusinessException{key + "参数长度过长"};
         }
         return value;
     }

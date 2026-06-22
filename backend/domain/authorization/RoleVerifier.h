@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <drogon/utils/coroutine.h>
-#include "common/framework/DrAdminObject.hpp"
 #include "RoleRepository.h"
 #include "domain/organization/user/UserRepository.h"
+#include "common/framework/DrAdminObject.hpp"
+#include <drogon/utils/coroutine.h>
+#include <memory>
 
 /**
  * @brief 角色校验器
@@ -32,6 +32,7 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
      */
     drogon::Task<> verifyRolesExists(
         const std::vector<std::int32_t> &roleIds) const;
+
     /**
      * @brief 验证指定部门是否可为所有角色新增用户
      */
@@ -40,6 +41,13 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
         const std::int32_t newDeptId,
         const std::vector<std::int32_t> &allRoleIds,
         const std::vector<std::int32_t> &newRoleIds) const;
+
+    /**
+     * @brief 验证指定部门是否可为所有角色新增用户
+     */
+    drogon::Task<> verifyDeptRolesAllowedForNewUser(
+        const std::int32_t deptId,
+        const std::vector<std::int32_t> &roleIds) const;
 
     /**
      * @brief 验证角色的用户数量限制是否满足要求

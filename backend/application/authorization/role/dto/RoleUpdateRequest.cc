@@ -24,7 +24,7 @@ RoleUpdateRequest fromRequest(const HttpRequest &req)
 
 void RoleUpdateRequest::setByJson(const Json::Value &json)
 {
-    name_ = getParam<string>(json, "name", {6, 50});
+    name_ = getParam<string>(json, "name", {2, 20});
     code_ = getParam<string>(json, "code", {2, 32});
     description_ = getParam<string, false, true>(json, "description", {1, -1});
     const auto quotaTypeInt =

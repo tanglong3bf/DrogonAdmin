@@ -143,6 +143,13 @@ Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
     }
 }
 
+Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
+{
+    co_await verifyDeptRolesAllowedForNewUser(0, deptId, roleIds, {});
+}
+
 // QuotaType // 无数量限制、总量限制、每部门限制
 // UserQuota // 数量
 // RelationType // 所有部门、白名单、黑名单
