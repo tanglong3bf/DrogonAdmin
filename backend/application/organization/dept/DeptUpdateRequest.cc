@@ -16,13 +16,12 @@ DeptUpdateRequest fromRequest(const HttpRequest &req)
     {
         throw BusinessException("请求体格式错误，请使用application/json");
     }
-    DeptUpdateRequest request;
-    request.setByJson(*jsonPtr);
+    DeptUpdateRequest request(*jsonPtr);
     return request;
 }
 };  // namespace drogon
 
-void DeptUpdateRequest::setByJson(const Json::Value &json)
+DeptUpdateRequest::DeptUpdateRequest(const Json::Value &json)
 {
     name_ = getParam<string, true>(json, "name", {1, -1});
 }

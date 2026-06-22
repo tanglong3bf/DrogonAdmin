@@ -9,42 +9,39 @@ Task<Role> RoleAssembler::fromCreateRequest(const RoleCreateRequest request,
                                             std::int32_t createdBy)
 {
     // 验证
-    const auto name = request.getName();
+    const std::string name{request.name()};
     co_await roleVerifier_->verifyRoleNameNotDuplicated(name);
-    const auto code = request.getCode();
+    const std::string code{request.code()};
     co_await roleVerifier_->verifyRoleCodeNotDuplicated(code);
-    if (request.getRelationType() != RelationType::All)
+    if (request.relationType() != RelationType::All)
     {
-        if (request.getDeptIds().size() == 0)
+        if (request.deptIds().size() == 0)
         {
             throw BusinessException("请选择关联部门");
         }
-        co_await deptVerifier_->verifyDeptIdsExist(request.getDeptIds());
+        co_await deptVerifier_->verifyDeptIdsExist(request.deptIds());
     }
 
     // 必备参数
-    Role role{name,
-              code,
-              request.getQuotaType(),
-              request.getRelationType(),
-              createdBy};
+    Role role{
+        name, code, request.quotaType(), request.relationType(), createdBy};
 
     // 可选参数
-    if (const auto desc = request.getDescription())
+    if (const auto desc = request.description())
     {
-        role.setDescription(*desc);
+        role.description = *desc;
     }
-    if (role.getQuotaType() != QuotaType::Unlimited)
+    if (role.quotaType != QuotaType::Unlimited)
     {
-        role.setUserQuota(*request.getUserQuota());
+        role.userQuota = *request.userQuota();
     }
-    if (role.getRelationType() != RelationType::All)
+    if (role.relationType != RelationType::All)
     {
-        for (const auto deptId : request.getDeptIds())
+        for (const auto deptId : request.deptIds())
         {
             role.addRoleDept(RoleDept{deptId, createdBy});
         }
     }
-    role.toNew();
+    role.markNew();
     co_return role;
 }

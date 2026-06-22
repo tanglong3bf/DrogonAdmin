@@ -11,7 +11,7 @@ Task<> RoleService::deleteExcludingDept(const std::int32_t deptId,
         co_await roleRepository_->getExcludingDeptByDeptId(deptId, dbClient);
     for (auto &roleDept : roleDepts)
     {
-        roleDept.toDelete();
+        roleDept.markDeleted();
     }
     co_await roleRepository_->saveRoleDepts(roleDepts, dbClient);
 }
@@ -21,26 +21,23 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
     const AttributesPtr &attr) const
 {
     const size_t count =
-        co_await roleCqrsRepo_->countByNameAndDeptId(request.getName(),
-                                                     request.getDeptId());
+        co_await roleCqrsRepo_->countByNameAndDeptId(request.name(),
+                                                     request.deptId());
 
     if (count == 0)
     {
-        co_return PaginatedResponse<RoleResponse>{1,
-                                                  request.getPageSize(),
-                                                  0,
-                                                  {}};
+        co_return PaginatedResponse<RoleResponse>{1, request.pageSize(), 0, {}};
     }
 
     const size_t maxPage =
-        (count + request.getPageSize() - 1) / request.getPageSize();
+        (count + request.pageSize() - 1) / request.pageSize();
     const auto list =
         co_await roleCqrsRepo_->getRoleList(request, maxPage, attr);
 
-    co_return PaginatedResponse<RoleResponse>{maxPage < request.getPage()
+    co_return PaginatedResponse<RoleResponse>{maxPage < request.page()
                                                   ? maxPage
-                                                  : request.getPage(),
-                                              request.getPageSize(),
+                                                  : request.page(),
+                                              request.pageSize(),
                                               count,
                                               list};
 }

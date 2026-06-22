@@ -22,6 +22,7 @@ RoleQueryRequest::RoleQueryRequest(const std::string &name,
         auto trimed = trim(name);
         name_ = escapeSqlLike(trimed);
     }
+
     if (deptId.size() > 0)
     {
         try

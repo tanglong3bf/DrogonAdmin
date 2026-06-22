@@ -14,13 +14,14 @@ enum class ChangingStatus
 class ChangeableEntity
 {
   public:
-    ChangeableEntity();
-
-    ChangingStatus getChangingStatus() const;
-    void toNew();
-    void toUpdate();
-    void toDelete();
+    ChangingStatus changingStatus() const noexcept;
+    bool isNew() const noexcept;
+    bool isUpdated() const noexcept;
+    bool isDeleted() const noexcept;
+    void markNew();
+    void markUpdated();
+    void markDeleted();
 
   private:
-    ChangingStatus changingStatus_;
+    ChangingStatus changingStatus_{ChangingStatus::UNCHANGED};
 };

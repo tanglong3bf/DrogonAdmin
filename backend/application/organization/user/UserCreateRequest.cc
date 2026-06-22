@@ -18,13 +18,12 @@ UserCreateRequest fromRequest(const HttpRequest &req)
     {
         throw BusinessException("请求体格式错误，请使用application/json");
     }
-    UserCreateRequest request;
-    request.setByJson(*jsonPtr);
+    UserCreateRequest request(*jsonPtr);
     return request;
 }
 };  // namespace drogon
 
-void UserCreateRequest::setByJson(const Json::Value &json)
+UserCreateRequest::UserCreateRequest(const Json::Value &json)
 {
     username_ = getParam<string, true>(
         json,

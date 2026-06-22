@@ -47,7 +47,7 @@ drogon::Task<std::size_t> UserRepository::countByNickname(
 
 drogon::Task<> UserRepository::save(User &user) const
 {
-    switch (user.getChangingStatus())
+    switch (user.changingStatus())
     {
         case ChangingStatus::NEW:
         {
@@ -56,13 +56,13 @@ drogon::Task<> UserRepository::save(User &user) const
             // 补充默认密码
             model.setPassword("123456");
             const auto userInDb = co_await userMapper(trans).insert(model);
-            if (user.getUserRoles().size() > 0)
+            if (user.userRoles.size() > 0)
             {
                 Json::Value data;
-                for (auto &userRole : user.getUserRoles())
+                for (auto &userRole : user.userRoles)
                 {
-                    const_cast<UserRole &>(userRole).setUserId(
-                        userInDb.getValueOfUserId());
+                    const_cast<UserRole &>(userRole).userId =
+                        userInDb.getValueOfUserId();
                     const auto item = static_cast<SysUserRole>(userRole);
                     data.append(item.toJson());
                 }
@@ -82,9 +82,9 @@ drogon::Task<> UserRepository::save(User &user) const
             Json::Value toInsert{Json::arrayValue};
             Json::Value toDelete{Json::arrayValue};
 
-            for (auto &userRole : user.getUserRoles())
+            for (auto &userRole : user.userRoles)
             {
-                const auto status = userRole.getChangingStatus();
+                const auto status = userRole.changingStatus();
                 const auto item = static_cast<SysUserRole>(userRole);
                 switch (status)
                 {
@@ -126,7 +126,7 @@ drogon::Task<> UserRepository::save(User &user) const
             co_await userMapper(trans).update(model);
             // 关联数据删除
             co_await userRoleMapper(trans).deleteBy(
-                Criteria{SysUserRole::Cols::_user_id, *user.getUserId()});
+                Criteria{SysUserRole::Cols::_user_id, *user.userId});
 
             co_return;
         }

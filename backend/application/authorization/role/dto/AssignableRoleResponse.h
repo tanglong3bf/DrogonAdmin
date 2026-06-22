@@ -7,12 +7,12 @@
 /**
  * 可分配角色
  */
-class AssignableRoleResponse
+struct AssignableRoleResponse
 {
-    std::int32_t roleId_;  ///< 角色ID
-    std::string name_;     ///< 角色名称
-
-  public:
     AssignableRoleResponse(const std::int32_t roleId, const std::string &name);
     Json::Value toJson() const;
+
+  private:
+    const std::int32_t roleId_;  ///< 角色ID
+    const std::string name_;     ///< 角色名称
 };

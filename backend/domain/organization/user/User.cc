@@ -3,39 +3,39 @@
 using namespace std;
 using namespace trantor;
 
-User::User(const string &username,
-           const string &nickname,
-           const Sex &sex,
-           const int32_t &deptId,
-           const Status &status)
-    : username_{username},
-      nickname_{nickname},
-      avatar_{"#"},
-      sex_{sex},
-      deptId_{deptId},
-      status_{status}
+User::User(string username,
+           string nickname,
+           Sex sex,
+           int32_t deptId,
+           Status status)
+    : username_{std::move(username)},
+      nickname{std::move(nickname)},
+      avatar{"#"},
+      sex{sex},
+      deptId{deptId},
+      status{status}
 {
 }
 
-User::User(const string &username,
-           const string &nickname,
-           const Sex &sex,
-           const int32_t &deptId,
-           const Status &status,
-           const int32_t createdBy)
-    : username_{username},
-      nickname_{nickname},
-      avatar_{"#"},
-      sex_{sex},
-      deptId_{deptId},
-      status_{status},
+User::User(std::string username,
+           std::string nickname,
+           Sex sex,
+           std::int32_t deptId,
+           Status status,
+           int32_t createdBy)
+    : username_{std::move(username)},
+      nickname{std::move(nickname)},
+      avatar{"#"},
+      sex{sex},
+      deptId{deptId},
+      status{status},
       AuditableEntity{AUDITABLE_INIT}
 {
 }
 
 User::User(const SysUser &model)
     : OPT_INIT(userId, UserId),
-      INIT(username, Username),
+      INIT(username_, Username),
       INIT(nickname, Nickname),
       INIT(avatar, Avatar),
       ENUM_INIT(Sex, sex, Sex),
@@ -51,38 +51,46 @@ User::operator SysUser() const
 {
     SysUser model;
     SET_OPT(userId, UserId);
-    SET_VAL(username, Username);
+    SET_VAL(username_, Username);
     SET_VAL(nickname, Nickname);
     SET_VAL(avatar, Avatar);
     SET_VAL_CAST(int16_t, sex, Sex);
     SET_VAL(deptId, DeptId);
-    if (phoneNumber_)
+    if (phoneNumber)
     {
-        model.setPhoneNumber(phoneNumber_->value());
+        model.setPhoneNumber(phoneNumber->value());
     }
     else
     {
         model.setPhoneNumberToNull();
     }
-    if (email_)
+    if (email)
     {
-        model.setEmail(email_->value());
+        model.setEmail(email->value());
     }
     else
     {
         model.setEmailToNull();
     }
     SET_VAL_CAST(int16_t, status, Status);
-    SET_OPT(createdBy, CreatedBy);
-    SET_OPT(createdTime, CreatedTime);
-    SET_OPT(updatedBy, UpdatedBy);
-    SET_OPT(updatedTime, UpdatedTime);
-    SET_OPT(deletedBy, DeletedBy);
-    SET_OPT(deletedTime, DeletedTime);
+    SET_OPT(createdBy(), CreatedBy);
+    SET_OPT(createdTime(), CreatedTime);
+    SET_OPT(updatedBy(), UpdatedBy);
+    SET_OPT(updatedTime(), UpdatedTime);
+    SET_OPT(deletedBy(), DeletedBy);
+    SET_OPT(deletedTime(), DeletedTime);
     return model;
+}
+
+void User::setUserRoles(const std::vector<UserRole> &userRoles)
+{
+    this->userRoles.clear();
+    std::copy(userRoles.begin(),
+              userRoles.end(),
+              std::back_inserter(this->userRoles));
 }
 
 void User::addUserRole(const UserRole &userRole)
 {
-    this->userRoles_.push_back(userRole);
+    this->userRoles.push_back(userRole);
 }

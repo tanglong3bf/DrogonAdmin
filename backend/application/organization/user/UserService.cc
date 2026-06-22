@@ -12,21 +12,18 @@ drogon::Task<PaginatedResponse<UserResponse>> UserService::getUserList(
     const size_t count = co_await userCqrsRepo_->countByQueryReq(request);
     if (count == 0)
     {
-        co_return PaginatedResponse<UserResponse>{1,
-                                                  request.getPageSize(),
-                                                  0,
-                                                  {}};
+        co_return PaginatedResponse<UserResponse>{1, request.pageSize(), 0, {}};
     }
 
     const size_t maxPage =
-        (count + request.getPageSize() - 1) / request.getPageSize();
+        (count + request.pageSize() - 1) / request.pageSize();
     const auto list =
         co_await userCqrsRepo_->getUserList(request, maxPage, attr);
 
-    co_return PaginatedResponse<UserResponse>{maxPage < request.getPage()
+    co_return PaginatedResponse<UserResponse>{maxPage < request.page()
                                                   ? maxPage
-                                                  : request.getPage(),
-                                              request.getPageSize(),
+                                                  : request.page(),
+                                              request.pageSize(),
                                               count,
                                               list};
 }

@@ -29,17 +29,18 @@ UserQueryRequest::UserQueryRequest(const string &username,
       page_{1},
       pageSize_{10}
 {
-    if (username.size() > 0)
+    if (!username.empty())
     {
         auto trimed = trim(username);
         username_ = escapeSqlLike(trimed);
     }
-    if (nickname.size() > 0)
+    if (!nickname.empty())
     {
         auto trimed = trim(nickname);
         nickname_ = escapeSqlLike(trimed);
     }
-    if (sex.size() == 1)
+    if (sex.size() == 1 && fromString<int32_t>(sex) >= 0 &&
+        fromString<int32_t>(sex) <= 2)
     {
         try
         {
@@ -58,7 +59,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             throw BusinessException("性别格式错误");
         }
     }
-    if (deptId.size() > 0)
+    if (!deptId.empty())
     {
         try
         {
@@ -77,17 +78,18 @@ UserQueryRequest::UserQueryRequest(const string &username,
             throw BusinessException("部门id格式错误");
         }
     }
-    if (phoneNumber.size() > 0)
+    if (!phoneNumber.empty())
     {
         auto trimed = trim(phoneNumber);
         phoneNumber_ = escapeSqlLike(trimed);
     }
-    if (email.size() > 0)
+    if (!email.empty())
     {
         auto trimed = trim(email);
         email_ = escapeSqlLike(trimed);
     }
-    if (status.size() > 0)
+    if (status.size() == 1 && fromString<int32_t>(status) >= 0 &&
+        fromString<int32_t>(status) <= 2)
     {
         try
         {

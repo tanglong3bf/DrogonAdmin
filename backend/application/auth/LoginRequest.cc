@@ -16,13 +16,12 @@ LoginRequest fromRequest(const HttpRequest &req)
     {
         throw BusinessException("请求体格式错误，请使用application/json");
     }
-    LoginRequest request;
-    request.setByJson(*jsonPtr);
+    LoginRequest request(*jsonPtr);
     return request;
 }
 };  // namespace drogon
 
-void LoginRequest::setByJson(const Json::Value &json)
+LoginRequest::LoginRequest(const Json::Value &json)
 {
     username_ = getParam<std::string, true>(json, "username", {6, 20});
     password_ = getParam<std::string, true>(json, "password", {6, 20});

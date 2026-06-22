@@ -8,7 +8,6 @@
 #include "domain/models/SysUser.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
-#include "common/util/Utilities.hpp"
 #include <optional>
 #include <string>
 #include <cstdint>
@@ -17,53 +16,43 @@ class User : public AuditableEntity, public ChangeableEntity
 {
     using SysUser = drogon_model::drogon_admin_db::SysUser;
 
-    std::optional<std::int32_t> userId_;
-    std::string username_;
-    std::string nickname_;
-    std::string avatar_;
-    Sex sex_;
-    std::int32_t deptId_;
-    std::optional<PhoneNumber> phoneNumber_;
-    std::optional<Email> email_;
-    Status status_;
-    std::vector<UserRole> userRoles_;
-
   public:
-    explicit User(const std::string &username,
-                  const std::string &nickname,
-                  const Sex &sex,
-                  const std::int32_t &deptId,
-                  const Status &status);
+    explicit User(std::string username,
+                  std::string nickname,
+                  Sex sex,
+                  int32_t deptId,
+                  Status status);
 
-    explicit User(const std::string &username,
-                  const std::string &nickname,
-                  const Sex &sex,
-                  const std::int32_t &deptId,
-                  const Status &status,
-                  const int32_t createdBy);
-
+    explicit User(std::string username,
+                  std::string nickname,
+                  Sex sex,
+                  std::int32_t deptId,
+                  Status status,
+                  int32_t createdBy);
     // 与模型类互转
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
 
-    OPT_GETTER(userId, UserId)
-    GETTER(username, Username)
-    GETTER(nickname, Nickname)
-    GETTER(avatar, Avatar)
-    GETTER(sex, Sex)
-    GETTER(deptId, DeptId)
-    OPT_GETTER(phoneNumber, PhoneNumber)
-    OPT_GETTER(email, Email)
-    GETTER(status, Status)
-    GETTER(userRoles, UserRoles)
+    std::string_view username() const noexcept
+    {
+        return username_;
+    }
 
-    SETTER(nickname, Nickname)
-    SETTER(sex, Sex)
-    SETTER(deptId, DeptId)
-    OPT_SETTER(phoneNumber, PhoneNumber)
-    OPT_SETTER(email, Email)
-    SETTER(status, Status)
-    SETTER(userRoles, UserRoles)
-
+    void setUserRoles(const std::vector<UserRole> &userRoles);
     void addUserRole(const UserRole &userRole);
+
+    std::optional<std::int32_t> userId;
+
+  private:
+    std::string username_;
+
+  public:
+    std::string nickname;
+    std::string avatar;
+    Sex sex;
+    std::int32_t deptId;
+    std::optional<PhoneNumber> phoneNumber;
+    std::optional<Email> email;
+    Status status;
+    std::vector<UserRole> userRoles;
 };

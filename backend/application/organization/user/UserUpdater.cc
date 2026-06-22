@@ -9,70 +9,69 @@ Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
                                const int32_t updatedBy) const
 {
-    LOG_TRACE << "更新用户，userId=" << *user.getUserId()
+    LOG_TRACE << "更新用户，userId=" << *user.userId
               << ", updatedBy=" << updatedBy;
     bool isUpdated = false;
-    ENTITY_SET(user, Nickname, isUpdated = true);
-    ENTITY_SET(user, Sex, isUpdated = true);
+    ENTITY_SET(user, nickname, isUpdated = true);
+    ENTITY_SET(user, sex, isUpdated = true);
     // 更新 phone_number
-    if (request.getPhoneNumber() &&
-        user.getPhoneNumber() != *request.getPhoneNumber())
+    if (request.phoneNumber() && user.phoneNumber != *request.phoneNumber())
     {
-        user.setPhoneNumber(*request.getPhoneNumber());
+        user.phoneNumber = *request.phoneNumber();
         isUpdated = true;
     }
     // 置空 phone_number
-    else if (request.getPhoneNumber().isNull() && user.getPhoneNumber())
+    else if (request.phoneNumber().isNull() && user.phoneNumber)
     {
-        user.setPhoneNumberToNullOpt();
+        user.phoneNumber = nullopt;
         isUpdated = true;
     }
     // 更新 email
-    if (request.getEmail() && user.getEmail() != *request.getEmail())
+    if (request.email() && user.email != *request.email())
     {
-        user.setEmail(*request.getEmail());
+        user.email = *request.email();
         isUpdated = true;
     }
     // 置空 email
-    else if (request.getEmail().isNull() && user.getEmail())
+    else if (request.email().isNull() && user.email)
     {
-        user.setEmailToNullOpt();
+        user.email = nullopt;
         isUpdated = true;
     }
-    ENTITY_SET(user, Status, isUpdated = true);
+    ENTITY_SET(user, status, isUpdated = true);
 
-    const auto oldDeptId = user.getDeptId();
+    const auto oldDeptId = user.deptId;
 
     // 部门id
-    if (request.getDeptId() && user.getDeptId() != *request.getDeptId())
+    if (request.deptId() && user.deptId != *request.deptId())
     {
-        co_await deptVerifier_->verifyDepartmentExists(*request.getDeptId());
-        user.setDeptId(*request.getDeptId());
+        co_await deptVerifier_->verifyDepartmentExists(*request.deptId());
+        user.deptId = *request.deptId();
         isUpdated = true;
     }
-    const auto newDeptId = user.getDeptId();
+    const auto newDeptId = user.deptId;
 
     // 角色列表
-    if (request.getRoleIds())
+    if (request.roleIds())
     {
-        co_await roleVerifier_->verifyRolesExists(*request.getRoleIds());
-        updateUserRoles(const_cast<vector<UserRole> &>(user.getUserRoles()),
-                        *request.getRoleIds(),
-                        *user.getUserId(),
+        co_await roleVerifier_->verifyRolesExists(*request.roleIds());
+        updateUserRoles(const_cast<vector<UserRole> &>(user.userRoles),
+                        *request.roleIds(),
+                        *user.userId,
                         updatedBy);
         isUpdated = true;
     }
     const auto allRoleIds =
-        user.getUserRoles() | views::filter([](const auto &ur) {
-            return ur.getChangingStatus() != ChangingStatus::DELETED;
+        user.userRoles | views::filter([](const auto &ur) {
+            return ur.changingStatus() != ChangingStatus::DELETED;
         }) |
-        views::transform([](const auto &ur) { return ur.getRoleId(); }) |
+        views::transform([](const auto &ur) { return ur.roleId(); }) |
         ranges::to<vector<int32_t>>();
     const auto newRoleIds =
-        user.getUserRoles() | views::filter([](const auto &ur) {
-            return ur.getChangingStatus() == ChangingStatus::NEW;
+        user.userRoles | views::filter([](const auto &ur) {
+            return ur.changingStatus() == ChangingStatus::NEW;
         }) |
-        views::transform([](const auto &ur) { return ur.getRoleId(); }) |
+        views::transform([](const auto &ur) { return ur.roleId(); }) |
         ranges::to<vector<int32_t>>();
     co_await roleVerifier_->verifyDeptRolesAllowedForNewUser(oldDeptId,
                                                              newDeptId,
@@ -81,8 +80,8 @@ Task<> UserUpdater::updateUser(User &user,
 
     if (isUpdated)
     {
-        user.setUpdatedBy(updatedBy);
-        user.toUpdate();
+        user.markUpdatedBy(updatedBy);
+        user.markUpdated();
     }
     co_return;
 }
@@ -97,9 +96,9 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
     // 标记删除
     for (auto &ur : userRoles)
     {
-        if (newRoleSet.find(ur.getRoleId()) == newRoleSet.end())
+        if (newRoleSet.find(ur.roleId()) == newRoleSet.end())
         {
-            ur.toDelete();
+            ur.markDeleted();
         }
     }
 
@@ -107,7 +106,7 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
     unordered_set<int32_t> existingRoleIds;
     for (const auto &rd : userRoles)
     {
-        existingRoleIds.insert(rd.getRoleId());
+        existingRoleIds.insert(rd.roleId());
     }
 
     for (int32_t roleId : newRoleIds)
@@ -117,8 +116,8 @@ void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
         {
             // 新增
             UserRole newUR(roleId, updatedBy);
-            newUR.setUserId(userId);
-            newUR.toNew();
+            newUR.userId = userId;
+            newUR.markNew();
             userRoles.push_back(std::move(newUR));
         }
     }

@@ -9,8 +9,20 @@
 /**
  * @brief 角色更新请求
  */
-class RoleUpdateRequest
+struct RoleUpdateRequest
 {
+    RoleUpdateRequest() = default;
+    RoleUpdateRequest(const Json::Value &json);
+
+    GETTER(name)
+    GETTER(code)
+    GETTER(description)
+    GETTER(quotaType)
+    GETTER(userQuota)
+    GETTER(relationType)
+    GETTER(deptIds)
+
+  private:
     std::optional<std::string> name_;                             ///< 角色名称
     std::optional<std::string> code_;                             ///< 角色编码
     drogon_admin::util::NullableValue<std::string> description_;  ///< 角色描述
@@ -18,15 +30,4 @@ class RoleUpdateRequest
     drogon_admin::util::NullableValue<int32_t> userQuota_;        ///< 限制数量
     std::optional<RelationType> relationType_;                    ///< 关联类型
     std::optional<std::vector<int32_t>> deptIds_;                 ///< 关联部门
-
-  public:
-    void setByJson(const Json::Value &json);
-
-    OPT_GETTER(name, Name)
-    OPT_GETTER(code, Code)
-    OPT_GETTER(description, Description)
-    OPT_GETTER(quotaType, QuotaType)
-    OPT_GETTER(userQuota, UserQuota)
-    OPT_GETTER(relationType, RelationType)
-    OPT_GETTER(deptIds, DeptIds)
 };

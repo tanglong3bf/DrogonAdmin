@@ -11,8 +11,13 @@
 /**
  * @brief 用户响应类
  */
-class UserResponse
+struct UserResponse
 {
+    explicit UserResponse(const User &user);
+
+    Json::Value toJson() const;
+
+  private:
     std::int32_t userId_;                      ///< 用户id
     std::string username_;                     ///< 用户名
     std::string nickname_;                     ///< 昵称
@@ -23,20 +28,4 @@ class UserResponse
     std::optional<Email> email_;               ///< 邮箱
     Status status_;                            ///< 状态
     std::vector<UserRoleResponse> userRoles_;  ///< 拥有的角色
-
-  public:
-    // 实体类
-    explicit UserResponse(const User &user);
-
-    Json::Value toJson() const;
-
-    GETTER(userId, UserId)
-    GETTER(username, Username)
-    GETTER(nickname, Nickname)
-    GETTER(avatar, Avatar)
-    GETTER(sex, Sex)
-    GETTER(deptId, DeptId)
-    OPT_GETTER(phoneNumber, PhoneNumber)
-    OPT_GETTER(email, Email)
-    GETTER(status, Status)
 };

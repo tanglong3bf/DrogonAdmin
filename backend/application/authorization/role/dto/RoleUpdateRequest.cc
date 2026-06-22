@@ -16,13 +16,12 @@ RoleUpdateRequest fromRequest(const HttpRequest &req)
     {
         throw BusinessException("请求体格式错误，请使用application/json");
     }
-    RoleUpdateRequest request;
-    request.setByJson(*jsonPtr);
+    RoleUpdateRequest request{*jsonPtr};
     return request;
 }
 };  // namespace drogon
 
-void RoleUpdateRequest::setByJson(const Json::Value &json)
+RoleUpdateRequest::RoleUpdateRequest(const Json::Value &json)
 {
     name_ = getParam<string>(json, "name", {2, 20});
     code_ = getParam<string>(json, "code", {2, 32});
@@ -35,7 +34,7 @@ void RoleUpdateRequest::setByJson(const Json::Value &json)
     }
     userQuota_ =
         getParam<std::int32_t, false, true>(json, "user_quota", {1, -1});
-    const auto relationTypeInt = getParam<std::int16_t>(json, "relation_type");
+    const auto relationTypeInt = getParam<int32_t>(json, "relation_type");
     if (relationTypeInt)
     {
         relationType_ = static_cast<RelationType>(*relationTypeInt);

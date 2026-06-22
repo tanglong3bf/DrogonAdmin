@@ -45,7 +45,7 @@ Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList,
 
     for (const auto &roleDept : roleDeptList)
     {
-        const auto status = roleDept.getChangingStatus();
+        const auto status = roleDept.changingStatus();
         const auto item = static_cast<SysRoleDept>(roleDept);
         switch (status)
         {
@@ -110,7 +110,7 @@ Task<> RoleRepository::save(Role &role) const
     // 由于这里涉及到多表操作，一定需要开启事务
     // 如果由外界传入，则无法保证
     const auto trans = co_await app().getDbClient()->newTransactionCoro();
-    switch (role.getChangingStatus())
+    switch (role.changingStatus())
     {
         case ChangingStatus::NEW:
         {
@@ -121,14 +121,14 @@ Task<> RoleRepository::save(Role &role) const
             const auto roleId = sysRoleInDb.getValueOfRoleId();
 
             // 处理关联数据
-            auto roleDepts = role.getRoleDepts();
+            auto roleDepts = role.roleDepts;
             if (roleDepts.size() == 0)
             {
                 co_return;
             }
             for (auto &dept : roleDepts)
             {
-                dept.setRoleId(roleId);
+                dept.roleId = roleId;
             }
 
             // 关联数据转json
@@ -150,11 +150,11 @@ Task<> RoleRepository::save(Role &role) const
             co_await roleMapper(trans).updateBy({SysRole::Cols::_deleted_by,
                                                  SysRole::Cols::_deleted_time},
                                                 {SysRole::Cols::_role_id,
-                                                 *role.getRoleId()},
-                                                *role.getDeletedBy(),
-                                                *role.getDeletedTime());
+                                                 *role.roleId},
+                                                *role.deletedBy(),
+                                                *role.deletedTime());
             // 处理关联数据
-            auto roleDepts = role.getRoleDepts();
+            auto roleDepts = role.roleDepts;
             if (roleDepts.size() == 0)
             {
                 co_return;
@@ -164,8 +164,8 @@ Task<> RoleRepository::save(Role &role) const
             for (const auto &dept : roleDepts)
             {
                 Json::Value json{Json::objectValue};
-                json["role_id"] = *dept.getRoleId();
-                json["dept_id"] = dept.getDeptId();
+                json["role_id"] = *dept.roleId;
+                json["dept_id"] = dept.deptId();
                 data.append(json);
             }
             auto sql = sqlGenerator()->getSql("multi_delete_role_dept",
@@ -179,8 +179,7 @@ Task<> RoleRepository::save(Role &role) const
             co_await roleMapper(trans).update(sysRole);
 
             // 处理关联数据
-            auto roleDepts = role.getRoleDepts();
-            if (roleDepts.size() == 0)
+            if (role.roleDepts.size() == 0)
             {
                 co_return;
             }
@@ -188,19 +187,18 @@ Task<> RoleRepository::save(Role &role) const
             // 关联数据转json
             Json::Value toDelete{Json::arrayValue};
             Json::Value newDepts{Json::arrayValue};
-            for (const auto &dept : roleDepts)
+            for (const auto &dept : role.roleDepts)
             {
                 Json::Value json{Json::objectValue};
-                json["role_id"] = *dept.getRoleId();
-                json["dept_id"] = dept.getDeptId();
-                if (dept.getChangingStatus() == ChangingStatus::NEW)
+                json["role_id"] = *dept.roleId;
+                json["dept_id"] = dept.deptId();
+                if (dept.isNew())
                 {
-                    json["created_by"] = *dept.getCreatedBy();
-                    json["created_time"] =
-                        dept.getCreatedTime()->toDbStringLocal();
+                    json["created_by"] = *dept.createdBy;
+                    json["created_time"] = dept.createdTime->toDbStringLocal();
                     newDepts.append(json);
                 }
-                else if (dept.getChangingStatus() == ChangingStatus::DELETED)
+                else if (dept.isDeleted())
                 {
                     toDelete.append(json);
                 }
@@ -271,8 +269,7 @@ drogon::Task<std::vector<Role>> RoleRepository::getByIds(
 
     for (auto &role : roles)
     {
-        auto roleId = role.getRoleId();
-        if (auto it = deptMap.find(*roleId); it != deptMap.end())
+        if (auto it = deptMap.find(*role.roleId); it != deptMap.end())
         {
             for (const auto &dept : it->second)
             {

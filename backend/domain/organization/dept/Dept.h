@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
+#include "domain/models/SysDept.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
-#include "domain/models/SysDept.h"
+#include <string>
 
 /**
  * @brief 部门实体
@@ -11,12 +11,6 @@
 class Dept : public AuditableEntity, public ChangeableEntity
 {
     using SysDept = drogon_model::drogon_admin_db::SysDept;
-
-    // 新增时没有id
-    std::optional<std::int32_t> deptId_;    ///< 部门id
-    std::string name_;                      ///< 部门名称
-    std::int32_t sortNum_;                  ///< 排序
-    std::optional<std::int32_t> parentId_;  ///< 父部门id
 
   public:
     /**
@@ -37,14 +31,10 @@ class Dept : public AuditableEntity, public ChangeableEntity
     explicit operator SysDept() const;
     /// @}
 
-    // setters
-    SETTER(name, Name)
-    SETTER(sortNum, SortNum)
-    OPT_SETTER(parentId, ParentId)
-
-    // getters
-    OPT_GETTER(deptId, DeptId)
-    GETTER(name, Name)
-    GETTER(sortNum, SortNum)
-    OPT_GETTER(parentId, ParentId)
+  public:
+    // 新增时没有id
+    std::optional<std::int32_t> deptId;    ///< 部门id
+    std::string name;                      ///< 部门名称
+    std::int32_t sortNum;                  ///< 排序
+    std::optional<std::int32_t> parentId;  ///< 父部门id
 };
