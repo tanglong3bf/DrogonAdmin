@@ -2,6 +2,7 @@
 
 #include <drogon/HttpTypes.h>
 #include <drogon/utils/Utilities.h>
+#include "common/util/ApiResponse.hpp"
 
 using namespace std;
 using namespace drogon;
@@ -13,9 +14,11 @@ Task<HttpResponsePtr> RoleController::list(const HttpRequestPtr req,
                                            const string page,
                                            const string pageSize) const
 {
-    RoleQueryRequest request{name, deptId, page, pageSize};
-    const auto paginated = co_await roleService_->getRoleList(request);
-    co_return toResponse(paginated);
+    const auto &attr = req->getAttributes();
+    RoleQueryRequest request{name, deptId, page, pageSize, attr};
+    const auto paginated = co_await roleService_->getRoleList(request, attr);
+    const auto response = ApiResponse(paginated, attr);
+    co_return toResponse(response);
 }
 
 Task<HttpResponsePtr> RoleController::createRole(

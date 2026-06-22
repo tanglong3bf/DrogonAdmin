@@ -9,10 +9,14 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
     co_await userVerifier_->verifyUsernameNotDuplicated(request.getUsername());
     co_await userVerifier_->verifyNicknameNotDuplicated(request.getNickname());
     co_await deptVerifier_->verifyDepartmentExists(request.getDeptId());
-    if (request.getRoleIds() && request.getRoleIds()->size() > 0)
+    if (request.getRoleIds())
     {
-        co_await deptVerifier_->verifyRoleAssignmentAllowed(
-            request.getDeptId(), *request.getRoleIds());
+        co_await roleVerifier_->verifyRolesExists(*request.getRoleIds());
+        if (request.getRoleIds()->size() > 0)
+        {
+            co_await roleVerifier_->verifyDeptRolesAllowedForNewUser(
+                request.getDeptId(), *request.getRoleIds());
+        }
     }
 
     // 必备参数

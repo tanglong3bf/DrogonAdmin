@@ -24,7 +24,8 @@ class UserService : public DrAdminObject<UserService>
      * @brief 带条件的分页查询用户列表
      */
     drogon::Task<PaginatedResponse<UserResponse>> getUserList(
-        const UserQueryRequest &request) const;
+        const UserQueryRequest &request,
+        const drogon::AttributesPtr &attr) const;
 
     /**
      * @brief 新增用户

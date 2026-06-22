@@ -56,8 +56,22 @@ User::operator SysUser() const
     SET_VAL(avatar, Avatar);
     SET_VAL_CAST(int16_t, sex, Sex);
     SET_VAL(deptId, DeptId);
-    SET_OPT_OV(phoneNumber, PhoneNumber);
-    SET_OPT_OV(email, Email);
+    if (phoneNumber_)
+    {
+        model.setPhoneNumber(phoneNumber_->value());
+    }
+    else
+    {
+        model.setPhoneNumberToNull();
+    }
+    if (email_)
+    {
+        model.setEmail(email_->value());
+    }
+    else
+    {
+        model.setEmailToNull();
+    }
     SET_VAL_CAST(int16_t, status, Status);
     SET_OPT(createdBy, CreatedBy);
     SET_OPT(createdTime, CreatedTime);

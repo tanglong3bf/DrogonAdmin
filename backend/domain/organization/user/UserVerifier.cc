@@ -40,3 +40,26 @@ Task<> UserVerifier::verifyNicknameNotDuplicated(const string &nickname) const
         throw BusinessException("指定昵称已被使用");
     }
 }
+
+Task<> UserVerifier::verifyUsersWithRoleBelongToDepts(
+    const std::int32_t roleId,
+    const std::vector<int32_t> deptIds) const
+{
+    const auto count =
+        co_await userRepository_->countByRoleNotInDepts(roleId, deptIds);
+    if (count > 0)
+    {
+        throw BusinessException("存在分配了指定角色但不属于指定部门的用户");
+    }
+}
+Task<> UserVerifier::verifyUsersWithRoleNotBelongToDepts(
+    const std::int32_t roleId,
+    const std::vector<int32_t> deptIds) const
+{
+    const auto count =
+        co_await userRepository_->countByRoleInDepts(roleId, deptIds);
+    if (count > 0)
+    {
+        throw BusinessException("存在分配了指定角色但属于指定部门的用户");
+    }
+}

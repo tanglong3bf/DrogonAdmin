@@ -34,9 +34,18 @@ Task<> RoleVerifier::verifyRoleCodeNotDuplicated(const string &code) const
     }
 }
 
-drogon::Task<> RoleVerifier::verifyRolesBelongToDept(
-    const std::int32_t deptId,
-    const std::vector<std::int32_t> &roleIds) const
+Task<> RoleVerifier::verifyRolesExists(const vector<int32_t> &roleIds) const
+{
+    const auto count = co_await roleRepository_->countByIds(roleIds);
+    if (count != roleIds.size())
+    {
+        throw BusinessException("部分角色不存在");
+    }
+}
+
+Task<> RoleVerifier::verifyRolesBelongToDept(
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
 {
     // 仅考虑黑白名单情况，两种情况不允许分配角色
     // 出现这两种情况，直接抛异常
@@ -83,6 +92,64 @@ drogon::Task<> RoleVerifier::verifyRolesBelongToDept(
     }
 }
 
+Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
+    const int32_t oldDeptId,
+    const int32_t newDeptId,
+    const vector<int32_t> &allRoleIds,
+    const vector<int32_t> &newRoleIds) const
+{
+    const bool isSameDept = oldDeptId == newDeptId;
+    const auto roleIds = isSameDept ? newRoleIds : allRoleIds;
+
+    // 验证指定部门可用所有角色
+    co_await verifyRolesBelongToDept(newDeptId, roleIds);
+
+    const auto rolesInDb = co_await roleRepository_->getByIds(roleIds, true);
+    // 获取每个角色在指定部门内已经使用的用户数量
+    const map<int32_t, size_t> userCount =
+        co_await userRepository_->countUsersPerRoleInDepartment(newDeptId,
+                                                                roleIds);
+
+    for (const auto &role : rolesInDb | views::filter([](const Role &role) {
+                                return role.getQuotaType() ==
+                                       QuotaType::PerDeptLimit;
+                            }) | ranges::to<vector>())
+    {
+        // 检查每个部门使用当前角色的用户数量是否超过限制
+        const auto userCountInRole = userCount.at(*role.getRoleId());
+        if (userCountInRole + 1 > *role.getUserQuota())
+        {
+            throw BusinessException("使用当前角色的用户数量已达限制");
+        }
+    }
+
+    const auto totalLimitRoles =
+        rolesInDb | views::filter([](const Role &role) {
+            return role.getQuotaType() == QuotaType::TotalLimit;
+        }) |
+        ranges::to<vector>();
+    auto totalLimitUserCount = co_await userRepository_->countByRoleList(
+        totalLimitRoles |
+        views::transform([](const Role &role) { return *role.getRoleId(); }) |
+        ranges::to<vector>());
+
+    for (const auto &role : totalLimitRoles)
+    {
+        // 检查所有使用当前角色的用户数量是否超过限制
+        if (totalLimitUserCount[*role.getRoleId()] + 1 > *role.getUserQuota())
+        {
+            throw BusinessException("使用当前角色的用户数量已达限制");
+        }
+    }
+}
+
+Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
+{
+    co_await verifyDeptRolesAllowedForNewUser(0, deptId, roleIds, {});
+}
+
 // QuotaType // 无数量限制、总量限制、每部门限制
 // UserQuota // 数量
 // RelationType // 所有部门、白名单、黑名单
@@ -99,7 +166,7 @@ Task<> RoleVerifier::checkQuota(const Role &role,
     {
         // 检查所有使用当前角色的用户数量是否超过限制
         const auto count =
-            co_await userRepository_->countByRoleId(*role.getRoleId());
+            co_await userRepository_->countByRole(*role.getRoleId());
         if (count > *role.getUserQuota())
         {
             throw BusinessException("使用当前角色的用户数量已达限制");

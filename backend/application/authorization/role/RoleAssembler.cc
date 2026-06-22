@@ -1,5 +1,6 @@
 #include "RoleAssembler.h"
 
+#include "common/exception/BusinessException.h"
 #include "domain/authorization/Role.h"
 
 using namespace drogon;
@@ -12,6 +13,14 @@ Task<Role> RoleAssembler::fromCreateRequest(const RoleCreateRequest request,
     co_await roleVerifier_->verifyRoleNameNotDuplicated(name);
     const auto code = request.getCode();
     co_await roleVerifier_->verifyRoleCodeNotDuplicated(code);
+    if (request.getRelationType() != RelationType::All)
+    {
+        if (request.getDeptIds().size() == 0)
+        {
+            throw BusinessException("请选择关联部门");
+        }
+        co_await deptVerifier_->verifyDeptIdsExist(request.getDeptIds());
+    }
 
     // 必备参数
     Role role{name,

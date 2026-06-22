@@ -1,0 +1,108 @@
+# /user 接口响应体结构
+type: object
+properties:
+  code:
+    type: integer
+    nullable: true
+  message:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  warning:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  error:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  data:
+    nullable: true
+    $ref: '#/components/schemas/PaginatedResponse'
+
+components:
+  schemas:
+    # 分页查询结果
+    PaginatedResponse:
+      type: object
+      required:
+        - page
+        - page_size
+        - total
+        - list
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    # 用户
+    User:
+      type: object
+      required:
+        - user_id
+        - username
+        - nickname
+        - avatar
+        - sex
+        - dept_id
+        - status
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        username:
+          type: string
+        nickname:
+          type: string
+        avatar:
+          type: string
+        sex:
+          type: integer
+          minimum: 0
+          maximum: 2
+        dept_id:
+          type: integer
+          minimum: 1
+        phone_number:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          minimum: 0
+          maximum: 1
+        user_roles:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/UserRole'
+
+    # 用户角色
+    UserRole:
+      type: object
+      required:
+        - user_id
+        - role_id
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        role_id:
+          type: integer
+          minimum: 1

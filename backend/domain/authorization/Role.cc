@@ -54,10 +54,18 @@ Role::operator SysRole() const
     {
         model.setDescription(*description_);
     }
+    else
+    {
+        model.setDescriptionToNull();
+    }
     model.setQuotaType(static_cast<int16_t>(quotaType_));
     if (userQuota_)
     {
         model.setUserQuota(*userQuota_);
+    }
+    else
+    {
+        model.setUserQuotaToNull();
     }
     model.setRelationType(static_cast<int16_t>(relationType_));
     model.setCreatedBy(*createdBy_);

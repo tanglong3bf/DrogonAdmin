@@ -3,6 +3,7 @@
 #include "domain/authorization/RoleDept.h"
 #include "domain/authorization/Role.h"
 #include "domain/models/SysRole.h"
+#include "common/util/AttrUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 
@@ -33,11 +34,16 @@ Task<size_t> RoleCqrsRepo::countByNameAndDeptId(
 
 Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     const RoleQueryRequest &request,
-    const size_t maxPage) const
+    const size_t maxPage,
+    const AttributesPtr &attr) const
 {
     ParamList params;
     const std::int32_t page =
         maxPage < request.getPage() ? maxPage : request.getPage();
+    if (page != request.getPage())
+    {
+        addWarn(attr, "查询页码超出范围，已自动调整到最后一页");
+    }
     params["offset"] =
         static_cast<std::int32_t>(request.getPageSize() * (page - 1));
     params["limit"] = static_cast<std::int32_t>(request.getPageSize());

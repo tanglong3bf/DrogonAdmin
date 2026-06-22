@@ -1,0 +1,1858 @@
+role_cases:
+  # 分页查询角色 {{{
+  - name: 分页查询角色-默认参数
+    sql_file: role.sql
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-page为0
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=0
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 查询页码超出范围，已自动调整到第一页
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-最后一页
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=11
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+  - name: 分页查询角色-页码超出最后一页
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=233
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 查询页码超出范围，已自动调整到最后一页
+        $.data.page: 11
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 1
+  - name: 分页查询角色-page为非数字
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=abc
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 页码格式错误，已自动使用第一页
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为5
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=5
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为10
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+  - name: 分页查询角色-size为15
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=15
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为10
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为20
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=20
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 20
+        $.data.total: 101
+        len:$.data.list: 20
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为25
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=25
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为20
+        $.data.page: 1
+        $.data.page_size: 20
+        $.data.total: 101
+        len:$.data.list: 20
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为30
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=30
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 30
+        $.data.total: 101
+        len:$.data.list: 30
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为40
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=40
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为30
+        $.data.page: 1
+        $.data.page_size: 30
+        $.data.total: 101
+        len:$.data.list: 30
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为50
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=50
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 50
+        $.data.total: 101
+        len:$.data.list: 50
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为75
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=75
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为50
+        $.data.page: 1
+        $.data.page_size: 50
+        $.data.total: 101
+        len:$.data.list: 50
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为100
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=100
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 100
+        $.data.total: 101
+        len:$.data.list: 100
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为999
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=999
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 不支持的分页大小，已自动调整为100
+        $.data.page: 1
+        $.data.page_size: 100
+        $.data.total: 101
+        len:$.data.list: 100
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-size为非数字
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=abc
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.warn: 分页大小格式错误，已自动调整为10
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name为空串
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name=
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 101
+        len:$.data.list: 10
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name为'0'
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name=0
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 9
+        len:$.data.list: 9
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试
+    url: http://localhost:8000/role
+    method: GET
+    json: {}
+    params: page=1&page_size=10&name='+OR+1=1+--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=';drop+table;--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-name参数渗透测试2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=';drop+table;--
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 0
+        len:$.data.list: 0
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-dept_id为非数字
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=abc
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部门id格式错误
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询1
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 2
+        len:$.data.list: 2
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=2
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 3
+        len:$.data.list: 3
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询3
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=3
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 1
+        len:$.data.list: 1
+    validate_schema: role_paginated.yaml
+  - name: 分页查询角色-部门黑白名单查询4
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=关联测试数据&dept_id=4
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 2
+        len:$.data.list: 2
+    validate_schema: role_paginated.yaml
+  # }}}
+  # 新增角色 {{{
+  - name: 新增角色-正常新增
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-正常
+      code: new-role-normal
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-不传name
+    url: http://localhost:8000/role
+    method: post
+    json:
+      code: new-role-name_none
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：name
+        $.code: lt 0
+  - name: 新增角色-name为空
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: ''
+      code: new-role-name_empty
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: name参数长度过短
+        $.code: lt 0
+  - name: 新增角色-不传code
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-code_none
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：code
+        $.code: lt 0
+  - name: 新增角色-code为空
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-code_empty
+      code: ''
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: code参数长度过短
+        $.code: lt 0
+  - name: 新增角色-设置描述
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-有描述
+      code: new-role-with_description
+      description: 这是一个测试角色
+      quota_type: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为0应无视数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-无限制
+      code: new-role-quota_type_0
+      quota_type: 0
+      user_quota: 999
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为-1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型-1
+      code: new-role-quota_type_-1
+      quota_type: -1
+      user_quota: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: quota_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1
+      code: new-role-quota_type_1
+      quota_type: 1
+      user_quota: 3
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为1应有数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1无数值
+      code: new-role-quota_type_1_no_value
+      quota_type: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：user_quota
+        $.code: lt 0
+  - name: 新增角色-限制类型为1时，数值至少为一
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型1数值为0
+      code: new-role-quota_type_1_value_0
+      quota_type: 1
+      user_quota: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: user_quota的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为2
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2
+      code: new-role-quota_type_2
+      quota_type: 2
+      user_quota: 5
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-限制类型为2应有数值
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2无数值
+      code: new-role-quota_type_2_no_value
+      quota_type: 2
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：user_quota
+        $.code: lt 0
+  - name: 新增角色-限制类型为2时，数值至少为一
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型2数值为0
+      code: new-role-quota_type_2_value_0
+      quota_type: 2
+      user_quota: 0
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: user_quota的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-限制类型为3
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-限制类型3
+      code: new-role-quota_type_3
+      quota_type: 3
+      user_quota: 1
+      relation_type: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: quota_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-关联关系为-1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联-1
+      code: new-role-r-1
+      quota_type: 0
+      relation_type: -1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: relation_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-关联关系为1
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1
+      code: new-role-r1
+      quota_type: 0
+      relation_type: 1
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-关联关系为1但部分dept_id不存在
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门125
+      code: new-role-r1d125
+      quota_type: 0
+      relation_type: 1
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部分部门id不存在
+        $.code: lt 0
+  - name: 新增角色-关联关系为1但缺少dept_ids
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1无部门
+      code: new-role-r1_no_d
+      quota_type: 0
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：dept_ids
+        $.code: lt 0
+  - name: 新增角色-关联关系为1,有dept_ids但格式错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门格式错误
+      code: new-role-r1d_format_e
+      quota_type: 0
+      relation_type: 1
+      dept_ids: 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: dept_ids必须是一个数组
+        $.code: lt 0
+  - name: 新增角色-关联关系为1,有dept_ids但类型错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联1部门类型错误
+      code: new-role-r1d_type_e
+      quota_type: 0
+      relation_type: 1
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 数组dept_ids的元素必须是整数
+        $.code: lt 0
+  - name: 新增角色-关联关系为2
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2
+      code: new-role-r2
+      quota_type: 0
+      relation_type: 2
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增角色-关联关系为2但部分dept_id不存在
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门125
+      code: new-role-r2d125
+      quota_type: 0
+      relation_type: 1
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 部分部门id不存在
+        $.code: lt 0
+  - name: 新增角色-关联关系为2但缺少dept_ids
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2无部门
+      code: new-role-r2_no_d
+      quota_type: 0
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 缺少必备参数：dept_ids
+        $.code: lt 0
+  - name: 新增角色-关联关系为2,有dept_ids但格式错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门格式错误
+      code: new-role-r2d_format_e
+      quota_type: 0
+      relation_type: 2
+      dept_ids: 'abc'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: dept_ids必须是一个数组
+        $.code: lt 0
+  - name: 新增角色-关联关系为2,有dept_ids但类型错误
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联2部门类型错误
+      code: new-role-r2d_type_e
+      quota_type: 0
+      relation_type: 2
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: 数组dept_ids的元素必须是整数
+        $.code: lt 0
+  - name: 新增角色-关联关系为3
+    url: http://localhost:8000/role
+    method: post
+    json:
+      name: 新增角色-关联3
+      code: new-role-r3
+      quota_type: 0
+      relation_type: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.error: relation_type的值超出期望范围
+        $.code: lt 0
+  - name: 新增角色-检查数据新增是否成功
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10&name=新增角色
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 7
+        len:$.data.list: 7
+        $.data.list[1].description: 这是一个测试角色
+        $.data.list[3].user_quota: 3
+        $.data.list[4].user_quota: 5
+        len:$.data.list[5].depts: 2
+        len:$.data.list[6].depts: 2
+    validate_schema: role_paginated.yaml
+  # }}}
+  # 更新角色 {{{
+  - name: 更新角色-正常更新
+    sql_file: role_to_update.sql
+    url: http://localhost:8000/role/1
+    method: put
+    json:
+      name: 更新角色-正常
+      code: update-role-normal
+      description: 这是一个更新后的测试角色
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据更新是否成功
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].name: 更新角色-正常
+        $.data.list[0].code: update-role-normal
+        $.data.list[0].description: 这是一个更新后的测试角色
+    validate_schema: role_paginated.yaml
+  - name: 更新角色-所有字段重复，不做修改但成功返回
+    sql_file: role_to_update.sql
+    url: http://localhost:8000/role/1
+    method: put
+    json:
+      name: 更新角色-正常
+      code: update-role-normal
+      description: 这是一个更新后的测试角色
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据2
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].name: 更新角色-正常
+        $.data.list[0].code: update-role-normal
+        $.data.list[0].description: 这是一个更新后的测试角色
+    validate_schema: role_paginated.yaml
+  - name: 更新角色-name过短、code过短
+    url: http://localhost:8000/role/1
+    method: put
+    json:
+      name: s
+      code: s
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: name参数长度过短
+  - name: 更新角色-检查数据3-name和code不应该被修改
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].name: 更新角色-正常
+        $.data.list[0].code: update-role-normal
+        $.data.list[0].description: 这是一个更新后的测试角色
+    validate_schema: role_paginated.yaml
+  - name: 更新角色-name过长、code过长
+    url: http://localhost:8000/role/1
+    method: put
+    json:
+      name: this_is_a_very_long_role_name_exceeding_the_maximum_length_limit
+      code: this_is_a_very_long_role_code_exceeding_the_maximum_length_limit
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: name参数长度过长
+  - name: 更新角色-检查数据4-name和code不应该被修改
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].name: 更新角色-正常
+        $.data.list[0].code: update-role-normal
+        $.data.list[0].description: 这是一个更新后的测试角色
+    validate_schema: role_paginated.yaml
+  - name: 更新角色-清空description
+    url: http://localhost:8000/role/1
+    method: put
+    json:
+      description: null
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据5-description应该被清空
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].name: 更新角色-正常
+        $.data.list[0].code: update-role-normal
+        len:$.data.list[0].description: 0
+    validate_schema: role_paginated.yaml
+    # 限制类型相关测试 {{{
+  - name: 更新角色-限制类型0->1数量空
+    url: http://localhost:8000/role/2
+    method: put
+    json:
+      quota_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当quota_type不为unlimited时，user_quota不能为空
+  - name: 更新角色-限制类型0->1数量null->3已使用1
+    url: http://localhost:8000/role/3
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据6-限制类型应该更新，数量应该更新
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].quota_type: 1
+        $.data.list[2].user_quota: 3
+  - name: 更新角色-限制类型0->1数量null->3已使用3
+    url: http://localhost:8000/role/4
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据7-限制类型应该更新，数量应该更新
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].quota_type: 1
+        $.data.list[3].user_quota: 3
+  - name: 更新角色-限制类型0->1数量null->3已使用4
+    url: http://localhost:8000/role/5
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新角色-检查数据8-数据不应更新
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].quota_type: 0
+  - name: 更新角色-限制类型0->2数量null
+    url: http://localhost:8000/role/6
+    method: put
+    json:
+      quota_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当quota_type不为unlimited时，user_quota不能为空
+  - name: 更新角色-限制类型0->2数量null->3已使用1,1,1,1
+    url: http://localhost:8000/role/7
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据9
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].quota_type: 2
+        $.data.list[6].user_quota: 3
+  - name: 更新角色-限制类型0->2数量null->3已使用3,3
+    url: http://localhost:8000/role/8
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据10
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[7].quota_type: 2
+        $.data.list[7].user_quota: 3
+  - name: 更新角色-限制类型0->2数量null->3已使用3,4
+    url: http://localhost:8000/role/9
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新角色-限制类型1->0数量自动null
+    url: http://localhost:8000/role/10
+    method: put
+    json:
+      quota_type: 0
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据11
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].quota_type: 0
+  - name: 更新角色-限制类型1->1数量3->1
+    url: http://localhost:8000/role/11
+    method: put
+    json:
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据12
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].quota_type: 1
+        $.data.list[0].user_quota: 1
+  - name: 更新角色-限制类型1->1数量3->1已使用2
+    url: http://localhost:8000/role/12
+    method: put
+    json:
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新角色-检查数据13
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].quota_type: 1
+        $.data.list[1].user_quota: 3
+  - name: 更新角色-限制类型1->1数量3->5
+    url: http://localhost:8000/role/13
+    method: put
+    json:
+      user_quota: 5
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据14
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].quota_type: 1
+        $.data.list[2].user_quota: 5
+  - name: 更新角色-限制类型2->0数量自动null
+    url: http://localhost:8000/role/14
+    method: put
+    json:
+      quota_type: 0
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据15
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].quota_type: 0
+  - name: 更新角色-限制类型2->2数量3->1
+    url: http://localhost:8000/role/15
+    method: put
+    json:
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据16
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].quota_type: 2
+        $.data.list[4].user_quota: 1
+  - name: 更新角色-限制类型2->2数量3->1已使用1,1
+    url: http://localhost:8000/role/16
+    method: put
+    json:
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据17
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].quota_type: 2
+        $.data.list[5].user_quota: 1
+  - name: 更新角色-限制类型2->2数量3->1已使用1,2
+    url: http://localhost:8000/role/17
+    method: put
+    json:
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新角色-检查数据18
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].quota_type: 2
+        $.data.list[6].user_quota: 3
+  - name: 更新角色-限制类型2->2数量3->5
+    url: http://localhost:8000/role/18
+    method: put
+    json:
+      user_quota: 5
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据19
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[7].quota_type: 2
+        $.data.list[7].user_quota: 5
+  - name: 更新角色-限制类型1->2数量3->1
+    url: http://localhost:8000/role/19
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据20
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].quota_type: 2
+        $.data.list[8].user_quota: 1
+  - name: 更新角色-限制类型1->2数量3->1已使用2,2
+    url: http://localhost:8000/role/20
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 400
+  - name: 更新角色-检查数据21
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=2&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].quota_type: 1
+        $.data.list[9].user_quota: 3
+  - name: 更新角色-限制类型1->2数量3->3
+    url: http://localhost:8000/role/21
+    method: put
+    json:
+      quota_type: 2
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据22
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].quota_type: 2
+        $.data.list[0].user_quota: 3
+  - name: 更新角色-限制类型1->2数量3->3已使用3,4
+    url: http://localhost:8000/role/22
+    method: put
+    json:
+      quota_type: 2
+    params: ''
+    expect:
+      status_code: 400
+  - name: 更新角色-检查数据23
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].quota_type: 1
+        $.data.list[1].user_quota: 3
+  - name: 更新角色-限制类型1->2数量3->5
+    url: http://localhost:8000/role/23
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 5
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据24
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].quota_type: 2
+        $.data.list[2].user_quota: 5
+  - name: 更新角色-限制类型1->2数量3->4已使用5,2
+    url: http://localhost:8000/role/24
+    method: put
+    json:
+      quota_type: 2
+      user_quota: 4
+    params: ''
+    expect:
+      status_code: 400
+  - name: 更新角色-检查数据25
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].quota_type: 1
+        $.data.list[3].user_quota: 3
+  - name: 更新角色-限制类型2->1数量3->1
+    url: http://localhost:8000/role/25
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据26
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].quota_type: 1
+        $.data.list[4].user_quota: 1
+  - name: 更新角色-限制类型2->1数量3->3
+    url: http://localhost:8000/role/26
+    method: put
+    json:
+      quota_type: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据27
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].quota_type: 1
+        $.data.list[5].user_quota: 3
+  - name: 更新角色-限制类型2->1数量3->3已使用2,2
+    url: http://localhost:8000/role/27
+    method: put
+    json:
+      quota_type: 1
+    params: ''
+    expect:
+      status_code: 400
+  - name: 更新角色-检查数据28
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].quota_type: 2
+        $.data.list[6].user_quota: 3
+  - name: 更新角色-限制类型2->1数量3->5
+    url: http://localhost:8000/role/28
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 5
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据29
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[7].quota_type: 1
+        $.data.list[7].user_quota: 5
+  - name: 更新角色-限制类型2->1数量3->5已使用2,2,1,1
+    url: http://localhost:8000/role/29
+    method: put
+    json:
+      quota_type: 1
+      user_quota: 5
+    params: ''
+    expect:
+      status_code: 400
+  - name: 更新角色-检查数据30
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].quota_type: 2
+        $.data.list[8].user_quota: 3
+    # }}}
+    # 部门黑白名单相关测试 {{{
+  - name: 更新角色-关联关系0->1缺少dept_ids
+    url: http://localhost:8000/role/30
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当relation_type不为0时，dept_ids不能为空
+  - name: 更新角色-检查数据31
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=3&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].relation_type: 0
+        len:$.data.list[9].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids但类型错误
+    url: http://localhost:8000/role/31
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 数组dept_ids的元素必须是整数
+  - name: 更新角色-检查数据32
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].relation_type: 0
+        len:$.data.list[0].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids但部分部门软删除
+    url: http://localhost:8000/role/32
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分部门id不存在
+  - name: 更新角色-检查数据33
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].relation_type: 0
+        len:$.data.list[1].depts: 0
+  - name: 更新角色-关联关系0->1有dept_ids
+    url: http://localhost:8000/role/33
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据34
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].relation_type: 1
+        len:$.data.list[2].depts: 2
+  - name: 更新角色-关联关系0->1有dept_ids但部分用户不在指定部门
+    url: http://localhost:8000/role/34
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据35
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].relation_type: 0
+        len:$.data.list[3].depts: 0
+  - name: 更新角色-关联关系0->2缺少dept_ids
+    url: http://localhost:8000/role/35
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 当relation_type不为0时，dept_ids不能为空
+  - name: 更新角色-检查数据36
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].relation_type: 0
+        len:$.data.list[4].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids但类型错误
+    url: http://localhost:8000/role/36
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 'abc']
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 数组dept_ids的元素必须是整数
+  - name: 更新角色-检查数据37
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].relation_type: 0
+        len:$.data.list[5].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids但部分部门软删除
+    url: http://localhost:8000/role/37
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分部门id不存在
+  - name: 更新角色-检查数据38
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].relation_type: 0
+        len:$.data.list[6].depts: 0
+  - name: 更新角色-关联关系0->2有dept_ids
+    url: http://localhost:8000/role/38
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据39
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[7].relation_type: 2
+        len:$.data.list[7].depts: 2
+  - name: 更新角色-关联关系0->2有dept_ids但部分用户在指定部门
+    url: http://localhost:8000/role/39
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据40
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].relation_type: 0
+        len:$.data.list[8].depts: 0
+  - name: 更新角色-关联关系1->2无dept_ids且无用户
+    url: http://localhost:8000/role/40
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据41
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=4&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[9].relation_type: 2
+        len:$.data.list[9].depts: 2
+  - name: 更新角色-关联关系1->2无dept_ids但有用户
+    url: http://localhost:8000/role/41
+    method: put
+    json:
+      relation_type: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据42
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].relation_type: 1
+        len:$.data.list[0].depts: 2
+  - name: 更新角色-关联关系1->2dept_ids1,2->2,4(1)
+    url: http://localhost:8000/role/42
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据43
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].relation_type: 2
+        len:$.data.list[1].depts: 2
+  - name: 更新角色-关联关系1->2dept_ids1,2->2,4(2)
+    url: http://localhost:8000/role/43
+    method: put
+    json:
+      relation_type: 2
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但属于指定部门的用户
+  - name: 更新角色-检查数据44
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[2].relation_type: 1
+        len:$.data.list[2].depts: 2
+  - name: 更新角色-关联关系2->1无dept_ids且无用户
+    url: http://localhost:8000/role/44
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据45
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].relation_type: 1
+        len:$.data.list[3].depts: 2
+  - name: 更新角色-关联关系2->1无dept_ids但有用户
+    url: http://localhost:8000/role/45
+    method: put
+    json:
+      relation_type: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据46
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].relation_type: 2
+        len:$.data.list[4].depts: 2
+  - name: 更新角色-关联关系2->1dept_ids3,4->2,4(4)
+    url: http://localhost:8000/role/46
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新角色-检查数据47
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].relation_type: 1
+        len:$.data.list[5].depts: 2
+  - name: 更新角色-关联关系2->1dept_ids3,4->2,4(3)
+    url: http://localhost:8000/role/47
+    method: put
+    json:
+      relation_type: 1
+      dept_ids: [2, 4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 存在分配了指定角色但不属于指定部门的用户
+  - name: 更新角色-检查数据48
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=5&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].relation_type: 2
+        len:$.data.list[6].depts: 2
+    # }}}
+  # }}}
+  # 删除角色 {{{
+  - name: 删除角色-正常删除
+    sql_file: role_to_delete.sql
+    url: http://localhost:8000/role/1
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据1-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-删除已被软删除的角色
+    url: http://localhost:8000/role/1
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据2-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-已经分配给用户的角色
+    url: http://localhost:8000/role/2
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定角色被用户使用
+  - name: 删除角色-检查数据3-角色不应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].role_id: 2
+  - name: 删除角色-有部门关联的角色
+    url: http://localhost:8000/role/3
+    method: delete
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除角色-检查数据4-角色应该被删除
+    url: http://localhost:8000/role
+    method: get
+    json: {}
+    params: page=1&page_size=10
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data.list: 1
+  # }}}
+  # 部门可用角色 {{{
+  - name: 部门可用角色-不存在的部门
+    sql_file: role_dept_to_query.sql
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=6
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        error: 指定的部门id不存在
+  - name: 部门可用角色-软删除的部门
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=5
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        error: 指定的部门id不存在
+  - name: 部门可用角色-正常查询1
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 2
+  - name: 部门可用角色-正常查询2
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=2
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 3
+  - name: 部门可用角色-正常查询3
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=3
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 1
+  - name: 部门可用角色-正常查询4
+    url: http://localhost:8000/role/assignable
+    method: get
+    json: {}
+    params: dept_id=4
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:data: 2
+  # }}}
+# vim: set foldmethod=marker foldlevel=0:

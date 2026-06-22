@@ -34,7 +34,8 @@ class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
      */
     drogon::Task<std::vector<RoleResponse>> getRoleList(
         const RoleQueryRequest &request,
-        const std::size_t maxPage /*很不优雅*/) const;
+        const std::size_t maxPage /*很不优雅*/,
+        const drogon::AttributesPtr &attr) const;
 
     /**
      * @brief 获取指定部门可分配的角色

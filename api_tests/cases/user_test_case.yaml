@@ -1,0 +1,1038 @@
+user_cases:
+  # 分页查询用户（未充分测试） {{{
+  - name: 分页查询用户-默认参数
+    sql_file: user.sql
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 17
+        len:$.data.list: 10
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询1
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: username=admin
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 4
+        len:$.data.list: 4
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询2
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: nickname=-
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 10
+        len:$.data.list: 10
+    validate_schema: user_paginated.yaml
+  - name: 分页查询用户-带参查询3
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: sex=0&dept_id=8&phone_number=0000&email=temp&status=1
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.page: 1
+        $.data.page_size: 10
+        $.data.total: 1
+        len:$.data.list: 1
+        $.data.list[0].username: guest_user
+    validate_schema: user_paginated.yaml
+  # }}}
+  # 更新用户 {{{
+  - name: 更新用户-不存在的用户id
+    sql_file: user_to_update.sql
+    url: http://localhost:8000/user/1
+    method: PUT
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 用户不存在
+  - name: 更新用户-软删除的用户id
+    url: http://localhost:8000/user/2
+    method: PUT
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 用户不存在
+  - name: 更新用户-所有字段和旧值相同
+    url: http://localhost:8000/user/3
+    method: PUT
+    json:
+      nickname: 无更新测试用户
+      phone_number: '18800000003'
+      email: noupdate@test.com
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-1
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].nickname: 无更新测试用户
+        $.data.list[0].phone_number: '18800000003'
+        $.data.list[0].email: noupdate@test.com
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-除部门id和拥有角色id之外的其他字段
+    url: http://localhost:8000/user/4
+    method: PUT
+    json:
+      nickname: 新的管理员名称
+      sex: 2
+      phone_number: '18212345678'
+      email: new_admin@example.com
+      status: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-2
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[1].nickname: 新的管理员名称
+        $.data.list[1].sex: 2
+        $.data.list[1].phone_number: '18212345678'
+        $.data.list[1].email: new_admin@example.com
+        $.data.list[1].status: 1
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-清空字段
+    url: http://localhost:8000/user/5
+    method: PUT
+    json:
+      phone_number: null
+      email: null
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-3
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data.list[2]: 7 # user_id, username, nickname, avatar, sex, dept_id, status
+    validate_schema: user_paginated.yaml
+    # 更新部门 {{{
+  - name: 更新用户-不存在的部门id
+    url: http://localhost:8000/user/6
+    method: PUT
+    json:
+      dept_id: 233
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 更新用户-软删除的部门id
+    url: http://localhost:8000/user/6
+    method: PUT
+    json:
+      dept_id: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 更新用户-数据检查-4-不应该更新
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[3].dept_id: 1
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-正常更新
+    url: http://localhost:8000/user/7
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-数据检查-5-正常更新
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[4].dept_id: 3
+    validate_schema: user_paginated.yaml
+  - name: 更新用户-白名单到其他
+    url: http://localhost:8000/user/8
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门不在角色的白名单中
+  - name: 更新用户-数据检查-6-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[5].dept_id: 1
+  - name: 更新用户-其他到黑名单
+    url: http://localhost:8000/user/9
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-数据检查-6-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[6].dept_id: 1
+  - name: 更新用户-角色数量限制
+    url: http://localhost:8000/user/11
+    method: PUT
+    json:
+      dept_id: 3
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-数据检查-7-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[8].dept_id: 1
+    # }}}
+    # 更新角色 {{{
+  - name: 更新用户-不存在的角色id
+    url: http://localhost:8000/user/12
+    method: PUT
+    json:
+      role_ids: [233]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分角色不存在
+  - name: 更新用户-软删除的角色id
+    url: http://localhost:8000/user/12
+    method: PUT
+    json:
+      role_ids: [4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分角色不存在
+  - name: 更新用户-正常分配普通角色
+    url: http://localhost:8000/user/13
+    method: PUT
+    json:
+      role_ids: [5]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-清空角色
+    url: http://localhost:8000/user/14
+    method: PUT
+    json:
+      role_ids: []
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-分配白名单但不在指定部门的角色
+    url: http://localhost:8000/user/15
+    method: PUT
+    json:
+      role_ids: [1]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门不在角色的白名单中
+  - name: 更新用户-分配黑名单且在指定部门的角色
+    url: http://localhost:8000/user/16
+    method: PUT
+    json:
+      role_ids: [2]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-分配角色，但超出了每部门数量限制
+    url: http://localhost:8000/user/17
+    method: PUT
+    json:
+      role_ids: [3]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-分配角色，但超出了总数量数量限制
+    url: http://localhost:8000/user/19
+    method: PUT
+    json:
+      role_ids: [6]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+    # }}}
+    # 同时更新部门和角色 {{{
+  - name: 更新用户-白名单->白名单
+    url: http://localhost:8000/user/20
+    method: PUT
+    json:
+      dept_id: 3
+      role_ids: [7]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-白名单->白名单(超出数量限制)
+    url: http://localhost:8000/user/22
+    method: PUT
+    json:
+      dept_id: 4
+      role_ids: [8]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-白名单->普通
+    url: http://localhost:8000/user/23
+    method: PUT
+    json:
+      dept_id: 3
+      role_ids: [5]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-白名单->黑名单
+    url: http://localhost:8000/user/24
+    method: PUT
+    json:
+      dept_id: 1
+      role_ids: [9]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-普通->白名单
+    url: http://localhost:8000/user/25
+    method: PUT
+    json:
+      dept_id: 3
+      role_ids: [7]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-普通->白名单(超出数量限制)
+    url: http://localhost:8000/user/26
+    method: PUT
+    json:
+      dept_id: 4
+      role_ids: [8]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 更新用户-普通->普通
+    url: http://localhost:8000/user/27
+    method: PUT
+    json:
+      dept_id: 3
+      role_ids: [10]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新用户-普通->黑名单
+    url: http://localhost:8000/user/28
+    method: PUT
+    json:
+      dept_id: 1
+      role_ids: [9]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+    # }}}
+    # 新增用户 {{{
+    # 正向用例 {{{
+  - name: 新增用户-仅填必填项
+    url: http://localhost:8000/user
+    sql_file: user_to_create.sql
+    method: POST
+    json:
+      username: user001
+      nickname: 用户001
+      sex: 0
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-必填项+手机号
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user002
+      nickname: 用户002
+      sex: 1
+      dept_id: 1
+      status: 1
+      phone_number: 12345678901
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-必填项+邮箱
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user003
+      nickname: 用户003
+      sex: 2
+      dept_id: 1
+      status: 0
+      email: test@example.com
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-必填项+角色
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user004
+      nickname: 用户004
+      sex: 0
+      dept_id: 1
+      status: 1
+      role_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-所有项
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user005
+      nickname: 用户005
+      sex: 1
+      dept_id: 1
+      status: 0
+      phone_number: 12345678902
+      email: hello@test.com
+      role_ids: [1, 2]
+    params: ''
+    expect:
+      status_code: 201
+      # }}}
+      # 边界值测试 {{{
+  - name: 新增用户-最短的用户名(6)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: abcdef
+      nickname: 用户006
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-最长的用户名(20)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: abcdefghijklmnopqrst
+      nickname: 用户007
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-最短的昵称(1)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user008
+      nickname: a
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-最长的昵称(50)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user009
+      nickname: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增用户-roleIds为空列表
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user010
+      nickname: 用户010
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: []
+    params: ''
+    expect:
+      status_code: 201
+      # }}}
+      # 反向用例 {{{
+  - name: 新增用户-用户名为空
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      nickname: 用户011
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：username
+  - name: 新增用户-昵称为空
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user012
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：nickname
+  - name: 新增用户-性别为空
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user013
+      nickname: 用户013
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：sex
+  - name: 新增用户-部门为空
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user014
+      nickname: 用户014
+      sex: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：dept_id
+  - name: 新增用户-状态为空
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user015
+      nickname: 用户015
+      sex: 1
+      dept_id: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：status
+  - name: 新增用户-用户名过短(5)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: abcde
+      nickname: 用户016
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: username参数长度过短
+  - name: 新增用户-用户名过长(21)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: abcdefghijklmnopqrstu
+      nickname: 用户017
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: username参数长度过长
+  - name: 新增用户-用户名包含非法字符
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user!018
+      nickname: 用户018
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 用户名只支持字母、数字和下划线
+  - name: 新增用户-昵称过长(51)
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user019
+      nickname: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: nickname参数长度过长
+  - name: 新增用户-不支持的性别1
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user020
+      nickname: 用户020
+      sex: -1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: sex的值超出期望范围
+  - name: 新增用户-不支持的性别2
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user021
+      nickname: 用户021
+      sex: 3
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: sex的值超出期望范围
+  - name: 新增用户-不支持的状态1
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user022
+      nickname: 用户022
+      sex: 1
+      dept_id: 1
+      status: -1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: status的值超出期望范围
+  - name: 新增用户-不支持的状态2
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user023
+      nickname: 用户023
+      sex: 1
+      dept_id: 1
+      status: 2
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: status的值超出期望范围
+  - name: 新增用户-不存在的部门id
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user024
+      nickname: 用户024
+      sex: 1
+      dept_id: 233
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的部门id不存在
+  - name: 新增用户-不存在的角色id
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user024
+      nickname: 用户024
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: [233]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分角色不存在
+  - name: 新增用户-重复的用户名
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user001
+      nickname: 用户025
+      sex: 1
+      dept_id: 1
+      status: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定用户名已被使用
+  - name: 新增用户-手机号长度过短
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user026
+      nickname: 用户026
+      sex: 1
+      dept_id: 1
+      status: 0
+      phone_number: '1234567890'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: phone_number参数长度过短
+  - name: 新增用户-手机号格式错误
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user027
+      nickname: 用户027
+      sex: 1
+      dept_id: 1
+      status: 0
+      phone_number: 1234567890a
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 手机号只支持数字
+  - name: 新增用户-错误的邮箱格式-缺少@
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user028
+      nickname: 用户028
+      sex: 1
+      dept_id: 1
+      status: 0
+      email: testemail.com
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 邮箱格式错误
+  - name: 新增用户-错误的邮箱格式-缺少域名
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user029
+      nickname: 用户029
+      sex: 1
+      dept_id: 1
+      status: 0
+      email: test@
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 邮箱格式错误
+      # }}}
+      # 部门和角色检查 {{{
+  - name: 新增用户-普通角色限制总数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user030
+      nickname: 用户030
+      sex: 1
+      dept_id: 2
+      status: 0
+      role_ids: [3]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 新增用户-普通角色限制每部门数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user031
+      nickname: 用户031
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: [4]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 新增用户-白名单角色但部门不在白名单
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user032
+      nickname: 用户032
+      sex: 1
+      dept_id: 2
+      status: 0
+      role_ids: [5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门不在角色的白名单中
+  - name: 新增用户-白名单角色限制总数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user033
+      nickname: 用户033
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: [6]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 新增用户-白名单角色限制每部门数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user034
+      nickname: 用户034
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: [7]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 新增用户-黑名单角色且部门在黑名单
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user035
+      nickname: 用户035
+      sex: 1
+      dept_id: 1
+      status: 0
+      role_ids: [8]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定部门在角色的黑名单中
+  - name: 新增用户-黑名单角色限制总数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user036
+      nickname: 用户036
+      sex: 1
+      dept_id: 2
+      status: 0
+      role_ids: [9]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+  - name: 新增用户-黑名单角色限制每部门数量
+    url: http://localhost:8000/user
+    method: POST
+    json:
+      username: user037
+      nickname: 用户037
+      sex: 1
+      dept_id: 2
+      status: 0
+      role_ids: [10]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 使用当前角色的用户数量已达限制
+      # }}}
+    # }}}
+    # 删除用户 {{{
+  - name: 删除用户-id为1的用户不可以被删除
+    sql_file: user_to_delete.sql
+    url: http://localhost:8000/user/1
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: id为1的用户不可以被删除
+  - name: 删除用户-不存在的用户id
+    sql_file: user_to_delete.sql
+    url: http://localhost:8000/user/233
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-软删除的用户id
+    url: http://localhost:8000/user/2
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-正常删除无角色的用户
+    url: http://localhost:8000/user/3
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-删除有角色的用户
+    url: http://localhost:8000/user/4
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+    # }}}
+  # }}}
+# vim: set foldmethod=marker foldlevel=0:

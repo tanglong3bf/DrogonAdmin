@@ -17,7 +17,8 @@ Task<> RoleService::deleteExcludingDept(const std::int32_t deptId,
 }
 
 Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
-    const RoleQueryRequest &request) const
+    const RoleQueryRequest &request,
+    const AttributesPtr &attr) const
 {
     const size_t count =
         co_await roleCqrsRepo_->countByNameAndDeptId(request.getName(),
@@ -25,7 +26,7 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
 
     if (count == 0)
     {
-        co_return PaginatedResponse<RoleResponse>{request.getPage(),
+        co_return PaginatedResponse<RoleResponse>{1,
                                                   request.getPageSize(),
                                                   0,
                                                   {}};
@@ -33,7 +34,8 @@ Task<PaginatedResponse<RoleResponse>> RoleService::getRoleList(
 
     const size_t maxPage =
         (count + request.getPageSize() - 1) / request.getPageSize();
-    const auto list = co_await roleCqrsRepo_->getRoleList(request, maxPage);
+    const auto list =
+        co_await roleCqrsRepo_->getRoleList(request, maxPage, attr);
 
     co_return PaginatedResponse<RoleResponse>{maxPage < request.getPage()
                                                   ? maxPage
@@ -71,5 +73,6 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
 Task<vector<AssignableRoleResponse>> RoleService::getAssignableRoles(
     const std::int32_t deptId) const
 {
+    co_await deptVerifier_->verifyDepartmentExists(deptId);
     co_return co_await roleCqrsRepo_->getAssignableRoles(deptId);
 }

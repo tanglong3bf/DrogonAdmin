@@ -1,0 +1,13 @@
+{
+  "configurations": {
+    "Launch": {
+      "adapter": "vscode-cpptools",
+      "filetypes": ["cpp"],
+      "configuration": {
+        "request": "launch",
+        "program": "./build/DrogonAdminBackend",
+        "stopAtEntry": true
+      }
+    }
+  }
+}

@@ -5,10 +5,10 @@ from jsonpath_ng import parse
 from pathlib import Path
 import psycopg2
 from psycopg2 import OperationalError
+from jsonschema import validate, ValidationError, RefResolver
 # python3-jsonpath-ng
 # python3-requests
 # python3-pytest
-
 
 """
 PG 配置
@@ -30,40 +30,20 @@ def load_schema(yaml_path):
         return yaml.safe_load(f)
 
 
-def validate_schema(data, schema):
+def validate_schema(data, schema, full_schema=None):
     """
-    递归校验树形结构
+    使用标准 jsonschema 库进行校验，支持外部 definitions
     """
-    # 校验必选字段
-    for key in schema.get("required", []):
-        assert key in data, f"缺失必选字段：{key}"
-
-    # 校验字段类型
-    for key, rule in schema.get("properties", {}).items():
-        if key not in data:
-            continue
-
-        value = data[key]
-        expected_type = rule["type"]
-
-        # 类型校验
-        if expected_type == "integer":
-            assert isinstance(value, int), f"{key} 必须是数字"
-        elif expected_type == "string":
-            assert isinstance(value, str), f"{key} 必须是字符串"
-        elif expected_type == "array":
-            assert isinstance(value, list), f"{key} 必须是数组"
-            # 数组子项递归校验
-            if "item_schema" in rule:
-                for item in value:
-                    validate_schema(item, rule["item_schema"])
-            elif "items" in rule:
-                for item in value:
-                    validate_schema(item, rule["items"])
-
-        # 可空判断
-        if value is None:
-            assert rule.get("nullable", False), f"{key} 不允许为null"
+    try:
+        if full_schema:
+            # 创建一个解析器，使用完整 schema 作为引用上下文
+            resolver = RefResolver.from_schema(full_schema)
+            validate(instance=data, schema=schema, resolver=resolver)
+        else:
+            validate(instance=data, schema=schema)
+    except ValidationError as e:
+        error_path = " -> ".join(map(str, e.path))
+        assert False, f"Schema 校验失败：路径 [{error_path}]，错误：{e.message}"
 
 
 def read_yaml(yaml_path):
@@ -109,13 +89,19 @@ def run_sql_file(sql_file: str):
             conn.close()
 
 
-datas: dict = read_yaml("cases/dept_test_case.yaml")
+dept_datas: dict = read_yaml("cases/dept_test_case.yaml")
 # 提取用例 name 做展示名
-case_names = [case_item["name"] for case_item in datas["dept_cases"]]
+case_names = [case_item["name"] for case_item in dept_datas["dept_cases"]]
 dic = {}
 
+role_datas: dict = read_yaml("cases/role_test_case.yaml")
+case_names += [case_item["name"] for case_item in role_datas["role_cases"]]
 
-@pytest.mark.parametrize("case_item", datas["dept_cases"], ids=case_names)
+user_datas: dict = read_yaml("cases/user_test_case.yaml")
+case_names += [case_item["name"] for case_item in user_datas["user_cases"]]
+
+
+@pytest.mark.parametrize("case_item", dept_datas["dept_cases"] + role_datas["role_cases"] + user_datas["user_cases"], ids=case_names)
 def test_dept_cases(case_item):
     # 部分接口需要提前准备数据
     if "sql_file" in case_item:
@@ -141,9 +127,9 @@ def test_dept_cases(case_item):
     if "validate_schema" in case_item and case_item["validate_schema"]:
         schema_file = case_item.get("validate_schema")
         if schema_file:
-            schema = load_schema("schemas/" + schema_file)
-            if isinstance(schema, dict) and "response" in schema:
-                validate_schema(res_json, schema["response"])
+            full_schema = load_schema("schemas/" + schema_file)
+            if isinstance(full_schema, dict):
+                validate_schema(res_json, full_schema, full_schema)
 
     # 根据jsonpath检查响应体
     if "assert_jsonpath" in case_item["expect"]:

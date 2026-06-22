@@ -24,19 +24,21 @@ RoleUpdateRequest fromRequest(const HttpRequest &req)
 
 void RoleUpdateRequest::setByJson(const Json::Value &json)
 {
-    name_ = getParam<string>(json, "name");
-    code_ = getParam<string>(json, "code");
-    description_ = getParam<string>(json, "description");
-    const auto quotaTypeInt = getParam<int32_t>(json, "quota_type");
+    name_ = getParam<string>(json, "name", {2, 20});
+    code_ = getParam<string>(json, "code", {2, 32});
+    description_ = getParam<string, false, true>(json, "description", {1, -1});
+    const auto quotaTypeInt =
+        getParam<std::int16_t>(json, "quota_type", {0, 2});
     if (quotaTypeInt)
     {
         quotaType_ = static_cast<QuotaType>(*quotaTypeInt);
     }
-    userQuota_ = getParam<int32_t>(json, "user_quota");
-    const auto relationTypeInt = getParam<int32_t>(json, "relation_type");
+    userQuota_ =
+        getParam<std::int32_t, false, true>(json, "user_quota", {1, -1});
+    const auto relationTypeInt = getParam<std::int16_t>(json, "relation_type");
     if (relationTypeInt)
     {
         relationType_ = static_cast<RelationType>(*relationTypeInt);
     }
-    deptIds_ = getParam<vector<int32_t>>(json, "dept_ids");
+    deptIds_ = getParam<vector<std::int32_t>>(json, "dept_ids");
 }
