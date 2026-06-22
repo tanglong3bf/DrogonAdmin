@@ -2,6 +2,7 @@
 
 #include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>
+#include <optional>
 
 /**
  * @brief 更新部门参数

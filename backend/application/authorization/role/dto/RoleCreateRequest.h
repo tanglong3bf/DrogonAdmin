@@ -4,6 +4,7 @@
 #include "domain/authorization/QuotaType.h"
 #include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>
+#include <optional>
 
 /**
  * @brief 角色创建请求

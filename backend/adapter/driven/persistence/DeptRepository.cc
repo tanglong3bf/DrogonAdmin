@@ -6,6 +6,7 @@
 #include <drogon/orm/Criteria.h>
 #include <drogon/HttpAppFramework.h>
 #include <optional>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;

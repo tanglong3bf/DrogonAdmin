@@ -5,6 +5,7 @@
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 #include <trantor/utils/Date.h>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;

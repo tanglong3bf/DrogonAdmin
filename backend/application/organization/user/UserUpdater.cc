@@ -1,9 +1,12 @@
 #include "UserUpdater.h"
 
+#include "common/util/rangesUtils.hpp"
 #include <unordered_set>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;
+using namespace tl;
 
 Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
@@ -66,13 +69,13 @@ Task<> UserUpdater::updateUser(User &user,
             return ur.changingStatus() != ChangingStatus::DELETED;
         }) |
         views::transform([](const auto &ur) { return ur.roleId(); }) |
-        ranges::to<vector<int32_t>>();
+        ranges_utils::to<vector<int32_t>>();
     const auto newRoleIds =
         user.userRoles | views::filter([](const auto &ur) {
             return ur.changingStatus() == ChangingStatus::NEW;
         }) |
         views::transform([](const auto &ur) { return ur.roleId(); }) |
-        ranges::to<vector<int32_t>>();
+        ranges_utils::to<vector<int32_t>>();
     co_await roleVerifier_->verifyDeptRolesAllowedForNewUser(oldDeptId,
                                                              newDeptId,
                                                              allRoleIds,
