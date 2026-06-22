@@ -43,10 +43,10 @@ Json::Value DeptResponse::toJson() const
 }
 
 DeptResponse::DeptResponse(const Dept &dept)
-    : deptId_{*dept.getDeptId()},
-      name_{dept.getName()},
-      sortNum_{dept.getSortNum()},
-      parentId_{dept.getParentId()}
+    : deptId_{*dept.deptId},
+      name_{dept.name},
+      sortNum_{dept.sortNum},
+      parentId_{dept.parentId}
 {
 }
 

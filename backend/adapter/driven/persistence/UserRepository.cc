@@ -47,7 +47,7 @@ drogon::Task<std::size_t> UserRepository::countByNickname(
 
 drogon::Task<> UserRepository::save(User &user) const
 {
-    switch (user.getChangingStatus())
+    switch (user.changingStatus())
     {
         case ChangingStatus::NEW:
         {
@@ -56,13 +56,13 @@ drogon::Task<> UserRepository::save(User &user) const
             // 补充默认密码
             model.setPassword("123456");
             const auto userInDb = co_await userMapper(trans).insert(model);
-            if (user.getUserRoles().size() > 0)
+            if (user.userRoles.size() > 0)
             {
                 Json::Value data;
-                for (auto &userRole : user.getUserRoles())
+                for (auto &userRole : user.userRoles)
                 {
-                    const_cast<UserRole &>(userRole).setUserId(
-                        userInDb.getValueOfUserId());
+                    const_cast<UserRole &>(userRole).userId =
+                        userInDb.getValueOfUserId();
                     const auto item = static_cast<SysUserRole>(userRole);
                     data.append(item.toJson());
                 }
@@ -82,9 +82,9 @@ drogon::Task<> UserRepository::save(User &user) const
             Json::Value toInsert{Json::arrayValue};
             Json::Value toDelete{Json::arrayValue};
 
-            for (auto &userRole : user.getUserRoles())
+            for (auto &userRole : user.userRoles)
             {
-                const auto status = userRole.getChangingStatus();
+                const auto status = userRole.changingStatus();
                 const auto item = static_cast<SysUserRole>(userRole);
                 switch (status)
                 {
@@ -101,20 +101,20 @@ drogon::Task<> UserRepository::save(User &user) const
                         throw std::runtime_error("不支持更新用户角色");
                         break;
                 }
-                if (toInsert.size() > 0)
-                {
-                    const auto insertSql =
-                        sqlGenerator()->getSql("multi_insert_user_role",
-                                               {{"data", toInsert}});
-                    co_await trans->execSqlCoro(insertSql);
-                }
-                if (toDelete.size() > 0)
-                {
-                    const auto deleteSql =
-                        sqlGenerator()->getSql("multi_delete_user_role",
-                                               {{"data", toDelete}});
-                    co_await trans->execSqlCoro(deleteSql);
-                }
+            }
+            if (toInsert.size() > 0)
+            {
+                const auto insertSql =
+                    sqlGenerator()->getSql("multi_insert_user_role",
+                                           {{"data", toInsert}});
+                co_await trans->execSqlCoro(insertSql);
+            }
+            if (toDelete.size() > 0)
+            {
+                const auto deleteSql =
+                    sqlGenerator()->getSql("multi_delete_user_role",
+                                           {{"data", toDelete}});
+                co_await trans->execSqlCoro(deleteSql);
             }
             co_return;
         }
@@ -126,7 +126,7 @@ drogon::Task<> UserRepository::save(User &user) const
             co_await userMapper(trans).update(model);
             // 关联数据删除
             co_await userRoleMapper(trans).deleteBy(
-                Criteria{SysUserRole::Cols::_user_id, *user.getUserId()});
+                Criteria{SysUserRole::Cols::_user_id, *user.userId});
 
             co_return;
         }
@@ -139,7 +139,9 @@ drogon::Task<> UserRepository::save(User &user) const
 Task<User> UserRepository::getById(const std::int32_t userId,
                                    bool withRelation) const
 {
-    const auto sysUser = co_await userMapper().findByPrimaryKey(userId);
+    const auto sysUser = co_await userMapper().findOne(
+        Criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull} &&
+        Criteria{SysUser::Cols::_user_id, userId});
     User user{sysUser};
     if (withRelation)
     {
@@ -177,10 +179,26 @@ Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
     co_return result;
 }
 
-Task<size_t> UserRepository::countByRoleId(const std::int32_t roleId) const
+drogon::Task<std::map<std::int32_t, std::size_t>> UserRepository::
+    countByRoleList(const std::vector<std::int32_t> &roleIds) const
 {
-    co_return co_await userRoleMapper().count(
-        Criteria{SysUserRole::Cols::_role_id, roleId});
+    LOG_TRACE << "统计角色的用户数量，roleIds=" << roleIds.size() << "个角色";
+    ParamList param;
+    Json::Value roleIdsJson(Json::arrayValue);
+    for (const auto &id : roleIds)
+    {
+        roleIdsJson.append(id);
+    }
+    param["role_ids"] = roleIdsJson;
+    const auto sql = sqlGenerator()->getSql("count_user_by_role_list", param);
+    // used_count, ur.role_id
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    std::map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["role_id"].as<int32_t>()] = row["used_count"].as<size_t>();
+    }
+    co_return result;
 }
 
 Task<unordered_map<std::int32_t, size_t>> UserRepository::
@@ -210,6 +228,65 @@ Task<vector<std::int32_t>> UserRepository::getDeptIdsByRoleId(
         deptIds.push_back(row["dept_id"].as<int32_t>());
     }
     co_return deptIds;
+}
+
+Task<size_t> UserRepository::countByRoleNotInDepts(
+    const std::int32_t roleId,
+    const vector<std::int32_t> &deptIds) const
+{
+    ParamList param;
+    param["role_id"] = roleId;
+    Json::Value deptIdsJson(Json::arrayValue);
+    for (const auto &id : deptIds)
+    {
+        deptIdsJson.append(id);
+    }
+    param["dept_ids"] = deptIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_user_by_role_not_in_depts", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    co_return dbResult[0][0].as<size_t>();
+}
+
+Task<size_t> UserRepository::countByRoleInDepts(
+    const std::int32_t roleId,
+    const vector<std::int32_t> &deptIds) const
+{
+    ParamList param;
+    param["role_id"] = roleId;
+    Json::Value deptIdsJson(Json::arrayValue);
+    for (const auto &id : deptIds)
+    {
+        deptIdsJson.append(id);
+    }
+    param["dept_ids"] = deptIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_user_by_role_in_depts", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    co_return dbResult[0][0].as<size_t>();
+}
+
+Task<map<int32_t, size_t>> UserRepository::countUsersPerRoleInDepartment(
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
+{
+    ParamList param;
+    param["dept_id"] = deptId;
+    Json::Value roleIdsJson(Json::arrayValue);
+    for (const auto &id : roleIds)
+    {
+        roleIdsJson.append(id);
+    }
+    param["role_ids"] = roleIdsJson;
+    const auto sql =
+        sqlGenerator()->getSql("count_users_per_role_in_department", param);
+    const auto dbResult = co_await dbClient()->execSqlCoro(sql);
+    map<int32_t, size_t> result;
+    for (const auto &row : dbResult)
+    {
+        result[row["role_id"].as<int32_t>()] = row["user_count"].as<size_t>();
+    }
+    co_return result;
 }
 
 vector<UserRole> UserRepository::buildUserRoleList(

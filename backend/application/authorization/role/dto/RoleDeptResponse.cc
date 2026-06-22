@@ -11,7 +11,7 @@ Json::Value RoleDeptResponse::toJson() const
 }
 
 RoleDeptResponse::RoleDeptResponse(const RoleDept &roleDept)
-    : roleId_{roleDept.getRoleId() != nullopt ? *roleDept.getRoleId() : -1},
-      deptId_{roleDept.getDeptId()}
+    : roleId_{roleDept.roleId != nullopt ? *roleDept.roleId : -1},
+      deptId_{roleDept.deptId()}
 {
 }

@@ -1,11 +1,14 @@
 #pragma once
 
-#include <algorithm>
-#include <optional>
-#include <json/value.h>
-#include <trantor/utils/Logger.h>
 #include "common/exception/BusinessException.h"
+#include "common/util/ParamUtils.hpp"
+#include <trantor/utils/Logger.h>
+#include <json/value.h>
+#include <algorithm>
+#include <limits>
+#include <optional>
 #include <type_traits>
+#include <variant>
 
 namespace drogon_admin::util
 {
@@ -29,14 +32,202 @@ inline constexpr bool is_vector_of_integral_v = is_vector_of_integral<T>::value;
 
 /// @}
 
-template <typename T, bool is_necessary>
+/**
+ * @brief 可空值类型，用于区分三种状态：不存在、存在但为null、存在且有值
+ * @tparam T 值的类型
+ */
+template <typename T>
+class NullableValue
+{
+    static_assert(!std::is_reference_v<T>,
+                  "NullableValue cannot hold references");
+    static_assert(!std::is_void_v<T>, "Use NullableValue<void> for void type");
+
+  public:
+    NullableValue() = default;
+
+    [[nodiscard]] static constexpr NullableValue absent() noexcept
+    {
+        return NullableValue(std::monostate{});
+    }
+
+    [[nodiscard]] static constexpr NullableValue null() noexcept
+    {
+        return NullableValue(NullTag{});
+    }
+
+    [[nodiscard]] static constexpr NullableValue value(T &&val) noexcept(
+        std::is_nothrow_move_constructible_v<T>)
+    {
+        return NullableValue(std::forward<T>(val));
+    }
+
+    static constexpr NullableValue value(const T &val) noexcept(
+        std::is_nothrow_copy_constructible_v<T>)
+    {
+        return NullableValue(val);
+    }
+
+    [[nodiscard]] constexpr bool isAbsent() const noexcept
+    {
+        return std::holds_alternative<std::monostate>(data_);
+    }
+
+    [[nodiscard]] constexpr bool isNull() const noexcept
+    {
+        return std::holds_alternative<NullTag>(data_);
+    }
+
+    [[nodiscard]] constexpr bool hasValue() const noexcept
+    {
+        return std::holds_alternative<T>(data_);
+    }
+
+    template <typename D>
+    [[nodiscard]] constexpr NullableValue<D> to() const noexcept
+    {
+        if (isNull())
+        {
+            return NullableValue<D>::null();
+        }
+        else if (isAbsent())
+        {
+            return NullableValue<D>::absent();
+        }
+        return NullableValue<D>::value(std::get<T>(data_));
+    }
+
+    [[nodiscard]] constexpr const T &value() const &
+    {
+        if (!hasValue())
+        {
+            throw std::bad_variant_access{};
+        }
+        return std::get<T>(data_);
+    }
+
+    [[nodiscard]] constexpr T &value() &
+    {
+        if (!hasValue())
+        {
+            throw std::bad_variant_access{};
+        }
+        return std::get<T>(data_);
+    }
+
+    [[nodiscard]] constexpr T &&value() &&
+    {
+        if (!hasValue())
+        {
+            throw std::bad_variant_access{};
+        }
+        return std::move(std::get<T>(data_));
+    }
+
+    [[nodiscard]] constexpr const T &operator*() const & noexcept
+    {
+        return *std::get_if<T>(&data_);
+    }
+
+    [[nodiscard]] constexpr T &operator*() & noexcept
+    {
+        return *std::get_if<T>(&data_);
+    }
+
+    [[nodiscard]] constexpr T &&operator*() && noexcept
+    {
+        return std::move(*std::get_if<T>(&data_));
+    }
+
+    [[nodiscard]] constexpr const T *operator->() const noexcept
+    {
+        return std::get_if<T>(&data_);
+    }
+
+    [[nodiscard]] constexpr T *operator->() noexcept
+    {
+        return std::get_if<T>(&data_);
+    }
+
+    [[nodiscard]] constexpr explicit operator bool() const noexcept
+    {
+        return hasValue();
+    }
+
+    template <typename U>
+    [[nodiscard]] constexpr T valueOr(U &&defaultValue) const &
+    {
+        return hasValue() ? value()
+                          : static_cast<T>(std::forward<U>(defaultValue));
+    }
+
+    template <typename U>
+    [[nodiscard]] constexpr T valueOr(U &&defaultValue) &&
+    {
+        return hasValue() ? std::move(value())
+                          : static_cast<T>(std::forward<U>(defaultValue));
+    }
+
+  private:
+    struct NullTag
+    {
+    };
+
+    std::variant<std::monostate, NullTag, T> data_{std::monostate{}};
+
+    constexpr explicit NullableValue(std::monostate) noexcept
+        : data_(std::monostate{})
+    {
+    }
+
+    constexpr explicit NullableValue(NullTag) noexcept : data_(NullTag{})
+    {
+    }
+
+    constexpr explicit NullableValue(const T &val) noexcept(
+        std::is_nothrow_copy_constructible_v<T>)
+        : data_(val)
+    {
+    }
+
+    constexpr explicit NullableValue(T &&val) noexcept(
+        std::is_nothrow_move_constructible_v<T>)
+        : data_(std::move(val))
+    {
+    }
+};
+
+/**
+ * @brief 默认参数验证器
+ */
+struct DefaultParamValidator
+{
+    template <typename T>
+    constexpr std::string operator()(const T &) const noexcept
+    {
+        return "";
+    }
+};
+
+/**
+ * @brief 参数提取仿函数对象
+ * @tparam T 期望的参数类型
+ * @tparam is_necessary 是否为必填参数，默认为false
+ * @tparam is_nullable 是否允许参数值为null，默认为false
+ */
+template <typename T, bool is_necessary, bool is_nullable>
 class ParamGetter
 {
   public:
+    template <typename Validator = DefaultParamValidator>
     auto operator()(const Json::Value &json,
                     const std::string &key,
-                    const std::pair<int32_t, int32_t> &range = {-1, -1})
+                    const std::pair<int32_t, int32_t> &range = {-1, -1},
+                    Validator validator = DefaultParamValidator{})
     {
+        static_assert(noexcept(validator(std::declval<const T &>())),
+                      "Validator must be a non-throwing callable! Mark it with "
+                      "`noexcept`.");
         assert(range.first < 0 || range.second < 0 ||
                range.first <= range.second);
 
@@ -49,33 +240,100 @@ class ParamGetter
             }
             else
             {
-                return std::optional<T>(std::nullopt);
+                if constexpr (is_nullable)
+                {
+                    return NullableValue<T>::absent();
+                }
+                else
+                {
+                    return std::optional<T>(std::nullopt);
+                }
+            }
+        }
+
+        // 处理 null 值情况
+        if (json[key].isNull())
+        {
+            if constexpr (is_nullable)
+            {
+                // 允许 null，返回 null 状态
+                return NullableValue<T>::null();
+            }
+            else
+            {
+                // 不允许 null，视为类型错误
+                if constexpr (is_necessary)
+                {
+                    throw BusinessException{"参数" + key + "不允许为null"};
+                }
+                else
+                {
+                    LOG_WARN << "参数" + key + "为null，已忽略";
+                    return std::optional<T>(std::nullopt);
+                }
             }
         }
 
         // 获取参数，内部会检查字符串长度、数值范围
         auto result = getParam<T>(json, key, range);
 
-        // 非必填参数，返回optional
-        if constexpr (!is_necessary)
+        if (result)
         {
-            return result;
+            // 调用验证器
+            const auto err = validator(*result);
+            if (err.length() > 0)
+            {
+                throw BusinessException{err};
+            }
+        }
+
+        // 根据 is_nullable 决定返回值类型
+        if constexpr (is_nullable)
+        {
+            if constexpr (is_necessary)
+            {
+                // 必填参数检查是否有值
+                if (!result)
+                {
+                    throw BusinessException{"必备参数" + key +
+                                            "存在，但是类型错误或值非法"};
+                }
+                return NullableValue<T>::value(std::move(*result));
+            }
+            else
+            {
+                if (result)
+                {
+                    return NullableValue<T>::value(std::move(*result));
+                }
+                else
+                {
+                    // 类型错误或值非法，返回 absent
+                    return NullableValue<T>::absent();
+                }
+            }
         }
         else
         {
-            // 必填参数检查是否有值
-            if (!result)
+            // 非必填返回 optional，必填返回值
+            if constexpr (!is_necessary)
             {
-                throw BusinessException{"必备参数" + key +
-                                        "存在，但是类型错误"};
+                return result;
             }
-            return *result;
+            else
+            {
+                if (!result)
+                {
+                    throw BusinessException{"必备参数" + key +
+                                            "存在，但是类型错误或值非法"};
+                }
+                return *result;
+            }
         }
     }
 
   private:
-    // length_range 表示期望的字符串长度范围，采用闭区间
-    // 如果传入负值，表示不限制
+    // 字符串类型参数
     template <typename D>
     std::enable_if_t<std::is_same_v<D, std::string>, std::optional<D>> getParam(
         const Json::Value &json,
@@ -101,33 +359,17 @@ class ParamGetter
         // 长度检查
         const bool isTooShort =
             length_range.first >= 0 &&
-            static_cast<int32_t>(value.length()) < length_range.first;
+            static_cast<int32_t>(utf8Length(value)) < length_range.first;
         const bool isTooLong =
             length_range.second >= 0 &&
-            static_cast<int32_t>(value.length()) > length_range.second;
-        if constexpr (is_necessary)
+            static_cast<int32_t>(utf8Length(value)) > length_range.second;
+        if (isTooShort)
         {
-            if (isTooShort)
-            {
-                throw BusinessException{key + "参数长度过短"};
-            }
-            else if (isTooLong)
-            {
-                throw BusinessException{key + "参数长度过长"};
-            }
+            throw BusinessException{key + "参数长度过短"};
         }
-        else
+        else if (isTooLong)
         {
-            if (isTooShort)
-            {
-                LOG_WARN << key + "参数长度过短，已忽略";
-                return std::nullopt;
-            }
-            else if (isTooLong)
-            {
-                LOG_WARN << key + "参数长度过长，已忽略";
-                return std::nullopt;
-            }
+            throw BusinessException{key + "参数长度过长"};
         }
         return value;
     }
@@ -158,7 +400,7 @@ class ParamGetter
             }
         }
 
-        int jsonValue = json[key].asInt();
+        const int jsonValue = json[key].asInt();
 
         // 符号检查
         if constexpr (std::is_unsigned_v<D>)
@@ -236,7 +478,7 @@ class ParamGetter
         {
             if (!element.isInt64())
             {
-                throw BusinessException{"数组元素必须是整数"};
+                throw BusinessException{"数组" + key + "的元素必须是整数"};
             }
         }
 
@@ -259,6 +501,7 @@ class ParamGetter
         }
 
         std::vector<int64_t> temp;
+        temp.reserve(array.size());
         for (const auto &element : array)
         {
             temp.push_back(element.asInt64());
@@ -277,13 +520,16 @@ class ParamGetter
                 return tooLow || tooHigh;
             });
         // 部分值比期望的最小值更低
-        const bool hasTooLow = std::ranges::any_of(temp, [&](int jsonValue) {
-            return value_range.first >= 0 && jsonValue < value_range.first;
-        });
+        const bool hasTooLow =
+            std::ranges::any_of(temp, [&](int32_t jsonValue) {
+                return value_range.first >= 0 && jsonValue < value_range.first;
+            });
         // 部分值比期望的最大值更高
-        const bool hasTooHigh = std::ranges::any_of(temp, [&](int jsonValue) {
-            return value_range.second >= 0 && jsonValue > value_range.second;
-        });
+        const bool hasTooHigh =
+            std::ranges::any_of(temp, [&](int32_t jsonValue) {
+                return value_range.second >= 0 &&
+                       jsonValue > value_range.second;
+            });
         if constexpr (is_necessary)
         {
             if (hasOutOfRange)
@@ -306,7 +552,10 @@ class ParamGetter
             LOG_WARN << key + "的部分值超出期望范围，已忽略";
             return std::nullopt;
         }
+
+        // 转换为目标类型
         D result;
+        result.reserve(temp.size());
         for (const auto &element : temp)
         {
             result.push_back(static_cast<typename D::value_type>(element));
@@ -318,6 +567,6 @@ class ParamGetter
 /**
  * @brief 伪装成函数的参数提取仿函数对象
  */
-template <typename T, bool is_necessary = false>
-ParamGetter<T, is_necessary> getParam;
+template <typename T, bool is_necessary = false, bool is_nullable = false>
+ParamGetter<T, is_necessary, is_nullable> getParam;
 };  // namespace drogon_admin::util

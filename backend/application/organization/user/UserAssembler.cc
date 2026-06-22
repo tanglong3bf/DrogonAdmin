@@ -1,44 +1,51 @@
 #include "UserAssembler.h"
 
+using namespace std;
 using namespace drogon;
 
 Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
                                             const int32_t createdBy) const
 {
     // 验证
-    co_await userVerifier_->verifyUsernameNotDuplicated(request.getUsername());
-    co_await userVerifier_->verifyNicknameNotDuplicated(request.getNickname());
-    co_await deptVerifier_->verifyDepartmentExists(request.getDeptId());
-    if (request.getRoleIds() && request.getRoleIds()->size() > 0)
+    co_await userVerifier_->verifyUsernameNotDuplicated(
+        static_cast<string>(request.username()));
+    co_await userVerifier_->verifyNicknameNotDuplicated(
+        static_cast<string>(request.nickname()));
+    co_await deptVerifier_->verifyDepartmentExists(request.deptId());
+    if (request.roleIds())
     {
-        co_await deptVerifier_->verifyRoleAssignmentAllowed(
-            request.getDeptId(), *request.getRoleIds());
+        co_await roleVerifier_->verifyRolesExists(*request.roleIds());
+        if (request.roleIds()->size() > 0)
+        {
+            co_await roleVerifier_->verifyDeptRolesAllowedForNewUser(
+                request.deptId(), *request.roleIds());
+        }
     }
 
     // 必备参数
-    User user{request.getUsername(),
-              request.getNickname(),
-              request.getSex(),
-              request.getDeptId(),
-              request.getStatus(),
+    User user{static_cast<string>(request.username()),
+              static_cast<string>(request.nickname()),
+              request.sex(),
+              request.deptId(),
+              request.status(),
               createdBy};
 
     // 可选参数
-    if (const auto phoneNumber = request.getPhoneNumber())
+    if (const auto phoneNumber = request.phoneNumber())
     {
-        user.setPhoneNumber(*phoneNumber);
+        user.phoneNumber = *phoneNumber;
     }
-    if (const auto email = request.getEmail())
+    if (const auto email = request.email())
     {
-        user.setEmail(*email);
+        user.email = *email;
     }
-    if (const auto roleIds = request.getRoleIds())
+    if (const auto roleIds = request.roleIds())
     {
         for (const auto roleId : *roleIds)
         {
             user.addUserRole(UserRole{roleId, createdBy});
         }
     }
-    user.toNew();
+    user.markNew();
     co_return user;
 }

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "DeptRepository.h"
-#include "domain/authorization/RoleVerifier.h"
-#include "domain/organization/user/UserRepository.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <memory>
 
@@ -30,23 +28,14 @@ class DeptVerifier : public DrAdminObject<DeptVerifier>
     drogon::Task<> verifyNoSubDept(const std::int32_t deptId) const;
 
     /**
-     * @brief 验证指定部门可以新增一个具有指定角色列表的用户
+     * @brief 验证指定部门id列表都存在
      */
-    drogon::Task<> verifyRoleAssignmentAllowed(
-        const std::int32_t deptId,
-        const std::vector<std::int32_t> roleIds) const;
+    drogon::Task<> verifyDeptIdsExist(
+        const std::vector<std::int32_t> deptIds) const;
 
   private:
     DeptRepositoryPtr deptRepository_{
         drogon::DrClassMap::getSingleInstance<DeptRepository>()};
-    UserRepositoryPtr userRepository_{
-        drogon::DrClassMap::getSingleInstance<UserRepository>()};
-    // 耦合
-    RoleVerifierPtr roleVerifier_{
-        drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
-    // 耦合
-    RoleRepositoryPtr roleRepository_{
-        drogon::DrClassMap::getSingleInstance<RoleRepository>()};
 };
 
 using DeptVerifierPtr = std::shared_ptr<DeptVerifier>;

@@ -77,3 +77,9 @@ PG_CONFIG = {
 # 运行测试
 pytest api_test_runner.py
 ```
+
+## 过程
+
+需求
+测试点
+测试用例

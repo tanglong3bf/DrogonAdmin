@@ -70,7 +70,6 @@ const roleList = ref<RoleOption[]>([])
 
 onMounted(async () => {
   deptTree.value = await getDeptTree()
-  roleList.value = await getAssignableRoles(user.dept_id)
   resetQuery()
   handleQuery()
 })
@@ -192,7 +191,7 @@ const dialogVisible = ref(false)
 watch(
   () => user.dept_id, // getter 函数，监听 dept_id 的变化
   async (newVal, oldVal) => {
-    if (newVal !== oldVal) {
+    if (newVal !== oldVal && newVal !== undefined) {
       // 部门id发生切换时，重新获取可用角色
       const newRoles = await getAssignableRoles(newVal)
       roleList.value = newRoles

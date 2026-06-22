@@ -26,7 +26,8 @@ class UserCqrsRepo : public DrAdminObject<UserCqrsRepo>
      */
     drogon::Task<std::vector<UserResponse>> getUserList(
         const UserQueryRequest &request,
-        const int32_t maxPage) const;
+        const int32_t maxPage,
+        const drogon::AttributesPtr &attr) const;
 
   protected:
     drogon::orm::Criteria buildCriteria(const UserQueryRequest &request) const;

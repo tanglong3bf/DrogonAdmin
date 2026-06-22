@@ -9,15 +9,19 @@
 /**
  * @brief 创建部门参数
  */
-class DeptCreateRequest
+struct DeptCreateRequest
 {
+    DeptCreateRequest() = default;
+    DeptCreateRequest(const Json::Value &json);
+
+    std::string_view name() const
+    {
+        return name_;
+    }
+
+    GETTER(parentId)
+
+  private:
     std::string name_;                      ///< 部门名称
     std::optional<std::int32_t> parentId_;  ///< 父部门ID
-
-  public:
-    void setByJson(const Json::Value &json);
-
-    // getters
-    GETTER(name, Name)
-    OPT_GETTER(parentId, ParentId)
 };

@@ -56,6 +56,11 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     drogon::Task<std::size_t> countByCode(const std::string &code) const;
 
     /**
+     * @brief 按照id列表统计角色数量
+     */
+    drogon::Task<std::size_t> countByIds(
+        const std::vector<std::int32_t> &roleIds) const;
+    /**
      * @brief 存储角色
      */
     drogon::Task<> save(Role &role) const;

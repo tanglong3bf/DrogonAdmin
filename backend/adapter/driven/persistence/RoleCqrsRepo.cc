@@ -3,6 +3,7 @@
 #include "domain/authorization/RoleDept.h"
 #include "domain/authorization/Role.h"
 #include "domain/models/SysRole.h"
+#include "common/util/AttrUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 
@@ -33,21 +34,26 @@ Task<size_t> RoleCqrsRepo::countByNameAndDeptId(
 
 Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     const RoleQueryRequest &request,
-    const size_t maxPage) const
+    const size_t maxPage,
+    const AttributesPtr &attr) const
 {
     ParamList params;
     const std::int32_t page =
-        maxPage < request.getPage() ? maxPage : request.getPage();
-    params["offset"] =
-        static_cast<std::int32_t>(request.getPageSize() * (page - 1));
-    params["limit"] = static_cast<std::int32_t>(request.getPageSize());
-    if (request.getDeptId())
+        maxPage < request.page() ? maxPage : request.page();
+    if (page != request.page())
     {
-        params["dept_id"] = *request.getDeptId();
+        addWarn(attr, "查询页码超出范围，已自动调整到最后一页");
     }
-    if (request.getName())
+    params["offset"] =
+        static_cast<std::int32_t>(request.pageSize() * (page - 1));
+    params["limit"] = static_cast<std::int32_t>(request.pageSize());
+    if (request.deptId())
     {
-        params["name"] = *request.getName();
+        params["dept_id"] = *request.deptId();
+    }
+    if (request.name())
+    {
+        params["name"] = *request.name();
     }
     const auto sql = sqlGenerator()->getSql("get_role_list", params);
     const auto dbResult = co_await dbClient()->execSqlCoro(sql);
@@ -56,7 +62,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     vector<std::int32_t> roleIds{};
     for (const auto &role : roleList)
     {
-        roleIds.push_back(role.getRoleId());
+        roleIds.push_back(role.roleId());
     }
 
     auto roleDeptList = co_await roleDeptMapper().findBy(
@@ -66,7 +72,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     {
         for (auto &role : roleList)
         {
-            if (role.getRoleId() == roleDept.getValueOfRoleId())
+            if (role.roleId() == roleDept.getValueOfRoleId())
             {
                 role.addRoleDept(RoleDept{roleDept});
             }

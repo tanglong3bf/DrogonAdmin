@@ -6,10 +6,7 @@ Role::Role(const std::string &name,
            const std::string &code,
            const QuotaType quotaType,
            const RelationType relationType)
-    : name_{name},
-      code_{code},
-      quotaType_{quotaType},
-      relationType_{relationType}
+    : name{name}, code{code}, quotaType{quotaType}, relationType{relationType}
 {
 }
 
@@ -18,10 +15,10 @@ Role::Role(const std::string &name,
            const QuotaType quotaType,
            const RelationType relationType,
            const std::int32_t createdBy)
-    : name_{name},
-      code_{code},
-      quotaType_{quotaType},
-      relationType_{relationType},
+    : name{name},
+      code{code},
+      quotaType{quotaType},
+      relationType{relationType},
       AuditableEntity{createdBy,
                       trantor::Date::now(),
                       createdBy,
@@ -44,22 +41,30 @@ Role::Role(const drogon_model::drogon_admin_db::SysRole &model)
 Role::operator SysRole() const
 {
     SysRole model;
-    if (roleId_)
+    if (roleId)
     {
-        model.setRoleId(*roleId_);
+        model.setRoleId(*roleId);
     }
-    model.setName(name_);
-    model.setCode(code_);
-    if (description_)
+    model.setName(name);
+    model.setCode(code);
+    if (description)
     {
-        model.setDescription(*description_);
+        model.setDescription(*description);
     }
-    model.setQuotaType(static_cast<int16_t>(quotaType_));
-    if (userQuota_)
+    else
     {
-        model.setUserQuota(*userQuota_);
+        model.setDescriptionToNull();
     }
-    model.setRelationType(static_cast<int16_t>(relationType_));
+    model.setQuotaType(static_cast<int16_t>(quotaType));
+    if (userQuota)
+    {
+        model.setUserQuota(*userQuota);
+    }
+    else
+    {
+        model.setUserQuotaToNull();
+    }
+    model.setRelationType(static_cast<int16_t>(relationType));
     model.setCreatedBy(*createdBy_);
     model.setCreatedTime(*createdTime_);
     model.setUpdatedBy(*updatedBy_);
@@ -75,7 +80,15 @@ Role::operator SysRole() const
     return model;
 }
 
+void Role::setRoleDepts(const std::vector<RoleDept> &roleDepts)
+{
+    this->roleDepts.clear();
+    std::copy(roleDepts.begin(),
+              roleDepts.end(),
+              std::back_inserter(this->roleDepts));
+}
+
 void Role::addRoleDept(const RoleDept &dept)
 {
-    roleDepts_.push_back(dept);
+    roleDepts.push_back(dept);
 }

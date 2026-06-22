@@ -1,58 +1,35 @@
 #pragma once
 
-#define OPT_SETTER(field, Field)                                 \
-    void set##Field(const decltype(field##_)::value_type &field) \
+#define GETTER(field)                  \
+    const auto &field() const noexcept \
+    {                                  \
+        return field##_;               \
+    }
+
+#define ENTITY_SET(entity, field, ...)                           \
+    do                                                           \
     {                                                            \
-        field##_ = field;                                        \
-    }                                                            \
-    void set##Field##ToNullOpt()                                 \
-    {                                                            \
-        field##_ = std::nullopt;                                 \
-    }
-
-#define OPT_GETTER(field, Field)   \
-    const auto &get##Field() const \
-    {                              \
-        return field##_;           \
-    }
-
-#define SETTER(field, Field)                         \
-    void set##Field(const decltype(field##_) &field) \
-    {                                                \
-        field##_ = field;                            \
-    }
-
-#define GETTER(field, Field)       \
-    const auto &get##Field() const \
-    {                              \
-        return field##_;           \
-    }
-
-#define ENTITY_SET(entity, Field, ...)                    \
-    do                                                    \
-    {                                                     \
-        if (request.get##Field() &&                       \
-            entity.get##Field() != *request.get##Field()) \
-        {                                                 \
-            entity.set##Field(*request.get##Field());     \
-            __VA_ARGS__;                                  \
-        }                                                 \
+        if (request.field() && entity.field != *request.field()) \
+        {                                                        \
+            entity.field = *request.field();                     \
+            __VA_ARGS__;                                         \
+        }                                                        \
     } while (0)
 
 #define INIT(field, Field)        \
-    field##_                      \
+    field                         \
     {                             \
         model.getValueOf##Field() \
     }
 
 #define ENUM_INIT(type, field, Field)                \
-    field##_                                         \
+    field                                            \
     {                                                \
         static_cast<type>(model.getValueOf##Field()) \
     }
 
 #define OPT_INIT(field, Field)                              \
-    field##_                                                \
+    field                                                   \
     {                                                       \
         model.get##Field() != nullptr                       \
             ? std::make_optional(model.getValueOf##Field()) \
@@ -61,7 +38,7 @@
 
 // OV: Object Value
 #define OPT_OV_INIT(type, field, Field)                           \
-    field##_                                                      \
+    field                                                         \
     {                                                             \
         model.get##Field() != nullptr                             \
             ? std::make_optional(type{model.getValueOf##Field()}) \
@@ -80,25 +57,25 @@
             ? std::make_optional(model.getValueOfDeletedTime())     \
             : std::nullopt
 
-#define SET_OPT(field, Field)            \
-    do                                   \
-    {                                    \
-        if (field##_)                    \
-        {                                \
-            model.set##Field(*field##_); \
-        }                                \
+#define SET_OPT(field, Field)         \
+    do                                \
+    {                                 \
+        if (field)                    \
+        {                             \
+            model.set##Field(*field); \
+        }                             \
     } while (0)
 
-#define SET_VAL(field, Field) model.set##Field(field##_)
+#define SET_VAL(field, Field) model.set##Field(field)
 
-#define SET_OPT_OV(field, Field)                 \
-    do                                           \
-    {                                            \
-        if (field##_)                            \
-        {                                        \
-            model.set##Field(field##_->value()); \
-        }                                        \
+#define SET_OPT_OV(field, Field)              \
+    do                                        \
+    {                                         \
+        if (field)                            \
+        {                                     \
+            model.set##Field(field->value()); \
+        }                                     \
     } while (0)
 
 #define SET_VAL_CAST(type, field, Field) \
-    model.set##Field(static_cast<type>(field##_))
+    model.set##Field(static_cast<type>(field))

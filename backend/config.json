@@ -20,7 +20,7 @@
       //port: Server port, 5432 by default
       "port": 5432,
       //dbname: Database name
-      "dbname": "drogon_admin_db",
+      "dbname": "da_test_db",
       //user: 'postgres' by default
       "user": "admin",
       //passwd: '' by default
@@ -368,24 +368,28 @@
             "condition": "r.deleted_by IS NULL AND r.relation_type = 2 AND rd.dept_id = ${dept_id} "
           },
           "count_role_by_name_and_dept_id": {
-            "main": "@if(dept_id) SELECT COUNT(*) FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name)) @else @allRoles(name) @endif",
+            "main": "@if(dept_id) SELECT COUNT(*) FROM (@includedRoles(name, dept_id) UNION @excludedRoles(name, dept_id) UNION @normalRoles(name)) @else @allRoles(name) @endif",
             "allRoles": "SELECT COUNT(*) FROM sys_role r @condition(name)",
-            "includedRoles": "@baseQuery(name, dept_id, type='1')",
-            "excludedRoles": "@baseQuery(name, dept_id, type='0')",
-            "normalRoles": "SELECT * FROM sys_role WHERE deleted_by IS NULL AND name LIKE '%${name}%' AND role_id NOT IN (SELECT role_id FROM sys_role_dept)",
-            "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
-            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id @if(type) AND r.relation_type = ${type} @endif",
-            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
+            "normalRoles": "@baseQuery(name, type='0')",
+            "includedRoles": "SELECT r.* FROM sys_role r @innerJoin(dept_id) @condition(name, type='1')",
+            "excludedRoles": "@baseQuery(name, dept_id, type='2')",
+            "baseQuery": "SELECT r.* FROM sys_role r @condition(name, dept_id, type)",
+            "innerJoin": "INNER JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.dept_id = ${dept_id}",
+            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(type) AND r.relation_type = ${type} @endif @noBindDept(type, dept_id)",
+            "noBindDept": "@if(type=='0'||type=='2') AND r.role_id NOT IN (@subQuery(dept_id)) @endif",
+            "subQuery": "SELECT DISTINCT role_id FROM sys_role_dept @if(dept_id) WHERE dept_id = ${dept_id} @endif"
           },
           "get_role_list": {
-            "main": "@if(dept_id) SELECT * FROM (@includedRoles(name, dept_id) UNION ALL @excludedRoles(name, dept_id) UNION ALL @normalRoles(name)) @else @allRoles(name) @endif ORDER BY role_id ASC LIMIT ${limit} OFFSET ${offset}",
+            "main": "@if(dept_id) SELECT * FROM (@normalRoles(name) UNION @includedRoles(name, dept_id) UNION @excludedRoles(name, dept_id)) @else @allRoles(name) @endif ORDER BY role_id ASC LIMIT ${limit} @if(offset != 0) OFFSET ${offset} @endif",
             "allRoles": "SELECT * FROM sys_role r @condition(name)",
-            "includedRoles": "@baseQuery(name, dept_id, type='1')",
-            "excludedRoles": "@baseQuery(name, dept_id, type='0')",
-            "normalRoles": "SELECT * FROM sys_role WHERE deleted_by IS NULL AND name LIKE '%${name}%' AND role_id NOT IN (SELECT role_id FROM sys_role_dept)",
-            "baseQuery": "SELECT r.* FROM sys_role r @leftJoin(type) @condition(name, dept_id, type)",
-            "leftJoin": "LEFT JOIN sys_role_dept rd ON r.role_id = rd.role_id @if(type) AND r.relation_type = ${type} @endif",
-            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(dept_id) AND dept_id @if(type=='0')!@endif= ${dept_id} @endif"
+            "normalRoles": "@baseQuery(name, type='0')",
+            "includedRoles": "SELECT r.* FROM sys_role r @innerJoin(dept_id) @condition(name, type='1')",
+            "excludedRoles": "@baseQuery(name, dept_id, type='2')",
+            "baseQuery": "SELECT r.* FROM sys_role r @condition(name, dept_id, type)",
+            "innerJoin": "INNER JOIN sys_role_dept rd ON r.role_id = rd.role_id AND rd.dept_id = ${dept_id}",
+            "condition": "WHERE r.deleted_by IS NULL @if(name) AND name LIKE '%${name}%' @endif @if(type) AND r.relation_type = ${type} @endif @noBindDept(type, dept_id)",
+            "noBindDept": "@if(type=='0'||type=='2') AND r.role_id NOT IN (@subQuery(dept_id)) @endif",
+            "subQuery": "SELECT DISTINCT role_id FROM sys_role_dept @if(dept_id) WHERE dept_id = ${dept_id} @endif"
           },
           "multi_insert_role_dept": {
             "main": {
@@ -424,7 +428,7 @@
           "count_user_by_dept_and_roles": {
             "main": "SELECT COUNT(*) AS used_count, ur.role_id AS role_id FROM sys_user u @inner_join() @where(dept_id, role_ids) @group_and_order()",
             "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id",
-            "where": "WHERE u.dept_id = ${dept_id} AND ur.role_id IN @id_list(role_ids)",
+            "where": "WHERE u.dept_id = ${dept_id} @if(role_ids.length) AND ur.role_id IN @id_list(role_ids) @endif",
             "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
             "group_and_order": "GROUP BY ur.role_id ORDER BY ur.role_id"
           },
@@ -436,6 +440,28 @@
             "main": "SELECT @fields() FROM public.sys_user u @inner_join() WHERE ur.role_id = ${role_id} GROUP BY u.dept_id ORDER BY u.dept_id",
             "fields": "u.dept_id, COUNT(*) AS user_count",
             "inner_join": "INNER JOIN public.sys_user_role ur ON u.user_id = ur.user_id"
+          },
+          "count_user_by_role_not_in_depts": {
+            "main": "SELECT COUNT(*) FROM sys_user u @inner_join(role_id) @where(dept_ids)",
+            "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = ${role_id}",
+            "where": "WHERE (u.dept_id IS NULL OR u.dept_id NOT IN @id_list(dept_ids))",
+            "id_list": "(@for(id in dept_ids, separator=',') ${id} @endfor)"
+          },
+          "count_user_by_role_in_depts": {
+            "main": "SELECT COUNT(*) FROM sys_user u @inner_join(role_id) @where(dept_ids)",
+            "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id AND ur.role_id = ${role_id}",
+            "where": "WHERE (u.dept_id IS NULL OR u.dept_id IN @id_list(dept_ids))",
+            "id_list": "(@for(id in dept_ids, separator=',') ${id} @endfor)"
+          },
+          "count_users_per_role_in_department": {
+            "main": "SELECT ur.role_id AS role_id, COUNT(u) user_count FROM sys_user u RIGHT JOIN sys_user_role ur ON u.user_id = ur.user_id @if(role_ids.length) AND ur.role_id IN (@for(id in role_ids, separator=',') ${id} @endfor) @endif WHERE u.deleted_by IS NULL AND u.dept_id = ${dept_id} GROUP BY ur.role_id"
+          },
+          "count_user_by_role_list": {
+            "main": "SELECT COUNT(u.*) used_count, ur.role_id FROM sys_user u @inner_join() @where(role_ids) @group()",
+            "inner_join": "INNER JOIN sys_user_role ur ON u.user_id = ur.user_id",
+            "where": "WHERE u.deleted_by IS NULL @if(role_ids.length) AND ur.role_id IN @id_list(role_ids) @endif",
+            "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
+            "group": "GROUP BY ur.role_id"
           }
         }
       }
