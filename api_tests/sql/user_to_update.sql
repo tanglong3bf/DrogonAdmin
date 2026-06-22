@@ -1,5 +1,4 @@
 -- 用户更新测试数据准备
-
 DROP TABLE IF EXISTS "public"."sys_user_role";
 DROP TABLE IF EXISTS "public"."sys_role_dept";
 DROP TABLE IF EXISTS "public"."sys_user";
@@ -179,11 +178,11 @@ INSERT INTO "public"."sys_user" VALUES (28, 'user-28', '123456', '用户-28', '#
 
 -- 设置序列起始值
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq" OWNED BY "public"."sys_dept"."dept_id";
-SELECT setval('"public"."sys_dept_dept_id_seq"', 3, true);
+SELECT setval('"public"."sys_dept_dept_id_seq"', 4, true);
 ALTER SEQUENCE "public"."sys_role_role_id_seq" OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 3, true);
+SELECT setval('"public"."sys_role_role_id_seq"', 10, true);
 ALTER SEQUENCE "public"."sys_user_user_id_seq" OWNED BY "public"."sys_user"."user_id";
-SELECT setval('"public"."sys_user_user_id_seq"', 11, true);
+SELECT setval('"public"."sys_user_user_id_seq"', 28, true);
 
 -- 添加主键约束
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");

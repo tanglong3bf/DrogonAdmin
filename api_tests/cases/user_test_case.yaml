@@ -992,5 +992,47 @@ user_cases:
         $.error: 使用当前角色的用户数量已达限制
       # }}}
     # }}}
+    # 删除用户 {{{
+  - name: 删除用户-id为1的用户不可以被删除
+    sql_file: user_to_delete.sql
+    url: http://localhost:8000/user/1
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: id为1的用户不可以被删除
+  - name: 删除用户-不存在的用户id
+    sql_file: user_to_delete.sql
+    url: http://localhost:8000/user/233
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-软删除的用户id
+    url: http://localhost:8000/user/2
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-正常删除无角色的用户
+    url: http://localhost:8000/user/3
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除用户-删除有角色的用户
+    url: http://localhost:8000/user/4
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+    # }}}
   # }}}
 # vim: set foldmethod=marker foldlevel=0:

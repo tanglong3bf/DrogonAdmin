@@ -58,7 +58,19 @@ Task<> UserService::updateUser(const std::int32_t userId,
 drogon::Task<> UserService::deleteUser(const std::int32_t userId,
                                        const int32_t deletedBy) const
 {
-    auto user = co_await userRepository_->getById(userId, true);
-    co_await userHandler_->deleteUser(user, deletedBy);
-    co_await userRepository_->save(user);
+    if (userId == 1)
+    {
+        throw BusinessException("id为1的用户不可以被删除");
+    }
+    try
+    {
+        auto user = co_await userRepository_->getById(userId, true);
+        co_await userHandler_->deleteUser(user, deletedBy);
+        co_await userRepository_->save(user);
+    }
+    catch (const orm::UnexpectedRows & /*ignore*/)
+    {
+        // 用户不存在
+        co_return;
+    }
 }
