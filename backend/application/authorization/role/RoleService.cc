@@ -55,16 +55,25 @@ Task<> RoleService::updateRole(const std::int32_t roleId,
 {
     LOG_TRACE << "更新角色，roleId=" << roleId << ", updatedBy=" << updatedBy;
     auto role = co_await roleRepository_->getById(roleId);
-    co_await roleUpdater_->updateRole(role, request, updatedBy);
-    co_await roleRepository_->save(role);
+    if (!role)
+    {
+        throw BusinessException{"指定的角色id不存在"};
+    }
+    co_await roleUpdater_->updateRole(*role, request, updatedBy);
+    co_await roleRepository_->save(*role);
 }
 
 Task<> RoleService::deleteRole(const std::int32_t roleId,
                                const std::int32_t deletedBy) const
 {
     auto role = co_await roleRepository_->getById(roleId);
-    co_await roleHandler_->deleteRole(role, deletedBy);
-    co_await roleRepository_->save(role);
+    if (!role)
+    {
+        // 没有数据，无需操作
+        co_return;
+    }
+    co_await roleHandler_->deleteRole(*role, deletedBy);
+    co_await roleRepository_->save(*role);
 }
 
 Task<vector<AssignableRoleResponse>> RoleService::getAssignableRoles(

@@ -68,14 +68,5 @@
 
 #define SET_VAL(field, Field) model.set##Field(field)
 
-#define SET_OPT_OV(field, Field)              \
-    do                                        \
-    {                                         \
-        if (field)                            \
-        {                                     \
-            model.set##Field(field->value()); \
-        }                                     \
-    } while (0)
-
 #define SET_VAL_CAST(type, field, Field) \
     model.set##Field(static_cast<type>(field))

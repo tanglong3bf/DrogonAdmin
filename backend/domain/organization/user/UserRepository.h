@@ -53,8 +53,8 @@ class UserRepository : public DrAdminObject<UserRepository>
     /**
      * @brief 根据ID获取用户
      */
-    drogon::Task<User> getById(const std::int32_t userId,
-                               bool withRelation = false) const;
+    drogon::Task<std::optional<User>> getById(const std::int32_t userId,
+                                              bool withRelation = false) const;
     /**
      * @brief 统计指定部门下指定角色的用户数量
      */

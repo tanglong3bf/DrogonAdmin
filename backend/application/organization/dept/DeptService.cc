@@ -40,7 +40,7 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
 Task<> DeptService::deleteDept(const std::int32_t deptId,
                                const std::int32_t deletedBy) const
 {
-    optional<Dept> dept = co_await deptRepository_->getById(deptId);
+    auto dept = co_await deptRepository_->getById(deptId);
     if (!dept)
     {
         // 没有数据，无需操作

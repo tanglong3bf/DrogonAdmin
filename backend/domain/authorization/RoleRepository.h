@@ -68,7 +68,7 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     /**
      * @brief 根据id获取角色
      */
-    drogon::Task<Role> getById(const std::int32_t roleId) const;
+    drogon::Task<std::optional<Role>> getById(const std::int32_t roleId) const;
 
     /**
      * @brief 根据id列表获取角色
@@ -82,6 +82,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
         const std::vector<SysRole> &sysRoleList) const;
     std::vector<RoleDept> buildRoleDeptList(
         const std::vector<SysRoleDept> &sysRoleDeptList) const;
+
+    std::string idListToString(const std::vector<std::int32_t> &roleIds) const;
 
   private:
     static SqlGenerator *sqlGenerator();

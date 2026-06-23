@@ -1,7 +1,10 @@
 #include "domain/authorization/RoleRepository.h"
 
+#include "domain/models/SysRole.h"
 #include "domain/models/SysRoleDept.h"
 #include "common/framework/domain/ChangeableEntity.h"
+#include "common/util/plugins/RelationQuery/src/RelationQuery.hpp"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
 #include <trantor/utils/Date.h>
@@ -11,6 +14,7 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
+using namespace tl;
 using namespace tl::sql;
 
 Task<size_t> RoleRepository::countBelongDept(const std::int32_t deptId,
@@ -227,19 +231,23 @@ Task<> RoleRepository::save(Role &role) const
     }
 }
 
-Task<Role> RoleRepository::getById(const std::int32_t roleId) const
+Task<optional<Role>> RoleRepository::getById(const std::int32_t roleId) const
 {
-    const auto sysRole = co_await roleMapper().findByPrimaryKey(roleId);
-    Role role{sysRole};
-
-    Criteria criteria{SysRoleDept::Cols::_role_id, roleId};
-
-    const auto sysRoleDepts = co_await roleDeptMapper().findBy(criteria);
-
-    auto roleDepts = buildRoleDeptList(sysRoleDepts);
-
-    role.setRoleDepts(roleDepts);
-    co_return role;
+    static const auto relationQuery = app().getPlugin<RelationQuery>();
+    const auto query = Query<SysRole>("r").hasMany<SysRoleDept>(
+        JoinOn("r.role_id", "rd.role_id"), "rd");
+    const auto roleInDb =
+        co_await relationQuery->findByCoro(query,
+                                           "r.role_id = " + to_string(roleId) +
+                                               " AND r.deleted_by IS NULL");
+    if (roleInDb.empty())
+    {
+        co_return nullopt;
+    }
+    const auto &[role, roleDepts] = roleInDb[0];
+    Role result{role};
+    result.setRoleDepts(buildRoleDeptList(roleDepts));
+    co_return result;
 }
 
 drogon::Task<std::vector<Role>> RoleRepository::getByIds(
@@ -251,35 +259,22 @@ drogon::Task<std::vector<Role>> RoleRepository::getByIds(
         co_return std::vector<Role>{};
     }
 
-    Criteria criteria{SysRole::Cols::_role_id, CompareOperator::In, roleIds};
-    const auto sysRoles = co_await roleMapper().findBy(criteria);
-    auto roles = buildRoleList(sysRoles);
+    static const auto relationQuery = app().getPlugin<RelationQuery>();
 
-    if (!withRelation)
-    {
-        co_return roles;
-    }
+    const auto query = Query<SysRole>("r").hasMany<SysRoleDept>(
+        JoinOn("r.role_id", "rd.role_id"), "rd");
+    const auto rolesInDb =
+        co_await relationQuery->findByCoro(query,
+                                           "r.role_id IN (" +
+                                               idListToString(roleIds) +
+                                               ") AND r.deleted_by IS NULL");
 
-    const auto sysRoleDepts = co_await roleDeptMapper().findBy(criteria);
-
-    std::unordered_map<std::int32_t, std::vector<SysRoleDept>> deptMap;
-    for (const auto &dept : sysRoleDepts)
-    {
-        deptMap[dept.getValueOfRoleId()].push_back(dept);
-    }
-
-    for (auto &role : roles)
-    {
-        if (auto it = deptMap.find(*role.roleId); it != deptMap.end())
-        {
-            for (const auto &dept : it->second)
-            {
-                role.addRoleDept(RoleDept{dept});
-            }
-        }
-    }
-
-    co_return roles;
+    co_return rolesInDb | views::transform([this](const auto &roleInDb) {
+        const auto &[role, roleDepts] = roleInDb;
+        Role result{role};
+        result.setRoleDepts(buildRoleDeptList(roleDepts));
+        return result;
+    }) | ranges_utils::to<std::vector>();
 }
 
 vector<Role> RoleRepository::buildRoleList(
@@ -301,6 +296,18 @@ vector<RoleDept> RoleRepository::buildRoleDeptList(
     {
         result.emplace_back(static_cast<RoleDept>(sysRoleDept));
     }
+    return result;
+}
+
+std::string RoleRepository::idListToString(
+    const std::vector<std::int32_t> &roleIds) const
+{
+    std::string result;
+    for (const auto &id : roleIds)
+    {
+        result += to_string(id) + ",";
+    }
+    result.pop_back();
     return result;
 }
 

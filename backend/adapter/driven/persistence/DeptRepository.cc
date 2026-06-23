@@ -2,6 +2,7 @@
 
 #include "domain/models/SysDept.h"
 #include "SqlGenerator/src/SqlGenerator.h"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/orm/Criteria.h>
 #include <drogon/HttpAppFramework.h>
@@ -12,6 +13,7 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
+using namespace tl;
 using namespace tl::sql;
 
 Task<std::optional<std::int32_t>> DeptRepository::getMaxSubDeptSortNum(
@@ -106,10 +108,9 @@ Task<vector<Dept>> DeptRepository::getByIds(
         criteria &&
         Criteria{SysDept::Cols::_dept_id, CompareOperator::In, idsVector};
     const auto deptInDb = co_await deptMapper().findBy(criteria);
-    const auto deptView = deptInDb | views::transform([](const auto &data) {
-                              return Dept{data};
-                          });
-    co_return {deptView.begin(), deptView.end()};
+    co_return deptInDb |
+        views::transform([](const auto &data) { return Dept{data}; }) |
+        ranges_utils::to<vector>();
 }
 
 Task<vector<Dept>> DeptRepository::getByParentId(
@@ -121,10 +122,9 @@ Task<vector<Dept>> DeptRepository::getByParentId(
                               : Criteria{SysDept::Cols::_parent_id,
                                          CompareOperator::IsNull});
     const auto deptInDb = co_await deptMapper().findBy(criteria);
-    const auto deptView = deptInDb | views::transform([](const auto &data) {
-                              return Dept{data};
-                          });
-    co_return {deptView.begin(), deptView.end()};
+    co_return deptInDb |
+        views::transform([](const auto &data) { return Dept{data}; }) |
+        ranges_utils::to<vector>();
 }
 
 Task<> DeptRepository::multiSave(const vector<Dept> &depts,

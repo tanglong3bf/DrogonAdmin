@@ -3,6 +3,7 @@
 #include "common/framework/domain/ChangeableEntity.h"
 #include "domain/models/SysUser.h"
 #include "domain/models/SysUserRole.h"
+#include "RelationQuery/src/RelationQuery.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <unordered_map>
 
@@ -136,21 +137,44 @@ drogon::Task<> UserRepository::save(User &user) const
     }
 }
 
-Task<User> UserRepository::getById(const std::int32_t userId,
-                                   bool withRelation) const
+Task<optional<User>> UserRepository::getById(const std::int32_t userId,
+                                             bool withRelation) const
 {
-    const auto sysUser = co_await userMapper().findOne(
-        Criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull} &&
-        Criteria{SysUser::Cols::_user_id, userId});
-    User user{sysUser};
+    static const auto relationQuery = app().getPlugin<RelationQuery>();
+
     if (withRelation)
     {
-        const auto sysUserRoles = co_await userRoleMapper().findBy(
-            Criteria{SysUserRole::Cols::_user_id, userId});
-        const auto userRoles = buildUserRoleList(sysUserRoles);
-        user.setUserRoles(userRoles);
+        auto query = Query<SysUser>("u").hasMany<SysUserRole>(
+            JoinOn("u.user_id", "ur.user_id"), "ur");
+
+        const auto userInDb = co_await relationQuery->findByCoro(
+            query,
+            "u.user_id = " + to_string(userId) + " AND u.deleted_by IS NULL");
+
+        if (userInDb.empty())
+        {
+            co_return nullopt;
+        }
+        const auto &[sysUser, sysUserRoles] = userInDb[0];
+        User user{sysUser};
+        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        co_return user;
     }
-    co_return user;
+    else
+    {
+        try
+        {
+            const auto sysUser = co_await userMapper().findOne(
+                Criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull} &&
+                Criteria{SysUser::Cols::_user_id, userId});
+            User user{sysUser};
+            co_return user;
+        }
+        catch (const UnexpectedRows & /* ignore */)
+        {
+            co_return nullopt;
+        }
+    }
 }
 
 Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
