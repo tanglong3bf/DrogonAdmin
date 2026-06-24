@@ -1,5 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
-project(DrogonAdminBackend CXX)
+
+set(PROJ_VER_MAJOR 0)
+set(PROJ_VER_MINOR 4)
+set(PROJ_VER_PATCH 0)
+set(PROJECT_VERSION "${PROJ_VER_MAJOR}.${PROJ_VER_MINOR}.${PROJ_VER_PATCH}")
+
+project(
+  DrogonAdminBackend
+  VERSION ${PROJECT_VERSION}
+  LANGUAGES CXX)
+
+add_compile_definitions(
+  VER_MAJOR=${PROJ_VER_MAJOR} VER_MINOR=${PROJ_VER_MINOR}
+  VER_PATCH=${PROJ_VER_PATCH} VER_STR="${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 20)
 
