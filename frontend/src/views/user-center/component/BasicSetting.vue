@@ -3,7 +3,7 @@ import { watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive } from 'vue'
-import { updateUserInfo } from '@/api/user'
+import { updateUserBasicInfo } from '@/api/user'
 import { UserInfoUpdateRequest } from '@/types/user'
 import { Sex } from '@/types/enums'
 
@@ -136,7 +136,7 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
         : undefined,
       email: emailChanged ? (emailIsEmpty ? null : formData.email) : undefined
     }
-    await updateUserInfo(request)
+    await updateUserBasicInfo(request)
     ElMessage.success('更新成功！')
     if (nicknameChanged) {
       userInfo.username = formData.nickname

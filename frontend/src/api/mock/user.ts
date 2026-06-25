@@ -8,9 +8,9 @@ import { UploadAvatarResponse, User } from '@/types/user'
 /**
  * 更新用户基础信息mock
  */
-if (mockConfig.user.update_basic_info) {
+if (mockConfig.user.update_user_basic_info) {
   mock
-    .onPatch(/^http:\/\/localhost:8000\/user$/)
+    .onPatch(/^http:\/\/localhost:8000\/user\/me$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {

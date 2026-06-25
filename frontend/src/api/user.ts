@@ -46,12 +46,12 @@ export const deleteUser = (user_id: number) => {
 }
 
 /**
- * 更新用户信息接口
+ * 用户修改自己的基础信息
  */
-export const updateUserInfo = (
+export const updateUserBasicInfo = (
   userInfoUpdateRequest: UserInfoUpdateRequest
 ): Promise<undefined> => {
-  return request.patch('/user', {
+  return request.patch('/user/me', {
     ...userInfoUpdateRequest
   })
 }

@@ -89,6 +89,45 @@ Task<> UserUpdater::updateUser(User &user,
     co_return;
 }
 
+drogon::Task<> UserUpdater::updateBasicInfo(
+    User &user,
+    const UserInfoUpdateRequest &request) const
+{
+    bool isUpdated = false;
+    ENTITY_SET(user, nickname, isUpdated = true);
+    ENTITY_SET(user, sex, isUpdated = true);
+    // 更新 phone_number
+    if (request.phoneNumber() && user.phoneNumber != *request.phoneNumber())
+    {
+        user.phoneNumber = *request.phoneNumber();
+        isUpdated = true;
+    }
+    // 置空 phone_number
+    else if (request.phoneNumber().isNull() && user.phoneNumber)
+    {
+        user.phoneNumber = nullopt;
+        isUpdated = true;
+    }
+    // 更新 email
+    if (request.email() && user.email != *request.email())
+    {
+        user.email = *request.email();
+        isUpdated = true;
+    }
+    // 置空 email
+    else if (request.email().isNull() && user.email)
+    {
+        user.email = nullopt;
+        isUpdated = true;
+    }
+    if (isUpdated)
+    {
+        user.markUpdatedBy(*user.userId);
+        user.markUpdated();
+    }
+    co_return;
+}
+
 void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,
                                   const vector<int32_t> &newRoleIds,
                                   const int32_t userId,

@@ -7,6 +7,7 @@
 #include "UserResponse.h"
 #include "UserUpdateRequest.h"
 #include "UserUpdater.h"
+#include "application/organization/user/UserInfoUpdateRequest.h"
 #include "domain/organization/user/UserHandler.h"
 #include "domain/organization/user/UserRepository.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -45,6 +46,12 @@ class UserService : public DrAdminObject<UserService>
      */
     drogon::Task<> deleteUser(const std::int32_t userId,
                               const std::int32_t deletedBy) const;
+
+    /**
+     * @brief 更新用户基本信息
+     */
+    drogon::Task<> updateBasicInfo(const std::int32_t userId,
+                                   const UserInfoUpdateRequest &request) const;
 
   private:
     UserCqrsRepoPtr userCqrsRepo_{
