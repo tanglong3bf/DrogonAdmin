@@ -5,6 +5,7 @@ import type { UserInfo } from '@/types/auth'
 import { ElMessage, ElUpload, UploadFile } from 'element-plus/es'
 import { uploadAvatar } from '@/api/user'
 import { Icon } from '@iconify/vue'
+import { Sex } from '@/types/enums'
 
 const authStore = useAuthStore()
 
@@ -166,7 +167,11 @@ const handleConfirmUpload = () => {
         <div class="text">
           <el-icon><Icon icon="mdi:gender-male-female" /></el-icon>
           <span class="value">{{
-            userInfo.sex === 1 ? '男' : userInfo.sex === 2 ? '女' : '保密'
+            userInfo.sex === Sex.Male
+              ? '男'
+              : userInfo.sex === Sex.Female
+                ? '女'
+                : '保密'
           }}</span>
         </div>
       </li>

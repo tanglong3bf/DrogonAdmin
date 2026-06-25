@@ -26,9 +26,9 @@ export interface UserInfo {
   avatar: string
   sex: Sex
   deparemnt_id: number
-  roles_id: number[]
-  phone_number: string
-  email: string
+  roles_id?: number[]
+  phone_number?: string
+  email?: string
   status: 'normal' | 'disabled'
 }
 
