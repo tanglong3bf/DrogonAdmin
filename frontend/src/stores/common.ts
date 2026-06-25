@@ -48,6 +48,18 @@ export const useCommonStore = defineStore(
 
       pageList.value = newPageList
     }
+    /**
+     * 页面标签清空
+     * @param newPage
+     */
+    const pageListClear = () => {
+      pageList.value = [
+        {
+          name: '首页',
+          path: '/home'
+        }
+      ]
+    }
 
     /**
      * 删除指定项
@@ -95,6 +107,7 @@ export const useCommonStore = defineStore(
       setMenuList,
       pageList,
       pageListRemoveByPath,
+      pageListClear,
       activePath,
       setActivePath
     }
