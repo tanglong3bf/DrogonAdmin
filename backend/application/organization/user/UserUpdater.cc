@@ -15,32 +15,11 @@ Task<> UserUpdater::updateUser(User &user,
     LOG_TRACE << "更新用户，userId=" << *user.userId
               << ", updatedBy=" << updatedBy;
     bool isUpdated = false;
+
     ENTITY_SET(user, nickname, isUpdated = true);
     ENTITY_SET(user, sex, isUpdated = true);
-    // 更新 phone_number
-    if (request.phoneNumber() && user.phoneNumber != *request.phoneNumber())
-    {
-        user.phoneNumber = *request.phoneNumber();
-        isUpdated = true;
-    }
-    // 置空 phone_number
-    else if (request.phoneNumber().isNull() && user.phoneNumber)
-    {
-        user.phoneNumber = nullopt;
-        isUpdated = true;
-    }
-    // 更新 email
-    if (request.email() && user.email != *request.email())
-    {
-        user.email = *request.email();
-        isUpdated = true;
-    }
-    // 置空 email
-    else if (request.email().isNull() && user.email)
-    {
-        user.email = nullopt;
-        isUpdated = true;
-    }
+    ENTITY_SET_OR_NULL(user, phoneNumber, isUpdated = true);
+    ENTITY_SET_OR_NULL(user, email, isUpdated = true);
     ENTITY_SET(user, status, isUpdated = true);
 
     const auto oldDeptId = user.deptId;
@@ -94,32 +73,12 @@ drogon::Task<> UserUpdater::updateBasicInfo(
     const UserInfoUpdateRequest &request) const
 {
     bool isUpdated = false;
+
     ENTITY_SET(user, nickname, isUpdated = true);
     ENTITY_SET(user, sex, isUpdated = true);
-    // 更新 phone_number
-    if (request.phoneNumber() && user.phoneNumber != *request.phoneNumber())
-    {
-        user.phoneNumber = *request.phoneNumber();
-        isUpdated = true;
-    }
-    // 置空 phone_number
-    else if (request.phoneNumber().isNull() && user.phoneNumber)
-    {
-        user.phoneNumber = nullopt;
-        isUpdated = true;
-    }
-    // 更新 email
-    if (request.email() && user.email != *request.email())
-    {
-        user.email = *request.email();
-        isUpdated = true;
-    }
-    // 置空 email
-    else if (request.email().isNull() && user.email)
-    {
-        user.email = nullopt;
-        isUpdated = true;
-    }
+    ENTITY_SET_OR_NULL(user, phoneNumber, isUpdated = true);
+    ENTITY_SET_OR_NULL(user, email, isUpdated = true);
+
     if (isUpdated)
     {
         user.markUpdatedBy(*user.userId);

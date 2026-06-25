@@ -16,6 +16,21 @@
         }                                                        \
     } while (0)
 
+#define ENTITY_SET_OR_NULL(entity, field, ...)                   \
+    do                                                           \
+    {                                                            \
+        if (request.field() && entity.field != *request.field()) \
+        {                                                        \
+            entity.field = *request.field();                     \
+            __VA_ARGS__;                                         \
+        }                                                        \
+        else if (request.field().isNull() && entity.field)       \
+        {                                                        \
+            entity.field = nullopt;                              \
+            __VA_ARGS__;                                         \
+        }                                                        \
+    } while (0)
+
 #define INIT(field, Field)        \
     field                         \
     {                             \
