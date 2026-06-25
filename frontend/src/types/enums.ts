@@ -40,3 +40,12 @@ export enum DialogType {
   ADD = 0, // 新增
   UPDATE = 1 // 更新
 }
+
+/**
+ * 菜单类型
+ */
+export enum MenuType {
+  Menu = 0, // 菜单
+  Page = 1, // 页面
+  OutLink = 2 // 外链
+}

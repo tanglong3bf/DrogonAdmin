@@ -166,11 +166,7 @@ const handleConfirmUpload = () => {
         <div class="text">
           <el-icon><Icon icon="mdi:gender-male-female" /></el-icon>
           <span class="value">{{
-            userInfo.sex === 'male'
-              ? '男'
-              : userInfo.sex === 'female'
-                ? '女'
-                : '保密'
+            userInfo.sex === 1 ? '男' : userInfo.sex === 2 ? '女' : '保密'
           }}</span>
         </div>
       </li>

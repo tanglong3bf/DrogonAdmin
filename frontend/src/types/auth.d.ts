@@ -1,3 +1,4 @@
+import { MenuType, Sex } from './enums'
 /**
  * 登录请求体
  */
@@ -23,7 +24,7 @@ export interface UserInfo {
   username: string
   nickname: string
   avatar: string
-  sex: 'male' | 'female' | 'secrecy'
+  sex: Sex
   deparemnt_id: number
   roles_id: number[]
   phone_number: string
@@ -43,7 +44,7 @@ export interface MenuResponse {
   menu_id: number
   icon?: string
   name: string
-  type: 'menu' | 'page' | 'out_link'
+  type: MenuType
   path?: string
   component?: string
   children?: MenuResponse[]

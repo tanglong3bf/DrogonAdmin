@@ -45,7 +45,7 @@ export interface UserFormData {
  */
 export interface UserInfoUpdateRequest {
   nickname?: string
-  sex?: 'male' | 'female' | 'secrecy'
+  sex?: Sex
   phone_number?: string | null
   email?: string | null
 }
