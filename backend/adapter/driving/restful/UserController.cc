@@ -39,8 +39,7 @@ Task<HttpResponsePtr> UserController::createUser(
     const HttpRequestPtr req,
     const UserCreateRequest request) const
 {
-    const auto createdBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto createdBy = req->getAttributes()->get<int32_t>("userId");
     co_await userService_->createUser(request, createdBy);
     co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
@@ -50,8 +49,7 @@ Task<HttpResponsePtr> UserController::updateUser(
     const std::int32_t userId,
     const UserUpdateRequest request) const
 {
-    const auto updatedBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
     LOG_TRACE << "/user/" << userId << "(PUT)";
     LOG_TRACE << "更新用户，userId=" << userId << ", updatedBy=" << updatedBy;
     co_await userService_->updateUser(userId, request, updatedBy);
@@ -62,8 +60,7 @@ Task<HttpResponsePtr> UserController::deleteUser(
     const HttpRequestPtr req,
     const std::int32_t userId) const
 {
-    const auto deletedBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto deletedBy = req->getAttributes()->get<int32_t>("userId");
     co_await userService_->deleteUser(userId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
