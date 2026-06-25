@@ -474,18 +474,7 @@
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
     "allowOrigin": "http:\/\/localhost:5173",
-    "user_info": {
-      "user_id": 1,
-      "username": "admin123",
-      "nickname": "超级管理员",
-      "avatar": "http://dummyimage.com/150x150/888/FFF&text=avatar",
-      "sex": "male",
-      "deparemnt_id": 1,
-      "roles_id": [1],
-      "phone_number": "13388886666",
-      "email": "admin123@dr-admin.com",
-      "status": "normal"
-    },
+    "login_check_white_list": ["/login"],
     "menu_list": [
       {
         "menu_id": 1,
@@ -552,7 +541,7 @@
                 "path": "/sys/role_auth/role",
                 "icon": "fa7-solid:user-cog",
                 "name": "角色管理",
-                "component": "/sys/role_auth/Role",
+                "component": "/sys/authorization/Role",
                 "type": "page"
               },
               {
@@ -560,7 +549,7 @@
                 "path": "/sys/role_auth/auth",
                 "icon": "ix:user-key",
                 "name": "权限管理",
-                "component": "/sys/role_auth/Auth",
+                "component": "/sys/authorization/Auth",
                 "type": "page"
               }
             ]

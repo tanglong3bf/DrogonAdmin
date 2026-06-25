@@ -19,9 +19,9 @@ Json::Value LoginResponse::toJson() const
 {
     Json::Value json;
     json["token"] = token_;
-    // TODO: 后续改为AuthService查询并传入
+    // TODO: 可访问目录后续改为AuthService查询并传入
     const auto config = app().getCustomConfig();
     json["menu_list"] = config["menu_list"];
-    json["user_info"] = config["user_info"];
+    json["user_info"] = user_.toJson();
     return json;
 }

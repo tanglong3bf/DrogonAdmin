@@ -17,14 +17,16 @@ class User : public AuditableEntity, public ChangeableEntity
     using SysUser = drogon_model::drogon_admin_db::SysUser;
 
   public:
-    explicit User(std::string username,
-                  std::string nickname,
+    explicit User(std::string_view username,
+                  std::string_view password,
+                  std::string_view nickname,
                   Sex sex,
                   int32_t deptId,
                   Status status);
 
-    explicit User(std::string username,
-                  std::string nickname,
+    explicit User(std::string_view username,
+                  std::string_view password,
+                  std::string_view nickname,
                   Sex sex,
                   std::int32_t deptId,
                   Status status,
@@ -38,6 +40,11 @@ class User : public AuditableEntity, public ChangeableEntity
         return username_;
     }
 
+    std::string_view password() const noexcept
+    {
+        return password_;
+    }
+
     void setUserRoles(const std::vector<UserRole> &userRoles);
     void addUserRole(const UserRole &userRole);
 
@@ -45,6 +52,7 @@ class User : public AuditableEntity, public ChangeableEntity
 
   private:
     std::string username_;
+    std::string password_;
 
   public:
     std::string nickname;

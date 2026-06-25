@@ -27,5 +27,6 @@ class AuthController : public drogon::HttpController<AuthController>
         noexcept(false);
 
   private:
-    AuthServicePtr authService_;
+    AuthServicePtr authService_{
+        drogon::DrClassMap::getSingleInstance<AuthService>()};
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "application/organization/user/UserResponse.h"
 #include <jsoncpp/json/value.h>
 
 /**
@@ -11,7 +12,8 @@
 class LoginResponse
 {
   public:
-    LoginResponse(const std::string &token) : token_{token}
+    LoginResponse(std::string_view token, const UserResponse &user)
+        : token_{token}, user_{user}
     {
     }
 
@@ -19,4 +21,5 @@ class LoginResponse
 
   private:
     std::string token_;  ///< token
+    UserResponse user_;  ///< 用户
 };
