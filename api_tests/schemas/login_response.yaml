@@ -1,0 +1,121 @@
+# /login 接口响应体结构
+type: object
+properties:
+  code:
+    type: integer
+    nullable: true
+  message:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  warning:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  error:
+    type: [string, array]
+    nullable: true
+    items:
+      type: string
+  data:
+    nullable: true
+    $ref: '#/components/schemas/LoginResponse'
+
+components:
+  schemas:
+    # 登录响应体
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - menu_list
+        - user_info
+      properties:
+        token:
+          type: string
+        menu_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+        user_info:
+          $ref: '#/components/schemas/UserInfo'
+    MenuItem:
+      type: object
+      required:
+        - menu_id
+        - name
+        - type
+      properties:
+        menu_id:
+          type: integer
+          minimum: 1
+        path:
+          type: string
+        icon:
+          type: string
+        name:
+          type: string
+        component:
+          type: string
+        type:
+          type: integer
+          minimum: 0
+          maximum: 2
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+    UserInfo:
+      type: object
+      required:
+        - user_id
+        - username
+        - nickname
+        - avatar
+        - sex
+        - dept_id
+        - status
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        username:
+          type: string
+        nickname:
+          type: string
+        avatar:
+          type: string
+        sex:
+          type: integer
+          minimum: 0
+          maximum: 2
+        dept_id:
+          type: integer
+          minimum: 1
+        phone_number:
+          type: string
+          length: 11
+        email:
+          type: string
+        status:
+          type: integer
+          minimum: 0
+          maximum: 1
+        user_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRole'
+    UserRole:
+      type: object
+      required:
+        - user_id
+        - role_id
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        role_id:
+          type: integer
+          minimum: 1

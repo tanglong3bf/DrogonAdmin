@@ -257,7 +257,7 @@ CACHE 1;
 CREATE TABLE "public"."sys_user" (
   "user_id" int4 NOT NULL DEFAULT nextval('sys_user_user_id_seq'::regclass),
   "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
-  "password" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
+  "password" char(60) COLLATE "pg_catalog"."default" NOT NULL,
   "nickname" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "avatar" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "sex" int2 NOT NULL DEFAULT 0,
@@ -289,17 +289,17 @@ COMMENT ON COLUMN "public"."sys_user"."updated_time" IS '最后一次更新时�
 COMMENT ON COLUMN "public"."sys_user"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
 
-INSERT INTO "public"."sys_user" VALUES (1, 'user-1', '123456', '用户-1', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (2, 'user-2', '123456', '用户-2', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (3, 'user-3', '123456', '用户-3', '#', 1, 3, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (4, 'user-4', '123456', '用户-4', '#', 1, 4, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (5, 'user-5', '123456', '用户-5', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (6, 'user-6', '123456', '用户-6', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (7, 'user-7', '123456', '用户-7', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (8, 'user-8', '123456', '用户-8', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (9, 'user-9', '123456', '用户-9', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (10, 'user-10', '123456', '用户-10', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (11, 'user-11', '123456', '用户-11', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (1, 'user-1', '$2a$10$VMz6cRN.7elxRRaav1vJau.Ay9Yi.VI2GS5g9FPDQ0qo19jKIuXAe', '用户-1', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (2, 'user-2', '$2a$10$jBQmR2wc/3hZkFTaPJPns.689/JjjOGmE0KmCykiDHa.lRQKr48RG', '用户-2', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (3, 'user-3', '$2a$10$ocp9Pm.0p6RD2sRVLKTGG.GWFT2KoebD6ZOZbboEm54xQEqaJKzRK', '用户-3', '#', 1, 3, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (4, 'user-4', '$2a$10$XKUKmKmxmsDFn2dLRfkNne8hT7P8t6SG1ac73Enog2.eVoi/2MO7q', '用户-4', '#', 1, 4, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (5, 'user-5', '$2a$10$806Q3IVSk.ORANarqwixuu9TS4K2prTz/ZwV9rtxfeBfNnjkY8pLq', '用户-5', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (6, 'user-6', '$2a$10$cz1AsLcxP2ENf1dO1CK5CehtCWRpjZOzy1EH5lBYWLq7E56NixamC', '用户-6', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (7, 'user-7', '$2a$10$BV1YzlenrsoyXZMCz1OcZ./YPDB2FQ2afxDMkPGXJ93FFT2F4..wa', '用户-7', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (8, 'user-8', '$2a$10$8M39eRE7CtnpE8a3kgvaa.DLYFCbzO7Um3btNdeSN3ddX88k36/5K', '用户-8', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (9, 'user-9', '$2a$10$PpHbJiXdHjj/zS8Hn391veZgIebz4a6m/vDAcMJHa5qnSGtPySSC6', '用户-9', '#', 1, 2, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (10, 'user-10', '$2a$10$kviUVjK0W6DIrfBUdCV1AeIX2gIRCmv18IOdIQVkg/Sxrdz0fbbLm', '用户-10', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (11, 'user-11', '$2a$10$g4A7AsN9.7j85VsnSgkPLuo2EdHyB9ujOWiDCw1/8v0UVn6u.uuni', '用户-11', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 
 ALTER SEQUENCE "public"."sys_user_user_id_seq"
 OWNED BY "public"."sys_user"."user_id";

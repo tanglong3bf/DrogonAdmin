@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth'
+import { useCommonStore } from '@/stores/common'
 import { UserInfo } from '@/types/auth'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router/dist/vue-router.mjs'
 
 const authStore = useAuthStore()
+const commonStore = useCommonStore()
 const router = useRouter()
 
 /**
@@ -16,6 +18,8 @@ const logout = async () => {
   await router.push('/login')
   authStore.setUserInfo(undefined)
   authStore.setToken(undefined)
+  commonStore.setMenuList([])
+  commonStore.pageListClear()
 }
 
 const userInfo = computed<UserInfo>(() => authStore.userInfo!)

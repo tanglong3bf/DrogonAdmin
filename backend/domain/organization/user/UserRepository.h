@@ -102,6 +102,13 @@ class UserRepository : public DrAdminObject<UserRepository>
         const std::int32_t deptId,
         const std::vector<std::int32_t> &roleIds) const;
 
+    /**
+     * @brief 根据用户名获取用户
+     */
+    drogon::Task<std::optional<User>> getByUsername(
+        std::string_view username,
+        bool withRelation = false) const;
+
   protected:
     std::vector<UserRole> buildUserRoleList(
         const std::vector<SysUserRole> &sysUserRoles) const;

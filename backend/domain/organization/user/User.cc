@@ -3,12 +3,14 @@
 using namespace std;
 using namespace trantor;
 
-User::User(string username,
-           string nickname,
+User::User(string_view username,
+           string_view password,
+           string_view nickname,
            Sex sex,
            int32_t deptId,
            Status status)
     : username_{std::move(username)},
+      password_{password},
       nickname{std::move(nickname)},
       avatar{"#"},
       sex{sex},
@@ -17,13 +19,15 @@ User::User(string username,
 {
 }
 
-User::User(std::string username,
-           std::string nickname,
+User::User(std::string_view username,
+           std::string_view password,
+           std::string_view nickname,
            Sex sex,
            std::int32_t deptId,
            Status status,
            int32_t createdBy)
     : username_{std::move(username)},
+      password_{password},
       nickname{std::move(nickname)},
       avatar{"#"},
       sex{sex},
@@ -36,6 +40,7 @@ User::User(std::string username,
 User::User(const SysUser &model)
     : OPT_INIT(userId, UserId),
       INIT(username_, Username),
+      INIT(password_, Password),
       INIT(nickname, Nickname),
       INIT(avatar, Avatar),
       ENUM_INIT(Sex, sex, Sex),
@@ -52,6 +57,7 @@ User::operator SysUser() const
     SysUser model;
     SET_OPT(userId, UserId);
     SET_VAL(username_, Username);
+    SET_VAL(password_, Password);
     SET_VAL(nickname, Nickname);
     SET_VAL(avatar, Avatar);
     SET_VAL_CAST(int16_t, sex, Sex);

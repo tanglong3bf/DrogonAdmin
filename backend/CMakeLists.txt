@@ -43,9 +43,11 @@ aux_source_directory(common/exception EXCEPTION_SRC)
 aux_source_directory(common/framework/domain COMMON_DOMAIN_SRC)
 aux_source_directory(common/util/plugins/DrogonJwtUtil/src JWT_SRC)
 aux_source_directory(common/util/plugins/SqlGenerator/src SQL_GENERATOR_SRC)
+aux_source_directory(common/util/third_party/BCryptCpp BCRYPT_SRC)
 
 include_directories("./")
 include_directories("./common/util/plugins")
+include_directories("./common/util/third_party")
 
 target_sources(
   ${PROJECT_NAME}
@@ -63,7 +65,9 @@ target_sources(
           ${USER_DOMAIN_SRC}
           ${EXCEPTION_SRC}
           ${COMMON_DOMAIN_SRC}
+          ${FILTER_SRC}
           ${JWT_SRC}
-          ${SQL_GENERATOR_SRC})
+          ${SQL_GENERATOR_SRC}
+          ${BCRYPT_SRC})
 
 file(COPY config.json DESTINATION ${CMAKE_BINARY_DIR})

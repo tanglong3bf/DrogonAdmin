@@ -1,9 +1,10 @@
 #include "domain/organization/user/UserRepository.h"
 
-#include "common/framework/domain/ChangeableEntity.h"
 #include "domain/models/SysUser.h"
 #include "domain/models/SysUserRole.h"
+#include "common/framework/domain/ChangeableEntity.h"
 #include "RelationQuery/src/RelationQuery.hpp"
+#include <drogon/orm/Exception.h>
 #include <drogon/HttpAppFramework.h>
 #include <unordered_map>
 
@@ -54,8 +55,6 @@ drogon::Task<> UserRepository::save(User &user) const
         {
             const auto trans = co_await dbClient()->newTransactionCoro();
             auto model = static_cast<SysUser>(user);
-            // 补充默认密码
-            model.setPassword("123456");
             const auto userInDb = co_await userMapper(trans).insert(model);
             if (user.userRoles.size() > 0)
             {
@@ -311,6 +310,46 @@ Task<map<int32_t, size_t>> UserRepository::countUsersPerRoleInDepartment(
         result[row["role_id"].as<int32_t>()] = row["user_count"].as<size_t>();
     }
     co_return result;
+}
+
+Task<optional<User>> UserRepository::getByUsername(std::string_view username,
+                                                   bool withRelation) const
+{
+    static const auto relationQuery = app().getPlugin<RelationQuery>();
+
+    if (withRelation)
+    {
+        auto query = Query<SysUser>("u").hasMany<SysUserRole>(
+            JoinOn("u.user_id", "ur.user_id"), "ur");
+
+        const auto userInDb = co_await relationQuery->findByCoro(
+            query,
+            "u.username = '" + string(username) + "' AND u.deleted_by IS NULL");
+
+        if (userInDb.empty())
+        {
+            co_return nullopt;
+        }
+        const auto &[sysUser, sysUserRoles] = userInDb[0];
+        User user{sysUser};
+        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        co_return user;
+    }
+    else
+    {
+        try
+        {
+            const auto sysUser = co_await userMapper().findOne(
+                Criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull} &&
+                Criteria{SysUser::Cols::_username, username});
+            User user{sysUser};
+            co_return user;
+        }
+        catch (const UnexpectedRows & /* ignore */)
+        {
+            co_return nullopt;
+        }
+    }
 }
 
 vector<UserRole> UserRepository::buildUserRoleList(

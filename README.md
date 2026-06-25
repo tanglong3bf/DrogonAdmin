@@ -14,6 +14,12 @@ docker run --name drogon-admin-pgsql \
       -d postgres:18.1
 ```
 
-## 部门管理
+## 开源协议 (License)
 
-## 角色管理
+本项目基于 **MIT** 许可证开源，详情请参阅 [LICENSE](LICENSE) 文件。
+
+### 第三方组件声明 (Third-Party Notices)
+
+本项目中包含以下第三方开源组件：
+
+- **BCryptCpp** - 位于 `/backend/common/util/third_party/BCryptCpp/`，基于 **ISC** 许可证开源。

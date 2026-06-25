@@ -1,6 +1,6 @@
-#include <drogon/drogon.h>
 #include "common/exception/BusinessException.h"
 #include "DrogonJwtUtil/src/JwtUtil.h"
+#include <drogon/drogon.h>
 
 using namespace std;
 using namespace drogon;
@@ -107,12 +107,47 @@ int main()
                          "XdvcmxkIQ=="));
     });
 
-    // TODO: 等完成用户管理时，修改此处逻辑，临时用
+    // 登录检查
     app().registerPreHandlingAdvice([](const HttpRequestPtr &req,
-                                       AdviceCallback && /*ignore*/,
+                                       AdviceCallback &&ac,
                                        AdviceChainCallback &&acc) {
-        req->setParameter("userId", "1");
-        acc();
+        static const auto jwtUtil_ = app().getPlugin<tl::jwt::JwtUtil>();
+        static const auto whiteList =
+            app().getCustomConfig()["login_check_white_list"];
+
+        // 放行白名单接口
+        for (const auto &item : whiteList)
+        {
+            if (req->getPath() == item.asString())
+            {
+                acc();
+                return;
+            }
+        }
+
+        const auto authorization = req->getHeader("Authorization");
+        // 检查格式
+        if (authorization.starts_with("Bearer "))
+        {
+            const auto token = authorization.substr(7);
+            // 校验token
+            const auto result = jwtUtil_->decode(token);
+            if (result.first == tl::jwt::Result::Ok)
+            {
+                const auto &userInfo = *result.second;
+                req->getAttributes()->insert("userId",
+                                             userInfo["user_id"].as<int32_t>());
+                acc();
+                return;
+            }
+        }
+        // 格式错误或token无效
+        Json::Value json;
+        json["code"] = -1;
+        json["error"] = "未登录";
+        auto resp = HttpResponse::newHttpJsonResponse(json);
+        resp->setStatusCode(k401Unauthorized);
+        ac(resp);
     });
 
     app().loadConfigFile("./config.json");

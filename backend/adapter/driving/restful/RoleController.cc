@@ -25,8 +25,7 @@ Task<HttpResponsePtr> RoleController::createRole(
     const HttpRequestPtr req,
     const RoleCreateRequest request) const
 {
-    const auto createdBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto createdBy = req->getAttributes()->get<int32_t>("userId");
     co_await roleService_->createRole(request, createdBy);
     co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
@@ -36,8 +35,7 @@ Task<HttpResponsePtr> RoleController::updateRole(
     const std::int32_t roleId,
     const RoleUpdateRequest request) const
 {
-    const auto updatedBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
     LOG_TRACE << "更新角色，roleId=" << roleId << ", updatedBy=" << updatedBy;
     co_await roleService_->updateRole(roleId, request, updatedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
@@ -47,8 +45,7 @@ Task<HttpResponsePtr> RoleController::deleteRole(
     const HttpRequestPtr req,
     const std::int32_t roleId) const
 {
-    const auto deletedBy =
-        fromString<std::int32_t>(req->getParameter("userId"));
+    const auto deletedBy = req->getAttributes()->get<int32_t>("userId");
     co_await roleService_->deleteRole(roleId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

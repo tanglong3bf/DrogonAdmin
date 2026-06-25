@@ -1,7 +1,10 @@
 #include "UserAssembler.h"
 
+#include "BCryptCpp/BCrypt.h"
+
 using namespace std;
 using namespace drogon;
+using namespace BCryptCpp;
 
 Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
                                             const int32_t createdBy) const
@@ -22,9 +25,13 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
         }
     }
 
+    // 准备默认密码
+    const auto salt = BCrypt::GenerateSalt();
+    const auto hashedPassword = BCrypt::HashPassword("123456", salt);
     // 必备参数
-    User user{static_cast<string>(request.username()),
-              static_cast<string>(request.nickname()),
+    User user{request.username(),
+              hashedPassword,
+              request.nickname(),
               request.sex(),
               request.deptId(),
               request.status(),

@@ -49,7 +49,7 @@ INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
 CREATE TABLE "public"."sys_user" (
   "user_id" int4 NOT NULL DEFAULT nextval('sys_user_user_id_seq'::regclass),
   "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
-  "password" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
+  "password" char(60) COLLATE "pg_catalog"."default" NOT NULL,
   "nickname" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "avatar" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "sex" int2 NOT NULL DEFAULT 0,
@@ -93,10 +93,10 @@ INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '技术部白�
 -- 用户角色关联数据
 INSERT INTO "public"."sys_user_role" VALUES (4, 1, 1, '2026-04-01 00:00:00');
 
-INSERT INTO "public"."sys_user" VALUES (1, 'admin123', '123456', '超级管理员', '#', 0, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (2, 'user002', '123456', '用户002', '#', 0, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
-INSERT INTO "public"."sys_user" VALUES (3, 'user003', '123456', '用户003', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_user" VALUES (4, 'user004', '123456', '用户004', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (1, 'admin123', '$2a$10$MoBFdqc0CWMsTWvOM3ugNevngom4g5Ss30uCr82HNrdLNuHk.M11G', '超级管理员', '#', 0, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (2, 'user002', '$2a$10$PNUDum1n84pJTAbzXHIbzeNSE8tfTag3OieOvaJz/JT/.IgcXwdEW', '用户002', '#', 0, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_user" VALUES (3, 'user003', '$2a$10$pqi6byAMrBVVWh.DmuhwOO7zD4AlGYIfVkUWsmNIGByLBUmo4axS2', '用户003', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (4, 'user004', '$2a$10$cUcFy4yufBAH1BxTPDIYjuMW1pC62p1KI1Ha7NSs8u84jTIig22oi', '用户004', '#', 1, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 
 -- 设置序列起始值
