@@ -116,7 +116,8 @@ Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
                             }) | ranges_utils::to<vector>())
     {
         // 检查每个部门使用当前角色的用户数量是否超过限制
-        const auto userCountInRole = userCount.at(*role.roleId);
+        const size_t userCountInRole =
+            userCount.contains(*role.roleId) ? userCount.at(*role.roleId) : 0;
         if (userCountInRole + 1 > *role.userQuota)
         {
             throw BusinessException("使用当前角色的用户数量已达限制");
