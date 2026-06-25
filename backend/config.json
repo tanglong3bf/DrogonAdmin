@@ -480,13 +480,13 @@
         "menu_id": 1,
         "icon": "ion:settings-sharp",
         "name": "系统管理",
-        "type": "menu",
+        "type": 0, // menu
         "children": [
           {
             "menu_id": 2,
             "icon": "ion:settings-sharp",
             "name": "组织架构",
-            "type": "menu",
+            "type": 0, // menu
             "children": [
               {
                 "menu_id": 5,
@@ -494,7 +494,7 @@
                 "icon": "mingcute:department-fill",
                 "name": "部门管理",
                 "component": "/sys/organization/Dept",
-                "type": "page"
+                "type": 1 // page
               },
               {
                 "menu_id": 6,
@@ -502,7 +502,7 @@
                 "icon": "ri:user-fill",
                 "name": "用户管理",
                 "component": "/sys/organization/User",
-                "type": "page"
+                "type": 1 // page
               }
             ]
           },
@@ -510,7 +510,7 @@
             "menu_id": 3,
             "icon": "ion:settings-sharp",
             "name": "模块菜单",
-            "type": "menu",
+            "type": 0, // menu
             "children": [
               {
                 "menu_id": 7,
@@ -518,7 +518,7 @@
                 "icon": "tdesign:module-filled",
                 "name": "模块管理",
                 "component": "/sys/module_menu/Module",
-                "type": "page"
+                "type": 1 // page
               },
               {
                 "menu_id": 8,
@@ -526,7 +526,7 @@
                 "icon": "fluent-mdl2:context-menu",
                 "name": "菜单管理",
                 "component": "/sys/module_menu/Menu",
-                "type": "page"
+                "type": 1 // page
               }
             ]
           },
@@ -534,7 +534,7 @@
             "menu_id": 4,
             "icon": "ion:settings-sharp",
             "name": "角色权限",
-            "type": "menu",
+            "type": 0, //menu
             "children": [
               {
                 "menu_id": 9,
@@ -542,7 +542,7 @@
                 "icon": "fa7-solid:user-cog",
                 "name": "角色管理",
                 "component": "/sys/authorization/Role",
-                "type": "page"
+                "type": 1 // page
               },
               {
                 "menu_id": 10,
@@ -550,7 +550,7 @@
                 "icon": "ix:user-key",
                 "name": "权限管理",
                 "component": "/sys/authorization/Auth",
-                "type": "page"
+                "type": 1 // page
               }
             ]
           }
@@ -561,7 +561,7 @@
         "path": "https://github.com/tanglong3bf/DrogonAdmin",
         "icon": "octicon:mark-github-24",
         "name": "源码地址",
-        "type": "out_link"
+        "type": 2 // out_link
       }
     ]
   }
