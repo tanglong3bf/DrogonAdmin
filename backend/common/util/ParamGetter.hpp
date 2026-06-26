@@ -422,26 +422,13 @@ class ParamGetter
         // 比期望的最大值更高
         const bool isTooHigh =
             value_range.second >= 0 && jsonValue > value_range.second;
-        if constexpr (is_necessary)
+        if (isOutOfRange)
         {
-            if (isOutOfRange)
-            {
-                throw BusinessException{key + "的值超出了指定类型的表示范围"};
-            }
-            else if (isTooLow || isTooHigh)
-            {
-                throw BusinessException{key + "的值超出期望范围"};
-            }
-        }
-        else if (isOutOfRange)
-        {
-            LOG_WARN << key + "的值超出了指定类型的表示范围，已忽略";
-            return std::nullopt;
+            throw BusinessException{key + "的值超出了指定类型的表示范围"};
         }
         else if (isTooLow || isTooHigh)
         {
-            LOG_WARN << key + "的值超出期望范围，已忽略";
-            return std::nullopt;
+            throw BusinessException{key + "的值超出期望范围"};
         }
         return static_cast<D>(jsonValue);
     }
