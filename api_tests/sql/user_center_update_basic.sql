@@ -1,4 +1,4 @@
--- 登录测试数据
+-- 个人中心更新基础信息测试数据
 DROP TABLE IF EXISTS "public"."sys_user";
 DROP TABLE IF EXISTS "public"."sys_dept";
 DROP SEQUENCE IF EXISTS "public"."sys_user_user_id_seq";

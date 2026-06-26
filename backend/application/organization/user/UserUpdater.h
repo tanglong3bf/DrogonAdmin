@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UserUpdateRequest.h"
+#include "application/organization/user/UserInfoUpdateRequest.h"
 #include "domain/organization/user/User.h"
 #include "domain/organization/dept/DeptVerifier.h"
 #include "domain/authorization/RoleVerifier.h"
@@ -19,6 +20,12 @@ class UserUpdater : public DrAdminObject<UserUpdater>
     drogon::Task<> updateUser(User &user,
                               const UserUpdateRequest &request,
                               const std::int32_t updatedBy) const;
+
+    /**
+     * @brief 更新用户基本信息
+     */
+    drogon::Task<> updateBasicInfo(User &user,
+                                   const UserInfoUpdateRequest &request) const;
 
   protected:
     /**

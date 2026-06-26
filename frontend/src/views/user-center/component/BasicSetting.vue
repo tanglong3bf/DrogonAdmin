@@ -3,8 +3,9 @@ import { watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive } from 'vue'
-import { updateUserInfo } from '@/api/user'
+import { updateUserBasicInfo } from '@/api/user_center'
 import { UserInfoUpdateRequest } from '@/types/user'
+import { Sex } from '@/types/enums'
 
 const authStore = useAuthStore()
 
@@ -13,7 +14,7 @@ const authStore = useAuthStore()
  */
 interface UserUpdatableInfo {
   nickname: string
-  sex: 'male' | 'female' | 'secrecy'
+  sex: Sex
   phoneNumber?: string
   email?: string
 }
@@ -28,7 +29,7 @@ const formRef = ref<FormInstance>()
  */
 const formData = reactive<UserUpdatableInfo>({
   nickname: '',
-  sex: 'secrecy',
+  sex: 0,
   phoneNumber: undefined,
   email: undefined
 })
@@ -135,7 +136,21 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
         : undefined,
       email: emailChanged ? (emailIsEmpty ? null : formData.email) : undefined
     }
-    await updateUserInfo(request)
+    await updateUserBasicInfo(request)
+    ElMessage.success('更新成功！')
+    if (nicknameChanged) {
+      userInfo.username = formData.nickname
+    }
+    if (sexChanged) {
+      userInfo.sex = formData.sex
+    }
+    if (phoneNumberChanged) {
+      userInfo.phone_number = formData.phoneNumber
+    }
+    if (emailChanged) {
+      userInfo.email = formData.email
+    }
+    authStore.setUserInfo(userInfo)
   }
 }
 </script>
@@ -153,9 +168,9 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
     </el-form-item>
     <el-form-item label="性别" prop="sex">
       <el-select v-model="formData.sex" placeholder="请选择你的性别">
-        <el-option label="男" value="male" />
-        <el-option label="女" value="female" />
-        <el-option label="保密" value="secrecy" />
+        <el-option label="男" :value="Sex.Male" />
+        <el-option label="女" :value="Sex.Female" />
+        <el-option label="保密" :value="Sex.Secrecy" />
       </el-select>
     </el-form-item>
     <el-form-item

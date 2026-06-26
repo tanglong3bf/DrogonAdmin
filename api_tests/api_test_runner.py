@@ -131,8 +131,11 @@ case_names += [case_item["name"] for case_item in role_datas["role_cases"]]
 user_datas: dict = read_yaml("cases/user_test_case.yaml")
 case_names += [case_item["name"] for case_item in user_datas["user_cases"]]
 
+user_center_datas: dict = read_yaml("cases/user_center_test_case.yaml")
+case_names += [case_item["name"] for case_item in user_center_datas["user_center_cases"]]
 
-@pytest.mark.parametrize("case_item", auth_datas["auth_cases"] + dept_datas["dept_cases"] + role_datas["role_cases"] + user_datas["user_cases"],  ids=case_names)
+
+@pytest.mark.parametrize("case_item", auth_datas["auth_cases"] + dept_datas["dept_cases"] + role_datas["role_cases"] + user_datas["user_cases"] + user_center_datas["user_center_cases"],  ids=case_names)
 def test_dept_cases(case_item):
     # 部分接口需要提前准备数据
     if "sql_file" in case_item:

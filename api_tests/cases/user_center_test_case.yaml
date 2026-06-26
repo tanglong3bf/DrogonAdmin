@@ -1,0 +1,147 @@
+user_center_cases:
+  # 修改基础信息 {{{
+  - name: 修改基础信息-过长的昵称
+    sql_file: user_center_update_basic.sql
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      nickname: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: nickname参数长度过长
+  - name: 修改基础信息-性别为-1
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      sex: -1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: sex的值超出期望范围
+  - name: 修改基础信息-性别为3
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      sex: -1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: sex的值超出期望范围
+  - name: 修改基础信息-修改手机号（10位）
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      phone_number: '1381234567'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: phone_number参数长度过短
+  - name: 修改基础信息-修改手机号（12位）
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      phone_number: '138123456789'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: phone_number参数长度过长
+  - name: 修改基础信息-修改手机号（11位+包含字母）
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      phone_number: '1381234567a'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 手机号只支持数字
+  - name: 修改基础信息-修改邮箱（缺少@）
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      email: abcqq.com
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 邮箱格式错误
+  - name: 修改基础信息-修改邮箱（缺少.）
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      email: abc@qq
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 邮箱格式错误
+  - name: 数据检查-更新失败
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].nickname: 超级管理员
+    validate_schema: user_paginated.yaml
+  - name: 修改基础信息-修改昵称
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      nickname: 修改后的昵称
+    params: ''
+    expect:
+      status_code: 204
+  - name: 修改基础信息-修改性别为1
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      sex: 1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 修改基础信息-修改手机号
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      phone_number: '13811223344'
+    params: ''
+    expect:
+      status_code: 204
+  - name: 修改基础信息-修改邮箱
+    url: http://localhost:8000/user_center/basic_info
+    method: PATCH
+    json:
+      email: hello@world.com
+    params: ''
+    expect:
+      status_code: 204
+  - name: 数据检查-更新成功
+    url: http://localhost:8000/user
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.list[0].nickname: 修改后的昵称
+        $.data.list[0].sex: 1
+        $.data.list[0].phone_number: '13811223344'
+        $.data.list[0].email: hello@world.com
+    validate_schema: user_paginated.yaml
+  # }}}
