@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import type { UserInfo } from '@/types/auth'
 import { ElMessage, ElUpload, UploadFile } from 'element-plus/es'
-import { uploadAvatar } from '@/api/user'
+import { uploadAvatar } from '@/api/user_center'
 import { Icon } from '@iconify/vue'
 import { Sex } from '@/types/enums'
 

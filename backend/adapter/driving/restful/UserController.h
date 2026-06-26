@@ -2,7 +2,6 @@
 
 #include "application/organization/user/UserService.h"
 #include "application/organization/user/UserCreateRequest.h"
-#include "application/organization/user/UserInfoUpdateRequest.h"
 #include <drogon/HttpController.h>
 
 class UserController : public drogon::HttpController<UserController>
@@ -25,10 +24,6 @@ class UserController : public drogon::HttpController<UserController>
     ADD_METHOD_TO(UserController::deleteUser,
                   "/user/{id}",
                   drogon::Delete,
-                  drogon::Options);
-    ADD_METHOD_TO(UserController::updateBasicInfo,
-                  "/user/me",
-                  drogon::Patch,
                   drogon::Options);
     METHOD_LIST_END
 
@@ -68,13 +63,6 @@ class UserController : public drogon::HttpController<UserController>
     drogon::Task<drogon::HttpResponsePtr> deleteUser(
         const drogon::HttpRequestPtr req,
         const std::int32_t userId) const;
-
-    /**
-     * @brief 更新用户基础信息
-     */
-    drogon::Task<drogon::HttpResponsePtr> updateBasicInfo(
-        const drogon::HttpRequestPtr req,
-        const UserInfoUpdateRequest request) const;
 
   private:
     UserServicePtr userService_{

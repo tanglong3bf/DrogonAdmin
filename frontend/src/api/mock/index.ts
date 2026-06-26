@@ -4,6 +4,7 @@ import { mock } from '@/utils/request'
 import './auth'
 import './dept'
 import './user'
+import './user_center'
 import './role'
 
 // 放行未mock的接口

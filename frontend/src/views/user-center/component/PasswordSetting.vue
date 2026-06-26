@@ -6,7 +6,7 @@ import type {
   Value
 } from 'async-validator/dist-types/interface.d.ts'
 import { UserPasswordUpdateRequest } from '@/types/user'
-import { changePassword } from '@/api/user'
+import { changePassword } from '@/api/user_center'
 
 /**
  * 更新密码表单数据

@@ -3,7 +3,7 @@ import { watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { onMounted, reactive } from 'vue'
-import { updateUserBasicInfo } from '@/api/user'
+import { updateUserBasicInfo } from '@/api/user_center'
 import { UserInfoUpdateRequest } from '@/types/user'
 import { Sex } from '@/types/enums'
 

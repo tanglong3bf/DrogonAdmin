@@ -64,12 +64,3 @@ Task<HttpResponsePtr> UserController::deleteUser(
     co_await userService_->deleteUser(userId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
-
-drogon::Task<drogon::HttpResponsePtr> UserController::updateBasicInfo(
-    const drogon::HttpRequestPtr req,
-    const UserInfoUpdateRequest request) const
-{
-    const auto userId = req->getAttributes()->get<int32_t>("userId");
-    co_await userService_->updateBasicInfo(userId, request);
-    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
-}
