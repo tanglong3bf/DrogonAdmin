@@ -26,4 +26,8 @@ ChangePasswordRequest::ChangePasswordRequest(const Json::Value &json)
 {
     oldPassword_ = getParam<string, true>(json, "old_password", {6, 20});
     newPassword_ = getParam<string, true>(json, "new_password", {6, 20});
+    if (oldPassword_ == newPassword_)
+    {
+        throw BusinessException("新旧密码不能相同");
+    }
 }

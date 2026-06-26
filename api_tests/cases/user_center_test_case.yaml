@@ -145,3 +145,78 @@ user_center_cases:
         $.data.list[0].email: hello@world.com
     validate_schema: user_paginated.yaml
   # }}}
+  # 修改密码 {{{
+  - name: 登录接口-为修改密码做准备
+    url: http://localhost:8000/login
+    method: POST
+    need_token: False
+    json:
+      username: admin123
+      password: '123456'
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.user_info.user_id: 1
+    validate_schema: login_response.yaml
+    extract:
+      token: $.data.token
+  - name: 修改密码-缺少旧密码
+    url: http://localhost:8000/user_center/change_password
+    method: PATCH
+    json:
+      new_password: '654321'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：old_password
+  - name: 修改密码-缺少新密码
+    url: http://localhost:8000/user_center/change_password
+    method: PATCH
+    json:
+      old_password: '123456'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：new_password
+  - name: 修改密码-新旧密码相同
+    url: http://localhost:8000/user_center/change_password
+    method: PATCH
+    json:
+      old_password: '123456'
+      new_password: '123456'
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 新旧密码不能相同
+  - name: 修改密码-正常修改
+    url: http://localhost:8000/user_center/change_password
+    method: PATCH
+    json:
+      old_password: '123456'
+      new_password: '654321'
+    params: ''
+    expect:
+      status_code: 204
+  - name: 登录接口-用新密码登录
+    url: http://localhost:8000/login
+    method: POST
+    need_token: False
+    json:
+      username: admin123
+      password: '654321'
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data.user_info.user_id: 1
+    validate_schema: login_response.yaml
+    extract:
+      token: $.data.token
+  #}}}
