@@ -24,6 +24,6 @@ ChangePasswordRequest fromRequest(const HttpRequest &req)
 
 ChangePasswordRequest::ChangePasswordRequest(const Json::Value &json)
 {
-    oldPassword_ = getParam<string, true>(json, "oldPassword", {6, 20});
-    newPassword_ = getParam<string, true>(json, "newPassword", {6, 20});
+    oldPassword_ = getParam<string, true>(json, "old_password", {6, 20});
+    newPassword_ = getParam<string, true>(json, "new_password", {6, 20});
 }

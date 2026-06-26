@@ -12,9 +12,9 @@ import { changePassword } from '@/api/user_center'
  * 更新密码表单数据
  */
 interface PasswordModifyForm {
-  oldPassword: string
-  oldPassword2: string
-  newPassword: string
+  old_password: string
+  old_password2: string
+  new_password: string
 }
 
 /**
@@ -26,9 +26,9 @@ const formRef = ref<FormInstance>()
  * 表单数据
  */
 const formData = reactive<PasswordModifyForm>({
-  oldPassword: '',
-  oldPassword2: '',
-  newPassword: ''
+  old_password: '',
+  old_password2: '',
+  new_password: ''
 })
 
 /**
@@ -39,13 +39,13 @@ const validateOldPwdEqual = (
   value: Value,
   callback: (error?: string | Error) => void
 ) => {
-  const { oldPassword } = formData
+  const { old_password } = formData
 
   if (!value) {
     return callback(new Error('请再次确认旧密码'))
   }
 
-  if (value !== oldPassword) {
+  if (value !== old_password) {
     callback(new Error('两次输入的旧密码不一致，请重新输入'))
   } else {
     callback()
@@ -60,14 +60,14 @@ const validateNewPwdNotEqualOld = (
   value: Value,
   callback: (error?: string | Error) => void
 ) => {
-  const { oldPassword, oldPassword2 } = formData
+  const { old_password, old_password2 } = formData
 
   if (!value) {
     return callback(new Error('请输入新密码'))
   }
 
-  if (oldPassword && oldPassword2 && oldPassword === oldPassword2) {
-    if (value === oldPassword) {
+  if (old_password && old_password2 && old_password === old_password2) {
+    if (value === old_password) {
       callback(new Error('新密码不能与旧密码相同，请重新输入'))
     } else {
       callback()
@@ -81,16 +81,16 @@ const validateNewPwdNotEqualOld = (
  * 表单校验规则
  */
 const rules = reactive<FormRules<PasswordModifyForm>>({
-  oldPassword: [
+  old_password: [
     { required: true, message: '请填写旧密码', trigger: 'blur' },
     { min: 6, max: 20, message: '旧密码长度不合法', trigger: 'blur' }
   ],
-  oldPassword2: [
+  old_password2: [
     { required: true, message: '请填写旧密码', trigger: 'blur' },
     { min: 6, max: 20, message: '旧密码长度不合法', trigger: 'blur' },
     { validator: validateOldPwdEqual, trigger: 'blur' }
   ],
-  newPassword: [
+  new_password: [
     { required: true, message: '请填写新密码', trigger: 'blur' },
     { min: 6, max: 20, message: '新密码长度不合法', trigger: 'blur' },
     { validator: validateNewPwdNotEqualOld, trigger: 'blur' }
@@ -101,16 +101,16 @@ const rules = reactive<FormRules<PasswordModifyForm>>({
  * 检查数据是否发生变化，且满足长度规则
  */
 const checkUpdatable = (): boolean => {
-  const oldPasswordLength = formData.oldPassword.length
-  const newPasswordLength = formData.newPassword.length
+  const old_passwordLength = formData.old_password.length
+  const new_passwordLength = formData.new_password.length
 
   return (
-    oldPasswordLength >= 6 &&
-    oldPasswordLength <= 20 &&
-    newPasswordLength >= 6 &&
-    newPasswordLength <= 20 &&
-    formData.oldPassword === formData.oldPassword2 &&
-    formData.newPassword !== formData.oldPassword
+    old_passwordLength >= 6 &&
+    old_passwordLength <= 20 &&
+    new_passwordLength >= 6 &&
+    new_passwordLength <= 20 &&
+    formData.old_password === formData.old_password2 &&
+    formData.new_password !== formData.old_password
   )
 }
 
@@ -121,15 +121,15 @@ const changePasswordBtn = async (formEl?: FormInstance) => {
   const isValid = formEl?.validate()
   if (isValid) {
     const request: UserPasswordUpdateRequest = {
-      oldPassword: formData.oldPassword,
-      newPassword: formData.newPassword
+      old_password: formData.old_password,
+      new_password: formData.new_password
     }
 
     await changePassword(request)
     ElMessage.success('密码修改成功！')
-    formData.oldPassword = ''
-    formData.oldPassword2 = ''
-    formData.newPassword = ''
+    formData.old_password = ''
+    formData.old_password2 = ''
+    formData.new_password = ''
   }
 }
 </script>
@@ -142,24 +142,24 @@ const changePasswordBtn = async (formEl?: FormInstance) => {
     label-position="top"
     ref="formRef"
   >
-    <el-form-item label="旧密码" prop="oldPassword">
+    <el-form-item label="旧密码" prop="old_password">
       <el-input
         type="password"
-        v-model="formData.oldPassword"
+        v-model="formData.old_password"
         placeholder="请输入旧密码"
       />
     </el-form-item>
-    <el-form-item label="旧密码（确认）" prop="oldPassword2">
+    <el-form-item label="旧密码（确认）" prop="old_password2">
       <el-input
         type="password"
-        v-model="formData.oldPassword2"
+        v-model="formData.old_password2"
         placeholder="请再次输入旧密码"
       />
     </el-form-item>
-    <el-form-item label="新密码" prop="newPassword">
+    <el-form-item label="新密码" prop="new_password">
       <el-input
         type="password"
-        v-model="formData.newPassword"
+        v-model="formData.new_password"
         placeholder="请输入新密码"
       />
     </el-form-item>
