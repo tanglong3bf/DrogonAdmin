@@ -11,7 +11,7 @@ import request, { validateResponse } from '@/utils/request'
 export const updateUserBasicInfo = (
   userInfoUpdateRequest: UserInfoUpdateRequest
 ): Promise<undefined> => {
-  return request.patch('/user-center/basic-info', {
+  return request.patch('/user_center/basic_info', {
     ...userInfoUpdateRequest
   })
 }
@@ -22,7 +22,7 @@ export const updateUserBasicInfo = (
 export const changePassword = (
   userPasswordUpdateRequest: UserPasswordUpdateRequest
 ): Promise<undefined> => {
-  return request.post('/user/change-password', {
+  return request.post('/user/change_password', {
     ...userPasswordUpdateRequest
   })
 }

@@ -34,7 +34,7 @@ if (mockConfig.user_center.update_basic_info) {
  */
 if (mockConfig.user_center.change_password) {
   mock
-    .onPost(/^http:\/\/localhost:8000\/user_center\/change-password$/)
+    .onPost(/^http:\/\/localhost:8000\/user_center\/change_password$/)
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {
