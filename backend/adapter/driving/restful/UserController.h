@@ -1,7 +1,7 @@
 #pragma once
 
 #include "application/organization/user/UserService.h"
-#include "application/organization/user/UserCreateRequest.h"
+#include "application/organization/user/dto/UserCreateRequest.h"
 #include <drogon/HttpController.h>
 
 class UserController : public drogon::HttpController<UserController>

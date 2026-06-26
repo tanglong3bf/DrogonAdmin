@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FormInstance, FormRules } from 'element-plus/es'
+import { ElMessage, FormInstance, FormRules } from 'element-plus/es'
 import { reactive, ref } from 'vue'
 import type {
   InternalRuleItem,
@@ -126,6 +126,10 @@ const changePasswordBtn = async (formEl?: FormInstance) => {
     }
 
     await changePassword(request)
+    ElMessage.success('密码修改成功！')
+    formData.oldPassword = ''
+    formData.oldPassword2 = ''
+    formData.newPassword = ''
   }
 }
 </script>

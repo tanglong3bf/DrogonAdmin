@@ -1,6 +1,7 @@
 #pragma once
 
-#include "UserInfoUpdateRequest.h"
+#include "application/organization/user/dto/ChangePasswordRequest.h"
+#include "dto/UserInfoUpdateRequest.h"
 #include "UserUpdater.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/utils/coroutine.h>
@@ -13,6 +14,9 @@ class UserCenterService : public DrAdminObject<UserCenterService>
      */
     drogon::Task<> updateBasicInfo(const std::int32_t userId,
                                    const UserInfoUpdateRequest &request) const;
+
+    drogon::Task<> changePassword(const std::int32_t userId,
+                                  const ChangePasswordRequest &request) const;
 
   private:
     UserUpdaterPtr userUpdater_{

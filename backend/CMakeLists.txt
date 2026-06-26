@@ -35,6 +35,7 @@ aux_source_directory(application/authorization/role ROLE_SERVICE_SRC)
 aux_source_directory(application/authorization/role/dto ROLE_DTO_SRC)
 aux_source_directory(application/organization/dept DEPT_SERVICE_SRC)
 aux_source_directory(application/organization/user USER_SERVICE_SRC)
+aux_source_directory(application/organization/user/dto USER_DTO_SRC)
 aux_source_directory(domain/models MODEL_SRC)
 aux_source_directory(domain/authorization AUTHORIZATION_DOMAIN_SRC)
 aux_source_directory(domain/organization/dept DEPT_DOMAIN_SRC)
@@ -59,6 +60,7 @@ target_sources(
           ${ROLE_DTO_SRC}
           ${DEPT_SERVICE_SRC}
           ${USER_SERVICE_SRC}
+	  ${USER_DTO_SRC}
           ${MODEL_SRC}
           ${AUTHORIZATION_DOMAIN_SRC}
           ${DEPT_DOMAIN_SRC}

@@ -22,7 +22,7 @@ Task<LoginResponse> AuthService::login(const LoginRequest &request) const
         throw BusinessException{"用户不存在，登录失败"};
     }
 
-    if (!matches(request.password(), user->password()))
+    if (!matches(request.password(), user->password))
     {
         throw BusinessException{"密码错误，登录失败"};
     }

@@ -40,11 +40,6 @@ class User : public AuditableEntity, public ChangeableEntity
         return username_;
     }
 
-    std::string_view password() const noexcept
-    {
-        return password_;
-    }
-
     void setUserRoles(const std::vector<UserRole> &userRoles);
     void addUserRole(const UserRole &userRole);
 
@@ -52,9 +47,9 @@ class User : public AuditableEntity, public ChangeableEntity
 
   private:
     std::string username_;
-    std::string password_;
 
   public:
+    std::string password;
     std::string nickname;
     std::string avatar;
     Sex sex;
