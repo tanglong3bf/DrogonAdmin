@@ -6,6 +6,7 @@ import { Sex } from '@/types/enums'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router/dist/vue-router.mjs'
+import { IMG_BASE_URL } from '@/config'
 
 const authStore = useAuthStore()
 const commonStore = useCommonStore()
@@ -31,6 +32,12 @@ const toUserCenter = () => router.push('/user-center')
  * 头像预览
  */
 const avatarPreviewUrl = computed(() => {
+  if (
+    userInfo.value.avatar.startsWith('http://') ||
+    userInfo.value.avatar.startsWith('https://')
+  ) {
+    return userInfo.value.avatar
+  }
   if (userInfo.value.avatar === '#') {
     switch (userInfo.value.sex) {
       case Sex.Secrecy:
@@ -41,7 +48,7 @@ const avatarPreviewUrl = computed(() => {
         return new URL(`@/assets/avatar/female.jpeg`, import.meta.url).href
     }
   }
-  return 'http://localhost:8000' + userInfo.value.avatar
+  return IMG_BASE_URL + userInfo.value.avatar
 })
 </script>
 

@@ -3,9 +3,10 @@ import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 import { ResponseBody } from '@/types/common'
 import MockAdapter from 'axios-mock-adapter'
+import { API_BASE_URL } from '@/config'
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: API_BASE_URL,
   timeout: 5000
 })
 

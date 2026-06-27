@@ -6,6 +6,7 @@ import { ElMessage, ElUpload, UploadFile } from 'element-plus/es'
 import { uploadAvatar } from '@/api/user_center'
 import { Icon } from '@iconify/vue'
 import { Sex } from '@/types/enums'
+import { IMG_BASE_URL } from '@/config'
 
 const authStore = useAuthStore()
 
@@ -116,6 +117,12 @@ const avatarPreviewUrl = computed(() => {
   if (avatarPreview.value !== null) {
     return avatarPreview.value
   }
+  if (
+    userInfo.value.avatar.startsWith('http://') ||
+    userInfo.value.avatar.startsWith('https://')
+  ) {
+    return userInfo.value.avatar
+  }
   if (userInfo.value.avatar === '#') {
     switch (userInfo.value.sex) {
       case Sex.Secrecy:
@@ -126,7 +133,7 @@ const avatarPreviewUrl = computed(() => {
         return new URL(`@/assets/avatar/female.jpeg`, import.meta.url).href
     }
   }
-  return 'http://localhost:8000' + userInfo.value.avatar
+  return IMG_BASE_URL + userInfo.value.avatar
 })
 </script>
 
