@@ -36,6 +36,9 @@ class User : public AuditableEntity, public ChangeableEntity
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
 
+    /**
+     * @brief 更新头像
+     */
     drogon::Task<std::string> updateAvatar(const drogon::HttpRequestPtr &req);
 
     std::string_view username() const noexcept

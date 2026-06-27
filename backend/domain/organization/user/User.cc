@@ -1,6 +1,7 @@
 #include "User.h"
 
 #include "common/exception/BusinessException.h"
+#include <drogon/HttpAppFramework.h>
 #include <drogon/MultiPart.h>
 #include <drogon/HttpResponse.h>
 
@@ -102,8 +103,16 @@ Task<string> User::updateAvatar(const HttpRequestPtr &req)
     {
         throw BusinessException("缺少头像文件");
     }
-    files.at("avatar").save();
-    avatar = "/uploads/" + files.at("avatar").getFileName();
+
+    const HttpFile &avatarFile = files.at("avatar");
+    const string_view extension = avatarFile.getFileExtension();
+    const string fileName =
+        avatarFile.getMd5() + "." + static_cast<string>(extension);
+    avatarFile.saveAs(fileName);
+
+    const auto imgPrefix =
+        app().getCustomConfig().get("img_prefix", "/uploads/").asString();
+    avatar = imgPrefix + fileName;
 
     this->markUpdated();
     this->markUpdatedBy(*this->userId);
