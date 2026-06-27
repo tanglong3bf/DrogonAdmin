@@ -1,6 +1,11 @@
 #include "User.h"
 
+#include "common/exception/BusinessException.h"
+#include <drogon/MultiPart.h>
+#include <drogon/HttpResponse.h>
+
 using namespace std;
+using namespace drogon;
 using namespace trantor;
 
 User::User(string_view username,
@@ -86,6 +91,24 @@ User::operator SysUser() const
     SET_OPT(deletedBy(), DeletedBy);
     SET_OPT(deletedTime(), DeletedTime);
     return model;
+}
+
+Task<string> User::updateAvatar(const HttpRequestPtr &req)
+{
+    MultiPartParser parser;
+    parser.parse(req);
+    const auto files = parser.getFilesMap();
+    if (!files.contains("avatar"))
+    {
+        throw BusinessException("缺少头像文件");
+    }
+    files.at("avatar").save();
+    avatar = "/uploads/" + files.at("avatar").getFileName();
+
+    this->markUpdated();
+    this->markUpdatedBy(*this->userId);
+
+    co_return avatar;
 }
 
 void User::setUserRoles(const std::vector<UserRole> &userRoles)

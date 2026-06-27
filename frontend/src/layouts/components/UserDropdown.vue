@@ -2,6 +2,7 @@
 import { useAuthStore } from '@/stores/auth'
 import { useCommonStore } from '@/stores/common'
 import { UserInfo } from '@/types/auth'
+import { Sex } from '@/types/enums'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router/dist/vue-router.mjs'
@@ -25,15 +26,32 @@ const logout = async () => {
 const userInfo = computed<UserInfo>(() => authStore.userInfo!)
 
 const toUserCenter = () => router.push('/user-center')
+
+/**
+ * 头像预览
+ */
+const avatarPreviewUrl = computed(() => {
+  if (userInfo.value.avatar === '#') {
+    switch (userInfo.value.sex) {
+      case Sex.Secrecy:
+        return new URL(`@/assets/avatar/drogon-logo.svg`, import.meta.url).href
+      case Sex.Male:
+        return new URL(`@/assets/avatar/male.jpeg`, import.meta.url).href
+      case Sex.Female:
+        return new URL(`@/assets/avatar/female.jpeg`, import.meta.url).href
+    }
+  }
+  return 'http://localhost:8000' + userInfo.value.avatar
+})
 </script>
 
 <template>
   <el-dropdown placement="bottom-end">
-    <el-avatar class="avatar" :size="36" :src="userInfo.avatar" />
+    <el-avatar class="avatar" :size="36" :src="avatarPreviewUrl" />
     <template #dropdown>
       <div class="wrapper">
         <div class="header">
-          <el-avatar :size="40" :src="userInfo.avatar" />
+          <el-avatar :size="40" :src="avatarPreviewUrl" />
           <div style="display: flex; flex-direction: column">
             <span class="nickname">{{ userInfo.nickname }}</span>
             <span class="email" v-if="userInfo.email">{{

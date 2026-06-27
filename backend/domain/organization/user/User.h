@@ -8,6 +8,7 @@
 #include "domain/models/SysUser.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
+#include <drogon/HttpRequest.h>
 #include <optional>
 #include <string>
 #include <cstdint>
@@ -34,6 +35,8 @@ class User : public AuditableEntity, public ChangeableEntity
     // 与模型类互转
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
+
+    drogon::Task<std::string> updateAvatar(const drogon::HttpRequestPtr &req);
 
     std::string_view username() const noexcept
     {

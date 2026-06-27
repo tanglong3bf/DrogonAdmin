@@ -28,6 +28,7 @@ const handleFileChange = (uploadFile: UploadFile) => {
 
   // 校验文件
   if (!beforeAvatarUpload(file)) {
+    uploadRef.value?.clearFiles()
     return
   }
 
@@ -79,18 +80,20 @@ const beforeAvatarUpload = (file: File) => {
 const handleManualUpload = async (_params: any) => {
   if (!avatarFile.value) return
   isUploading.value = true
-  resetAvatar()
   try {
     const response = await uploadAvatar(avatarFile.value)
     const { file_path: filePath } = response
-
-    userInfo.value.avatar = filePath
+    authStore.setUserInfo({
+      ...userInfo.value,
+      avatar: filePath
+    })
   } catch (error) {
     console.error('上传请求异常：', error)
     ElMessage.error('头像上传失败，请稍后重试！')
   } finally {
     isUploading.value = false
     uploadRef.value?.clearFiles()
+    resetAvatar()
   }
 }
 
@@ -105,6 +108,26 @@ const handleConfirmUpload = () => {
   }
   uploadRef.value?.submit()
 }
+
+/**
+ * 头像预览
+ */
+const avatarPreviewUrl = computed(() => {
+  if (avatarPreview.value !== null) {
+    return avatarPreview.value
+  }
+  if (userInfo.value.avatar === '#') {
+    switch (userInfo.value.sex) {
+      case Sex.Secrecy:
+        return new URL(`@/assets/avatar/drogon-logo.svg`, import.meta.url).href
+      case Sex.Male:
+        return new URL(`@/assets/avatar/male.jpeg`, import.meta.url).href
+      case Sex.Female:
+        return new URL(`@/assets/avatar/female.jpeg`, import.meta.url).href
+    }
+  }
+  return 'http://localhost:8000' + userInfo.value.avatar
+})
 </script>
 
 <template>
@@ -126,11 +149,7 @@ const handleConfirmUpload = () => {
             :http-request="handleManualUpload"
             ref="uploadRef"
           >
-            <img
-              :src="avatarPreview !== null ? avatarPreview : userInfo.avatar"
-              class="avatar"
-              alt="头像预览"
-            />
+            <img :src="avatarPreviewUrl" class="avatar" alt="头像预览" />
           </el-upload>
           <br />
         </div>
