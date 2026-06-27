@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UserCreateRequest.h"
+#include "dto/UserCreateRequest.h"
 #include "domain/organization/user/User.h"
 #include "domain/organization/user/UserVerifier.h"
 #include "domain/organization/dept/DeptVerifier.h"

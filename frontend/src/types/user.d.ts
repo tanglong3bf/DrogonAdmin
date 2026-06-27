@@ -54,8 +54,8 @@ export interface UserInfoUpdateRequest {
  * 更新用户密码请求体
  */
 export interface UserPasswordUpdateRequest {
-  oldPassword: string
-  newPassword: string
+  old_password: string
+  new_password: string
 }
 
 export interface UploadAvatarResponse {

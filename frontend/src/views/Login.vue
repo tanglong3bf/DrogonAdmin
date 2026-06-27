@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth'
 import { login } from '@/api/auth'
 import { LoginRequest, MenuResponse } from '@/types/auth'
 import { SidebarMenu } from '@/types/menu'
+import { MenuType } from '@/types/enums'
 
 const commonStore = useCommonStore()
 const authStore = useAuthStore()
@@ -77,7 +78,7 @@ const onLogin = async (formEl?: FormInstance) => {
             ? toSidebarMenu(menu.children)
             : undefined
         const sidebarMenu: SidebarMenu =
-          menu.type === 'menu'
+          menu.type === MenuType.Menu
             ? {
                 ...sidebarMenuBase,
                 children

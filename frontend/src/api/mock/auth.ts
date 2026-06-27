@@ -32,7 +32,7 @@ if (mockConfig.auth.login) {
                 username: 'admin123',
                 nickname: '超级管理员',
                 avatar: Random.image('150x150', '#888', '#FFF', 'avatar'),
-                sex: 'male',
+                sex: 1,
                 deparemnt_id: 1,
                 roles_id: [1],
                 phone_number: '13388886666',
@@ -44,13 +44,13 @@ if (mockConfig.auth.login) {
                   menu_id: 1,
                   icon: 'ion:settings-sharp',
                   name: '系统管理',
-                  type: 'menu',
+                  type: 0,
                   children: [
                     {
                       menu_id: 2,
                       icon: 'ion:settings-sharp',
                       name: '组织架构',
-                      type: 'menu',
+                      type: 0,
                       children: [
                         {
                           menu_id: 5,
@@ -58,7 +58,7 @@ if (mockConfig.auth.login) {
                           icon: 'mingcute:department-fill',
                           name: '部门管理',
                           component: '/sys/organization/Dept',
-                          type: 'page'
+                          type: 1
                         },
                         {
                           menu_id: 6,
@@ -66,7 +66,7 @@ if (mockConfig.auth.login) {
                           icon: 'ri:user-fill',
                           name: '用户管理',
                           component: '/sys/organization/User',
-                          type: 'page'
+                          type: 1
                         }
                       ]
                     },
@@ -74,7 +74,7 @@ if (mockConfig.auth.login) {
                       menu_id: 3,
                       icon: 'ion:settings-sharp',
                       name: '模块菜单',
-                      type: 'menu',
+                      type: 0,
                       children: [
                         {
                           menu_id: 7,
@@ -82,7 +82,7 @@ if (mockConfig.auth.login) {
                           icon: 'tdesign:module-filled',
                           name: '模块管理',
                           component: '/sys/module_menu/Module',
-                          type: 'page'
+                          type: 1
                         },
                         {
                           menu_id: 8,
@@ -90,7 +90,7 @@ if (mockConfig.auth.login) {
                           icon: 'fluent-mdl2:context-menu',
                           name: '菜单管理',
                           component: '/sys/module_menu/Menu',
-                          type: 'page'
+                          type: 1
                         }
                       ]
                     },
@@ -98,7 +98,7 @@ if (mockConfig.auth.login) {
                       menu_id: 4,
                       icon: 'ion:settings-sharp',
                       name: '角色权限',
-                      type: 'menu',
+                      type: 0,
                       children: [
                         {
                           menu_id: 9,
@@ -106,7 +106,7 @@ if (mockConfig.auth.login) {
                           icon: 'fa7-solid:user-cog',
                           name: '角色管理',
                           component: '/sys/authorization/Role',
-                          type: 'page'
+                          type: 1
                         },
                         {
                           menu_id: 10,
@@ -114,7 +114,7 @@ if (mockConfig.auth.login) {
                           icon: 'ix:user-key',
                           name: '权限管理',
                           component: '/sys/authorization/Auth',
-                          type: 'page'
+                          type: 1
                         }
                       ]
                     }
@@ -125,7 +125,7 @@ if (mockConfig.auth.login) {
                   path: 'https://github.com/tanglong3bf/DrogonAdmin',
                   icon: 'octicon:mark-github-24',
                   name: '源码地址',
-                  type: 'out_link'
+                  type: 2
                 }
               ]
             }

@@ -3,6 +3,7 @@ import type { UploadAvatarResponse, User, UserRole } from './user'
 import type { Department } from './department'
 import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
+import { MenuType } from './enums'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isArray = (data: unknown, callback: any) =>
@@ -41,7 +42,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
     isNumberField(data, 'menu_id') &&
     isStringOrUndefinedField(data, 'icon') &&
     isStringField(data, 'name') &&
-    ['menu', 'page', 'out_link'].includes((data as any).type)
+    [0, 1, 2].includes((data as any).type)
 
   if (!isCommonFieldsValid) {
     return false
@@ -51,13 +52,13 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
   const { type } = menuData
 
   switch (type) {
-    case 'menu':
+    case MenuType.Menu:
       return (
         !isContainKey(menuData, 'path') &&
         !isContainKey(menuData, 'component') &&
         isArrayOrUndefinedField(menuData, 'children', isMenuResponse)
       )
-    case 'page':
+    case MenuType.Page:
       return (
         isNotEmptyStringField(menuData, 'path') &&
         !menuData.path!.startsWith('http://') &&
@@ -65,7 +66,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
         isNotEmptyStringField(menuData, 'component') &&
         !isContainKey(menuData, 'children')
       )
-    case 'out_link':
+    case MenuType.OutLink:
       return (
         isNotEmptyStringField(menuData, 'path') &&
         (menuData.path!.startsWith('http://') ||
@@ -73,7 +74,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
         !isContainKey(menuData, 'component') &&
         !isContainKey(menuData, 'children')
       )
-  }
+  } 
 }
 export function isUploadAvatarResponse(
   data: unknown

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "application/organization/user/UserResponse.h"
+#include "application/organization/user/dto/UserResponse.h"
 #include <jsoncpp/json/value.h>
 
 /**

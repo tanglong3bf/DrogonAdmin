@@ -1,7 +1,7 @@
 #pragma once
 
-#include "UserQueryRequest.h"
-#include "UserResponse.h"
+#include "dto/UserQueryRequest.h"
+#include "dto/UserResponse.h"
 #include "domain/models/SysUser.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/orm/CoroMapper.h>

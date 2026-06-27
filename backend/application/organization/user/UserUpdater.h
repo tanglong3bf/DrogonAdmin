@@ -1,7 +1,8 @@
 #pragma once
 
-#include "UserUpdateRequest.h"
-#include "application/organization/user/UserInfoUpdateRequest.h"
+#include "dto/UserUpdateRequest.h"
+#include "dto/UserInfoUpdateRequest.h"
+#include "dto/ChangePasswordRequest.h"
 #include "domain/organization/user/User.h"
 #include "domain/organization/dept/DeptVerifier.h"
 #include "domain/authorization/RoleVerifier.h"
@@ -26,6 +27,11 @@ class UserUpdater : public DrAdminObject<UserUpdater>
      */
     drogon::Task<> updateBasicInfo(User &user,
                                    const UserInfoUpdateRequest &request) const;
+
+    /**
+     * @brief 更新用户密码
+     */
+    void updatePassword(User &user, const ChangePasswordRequest &request) const;
 
   protected:
     /**

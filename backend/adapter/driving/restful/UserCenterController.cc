@@ -10,3 +10,12 @@ Task<HttpResponsePtr> UserCenterController::updateBasicInfo(
     co_await userCenterService_->updateBasicInfo(userId, request);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
+
+Task<HttpResponsePtr> UserCenterController::changePassword(
+    const HttpRequestPtr req,
+    const ChangePasswordRequest request) const
+{
+    const auto userId = req->getAttributes()->get<int32_t>("userId");
+    co_await userCenterService_->changePassword(userId, request);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

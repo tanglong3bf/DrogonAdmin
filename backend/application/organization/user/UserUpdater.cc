@@ -1,12 +1,16 @@
 #include "UserUpdater.h"
 
 #include "common/util/rangesUtils.hpp"
+#include "common/util/third_party/BCryptCpp/BCrypt.h"
 #include <unordered_set>
 #include <ranges>
 
 using namespace std;
 using namespace drogon;
 using namespace tl;
+using namespace BCryptCpp;
+
+bool matches(string_view raw, string_view mask);
 
 Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
@@ -85,6 +89,23 @@ drogon::Task<> UserUpdater::updateBasicInfo(
         user.markUpdated();
     }
     co_return;
+}
+
+void UserUpdater::updatePassword(User &user,
+                                 const ChangePasswordRequest &request) const
+{
+    if (!matches(request.oldPassword(), user.password))
+    {
+        throw BusinessException("旧密码不正确");
+    }
+
+    const auto salt = BCrypt::GenerateSalt();
+    const auto hashedPassword =
+        BCrypt::HashPassword(static_cast<string>(request.newPassword()), salt);
+
+    user.password = hashedPassword;
+    user.markUpdatedBy(*user.userId);
+    user.markUpdated();
 }
 
 void UserUpdater::updateUserRoles(vector<UserRole> &userRoles,

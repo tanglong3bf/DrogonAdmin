@@ -22,7 +22,7 @@ export const updateUserBasicInfo = (
 export const changePassword = (
   userPasswordUpdateRequest: UserPasswordUpdateRequest
 ): Promise<undefined> => {
-  return request.post('/user/change_password', {
+  return request.patch('/user_center/change_password', {
     ...userPasswordUpdateRequest
   })
 }
@@ -34,7 +34,7 @@ export const uploadAvatar = (file: File) => {
   const formData = new FormData()
   formData.append('avatar', file)
   return validateResponse<UploadAvatarResponse>(
-    request.post('/user/upload_avatar', formData, {
+    request.post('/user_center/upload_avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
     isUploadAvatarResponse

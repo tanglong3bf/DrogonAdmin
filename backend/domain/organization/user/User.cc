@@ -10,7 +10,7 @@ User::User(string_view username,
            int32_t deptId,
            Status status)
     : username_{std::move(username)},
-      password_{password},
+      password{password},
       nickname{std::move(nickname)},
       avatar{"#"},
       sex{sex},
@@ -27,7 +27,7 @@ User::User(std::string_view username,
            Status status,
            int32_t createdBy)
     : username_{std::move(username)},
-      password_{password},
+      password{password},
       nickname{std::move(nickname)},
       avatar{"#"},
       sex{sex},
@@ -40,7 +40,7 @@ User::User(std::string_view username,
 User::User(const SysUser &model)
     : OPT_INIT(userId, UserId),
       INIT(username_, Username),
-      INIT(password_, Password),
+      INIT(password, Password),
       INIT(nickname, Nickname),
       INIT(avatar, Avatar),
       ENUM_INIT(Sex, sex, Sex),
@@ -57,7 +57,7 @@ User::operator SysUser() const
     SysUser model;
     SET_OPT(userId, UserId);
     SET_VAL(username_, Username);
-    SET_VAL(password_, Password);
+    SET_VAL(password, Password);
     SET_VAL(nickname, Nickname);
     SET_VAL(avatar, Avatar);
     SET_VAL_CAST(int16_t, sex, Sex);
