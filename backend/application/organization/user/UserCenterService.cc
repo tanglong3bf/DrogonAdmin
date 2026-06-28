@@ -19,6 +19,6 @@ drogon::Task<> UserCenterService::changePassword(
 {
     // userId源自于jwt，可保证有数据
     auto user = co_await userRepository_->getById(userId, true);
-    userUpdater_->updatePassword(*user, request);
+    user->updatePassword(request.oldPassword(), request.newPassword());
     co_await userRepository_->save(*user);
 }

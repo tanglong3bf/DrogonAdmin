@@ -35,6 +35,9 @@ class User : public AuditableEntity, public ChangeableEntity
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
 
+    void updatePassword(std::string_view oldPassword,
+                        std::string_view newPassword);
+
     std::string_view username() const noexcept
     {
         return username_;

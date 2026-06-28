@@ -20,7 +20,7 @@
       //port: Server port, 5432 by default
       "port": 5432,
       //dbname: Database name
-      "dbname": "drogon_admin_db",
+      "dbname": "da_test_db",
       //user: 'postgres' by default
       "user": "admin",
       //passwd: '' by default

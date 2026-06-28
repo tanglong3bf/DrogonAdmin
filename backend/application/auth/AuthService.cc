@@ -1,17 +1,12 @@
 #include "AuthService.h"
 
 #include "DrogonJwtUtil/src/JwtUtil.h"
-#include "BCryptCpp/BCrypt.h"
 #include "common/exception/BusinessException.h"
 
 using namespace std;
 using namespace drogon;
-using namespace BCryptCpp;
 
-bool matches(string_view raw, string_view mask)
-{
-    return BCrypt::CheckPassword(string(raw), string(mask));
-}
+bool matches(string_view raw, string_view mask);
 
 Task<LoginResponse> AuthService::login(const LoginRequest &request) const
 {

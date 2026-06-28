@@ -1,7 +1,16 @@
 #include "User.h"
 
+#include "common/exception/BusinessException.h"
+#include "common/util/third_party/BCryptCpp/BCrypt.h"
+
 using namespace std;
 using namespace trantor;
+using namespace BCryptCpp;
+
+bool matches(string_view raw, string_view mask)
+{
+    return BCrypt::CheckPassword(string(raw), string(mask));
+}
 
 User::User(string_view username,
            string_view password,
@@ -86,6 +95,22 @@ User::operator SysUser() const
     SET_OPT(deletedBy(), DeletedBy);
     SET_OPT(deletedTime(), DeletedTime);
     return model;
+}
+
+void User::updatePassword(string_view oldPassword, string_view newPassword)
+{
+    if (!matches(oldPassword, password))
+    {
+        throw BusinessException("旧密码不正确");
+    }
+
+    const auto salt = BCrypt::GenerateSalt();
+    const auto hashedPassword =
+        BCrypt::HashPassword(static_cast<string>(newPassword), salt);
+
+    this->password = hashedPassword;
+    this->markUpdatedBy(*this->userId);
+    this->markUpdated();
 }
 
 void User::setUserRoles(const std::vector<UserRole> &userRoles)
