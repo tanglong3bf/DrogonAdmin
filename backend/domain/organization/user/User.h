@@ -9,13 +9,21 @@
 #include "common/util/ParamGetter.hpp"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
+#include "domain/models/SysUserRole.h"
 #include <optional>
 #include <string>
+#include <vector>
 #include <cstdint>
 
+/**
+ * @brief 用户实体类
+ *
+ * @note 密码存储的是密文
+ */
 class User : public AuditableEntity, public ChangeableEntity
 {
     using SysUser = drogon_model::drogon_admin_db::SysUser;
+    using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
 
   public:
     explicit User(std::string_view username,
@@ -61,9 +69,6 @@ class User : public AuditableEntity, public ChangeableEntity
 
     bool assignToDept(std::int32_t deptId, std::int32_t updatedBy);
 
-    void updateUserRoles(const std::vector<int32_t> &newRoleIds,
-                         const int32_t updatedBy);
-
     GETTER(userId)
     GETTER_STR_VIEW(username)
     GETTER_STR_VIEW(password)
@@ -76,8 +81,25 @@ class User : public AuditableEntity, public ChangeableEntity
     GETTER(status)
     GETTER(userRoles)
 
-    void setUserRoles(const std::vector<UserRole> &userRoles);
-    void addUserRole(const UserRole &userRole);
+    /**
+     * @brief 追加角色（仅新增，不删除已有角色）
+     * @param roleIds 待新增角色ID列表
+     * @param createdBy 操作人ID，用于填充新建角色审计字段
+     * @throw DomainException 存在重复角色ID / 非法roleId
+     */
+    void appendRoles(const std::vector<int32_t> &newRoleIds,
+                     const int32_t createdBy);
+
+    /**
+     * @brief 差量对齐更新角色：保留交集、删除不在新列表的旧角色、新增缺少角色
+     * @param newRoleIds 最终需要持有的角色ID集合
+     * @param updatedBy 本次更新操作人
+     */
+    void replaceRoles(const std::vector<int32_t> &roleIds,
+                      const int32_t updatedBy);
+
+    // 仓储重建聚合时调用
+    void restoreRoles(const std::vector<SysUserRole> &sysUserRoles);
 
   private:
     std::optional<std::int32_t> userId_;

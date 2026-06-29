@@ -2,12 +2,15 @@
 
 #include "common/exception/BusinessException.h"
 #include "common/util/Utilities.hpp"
+#include "common/util/rangesUtils.hpp"
 #include "common/util/third_party/BCryptCpp/BCrypt.h"
 #include <unordered_set>
+#include <ranges>
 
 using namespace std;
 using namespace trantor;
 using namespace BCryptCpp;
+using namespace drogon_admin;
 using namespace drogon_admin::util;
 
 bool matches(string_view raw, string_view mask)
@@ -169,10 +172,23 @@ bool User::assignToDept(std::int32_t deptId, std::int32_t updatedBy)
     return false;
 }
 
-void User::updateUserRoles(const vector<int32_t> &newRoleIds,
-                           const int32_t updatedBy)
+void User::appendRoles(const std::vector<int32_t> &newRoleIds,
+                       const int32_t createdBy)
 {
-    unordered_set<int32_t> newRoleSet(newRoleIds.begin(), newRoleIds.end());
+    const auto newRoles =
+        newRoleIds | views::transform([createdBy, this](const int32_t roleId) {
+            UserRole ur{roleId, createdBy};
+            ur.userId_ = userId_;
+            return ur;
+        }) |
+        ranges_utils::to<vector>();
+
+    userRoles_.insert(userRoles_.end(), newRoles.begin(), newRoles.end());
+}
+
+void User::replaceRoles(const vector<int32_t> &roleIds, const int32_t updatedBy)
+{
+    unordered_set<int32_t> newRoleSet(roleIds.begin(), roleIds.end());
 
     // 标记删除
     for (auto &ur : userRoles_)
@@ -190,27 +206,24 @@ void User::updateUserRoles(const vector<int32_t> &newRoleIds,
         existingRoleIds.insert(rd.roleId());
     }
 
-    for (int32_t roleId : newRoleIds)
+    for (int32_t roleId : roleIds)
     {
         // 没有在已拥有的角色id列表寻找到
         if (existingRoleIds.find(roleId) == existingRoleIds.end())
         {
             // 新增
             UserRole newUR(roleId, updatedBy);
-            newUR.userId = userId_;
+            newUR.userId_ = userId_;
             newUR.markNew();
             userRoles_.push_back(std::move(newUR));
         }
     }
 }
 
-void User::setUserRoles(const std::vector<UserRole> &userRoles)
+void User::restoreRoles(const std::vector<SysUserRole> &sysUserRoles)
 {
-    userRoles_.clear();
-    copy(userRoles.begin(), userRoles.end(), back_inserter(userRoles_));
-}
-
-void User::addUserRole(const UserRole &userRole)
-{
-    userRoles_.push_back(userRole);
+    userRoles_ =
+        sysUserRoles |
+        views::transform([](const SysUserRole &ur) { return UserRole{ur}; }) |
+        ranges_utils::to<vector>();
 }

@@ -1,7 +1,6 @@
 #include "UserAssembler.h"
 
 #include "BCryptCpp/BCrypt.h"
-#include <ranges>
 #include "common/util/rangesUtils.hpp"
 
 using namespace std;
@@ -44,12 +43,7 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
     user.constructOptionalFields(request.phoneNumber(), request.email());
     if (const auto roleIds = request.roleIds())
     {
-        const auto roles = *request.roleIds() |
-                           views::transform([createdBy](int32_t roleId) {
-                               return UserRole{roleId, createdBy};
-                           }) |
-                           ranges_utils::to<vector>();
-        user.setUserRoles(roles);
+        user.appendRoles(*roleIds, createdBy);
     }
     user.markNew();
     co_return user;

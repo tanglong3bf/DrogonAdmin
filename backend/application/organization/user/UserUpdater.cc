@@ -40,7 +40,7 @@ Task<> UserUpdater::updateUser(User &user,
     if (request.roleIds())
     {
         co_await roleVerifier_->verifyRolesExists(*request.roleIds());
-        user.updateUserRoles(*request.roleIds(), updatedBy);
+        user.replaceRoles(*request.roleIds(), updatedBy);
         isUpdated = true;
     }
     const auto allRoleIds =

@@ -61,9 +61,8 @@ drogon::Task<> UserRepository::save(User &user) const
                 Json::Value data;
                 for (auto &userRole : user.userRoles())
                 {
-                    const_cast<UserRole &>(userRole).userId =
-                        userInDb.getValueOfUserId();
-                    const auto item = static_cast<SysUserRole>(userRole);
+                    auto item = static_cast<SysUserRole>(userRole);
+                    item.setUserId(userInDb.getValueOfUserId());
                     data.append(item.toJson());
                 }
                 const auto sql =
@@ -156,7 +155,7 @@ Task<optional<User>> UserRepository::getById(const std::int32_t userId,
         }
         const auto &[sysUser, sysUserRoles] = userInDb[0];
         User user{sysUser};
-        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        user.restoreRoles(sysUserRoles);
         co_return user;
     }
     else
@@ -332,7 +331,7 @@ Task<optional<User>> UserRepository::getByUsername(std::string_view username,
         }
         const auto &[sysUser, sysUserRoles] = userInDb[0];
         User user{sysUser};
-        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        user.restoreRoles(sysUserRoles);
         co_return user;
     }
     else
@@ -350,17 +349,6 @@ Task<optional<User>> UserRepository::getByUsername(std::string_view username,
             co_return nullopt;
         }
     }
-}
-
-vector<UserRole> UserRepository::buildUserRoleList(
-    const vector<SysUserRole> &sysUserRoles) const
-{
-    vector<UserRole> userRoles;
-    for (const auto &sysUserRole : sysUserRoles)
-    {
-        userRoles.push_back(UserRole{sysUserRole});
-    }
-    return userRoles;
 }
 
 inline SqlGenerator *UserRepository::sqlGenerator()
