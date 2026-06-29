@@ -1,7 +1,6 @@
 #include "RoleUpdater.h"
 
 #include <unordered_set>
-#include "common/util/Utilities.hpp"
 #include "domain/authorization/RoleDept.h"
 
 using namespace std;
@@ -38,7 +37,12 @@ Task<> RoleUpdater::updateRole(Role &role,
         role.description = nullopt;
         isUpdated = true;
     }
-    ENTITY_SET(role, quotaType, isUpdated = true; isQuotaUpdated = true);
+    if (request.quotaType() && role.quotaType != *request.quotaType())
+    {
+        role.quotaType = *request.quotaType();
+        isUpdated = true;
+        isQuotaUpdated = true;
+    }
     // 更新为新值
     if (request.userQuota() && role.userQuota != *request.userQuota())
     {
@@ -53,7 +57,12 @@ Task<> RoleUpdater::updateRole(Role &role,
         isUpdated = true;
         isQuotaUpdated = true;
     }
-    ENTITY_SET(role, relationType, isUpdated = true; isQuotaUpdated = true);
+    if (request.relationType() && role.relationType != *request.relationType())
+    {
+        role.relationType = *request.relationType();
+        isUpdated = true;
+        isQuotaUpdated = true;
+    }
 
     if (request.deptIds() && request.deptIds()->size() > 0)
     {

@@ -9,8 +9,15 @@ Task<> UserCenterService::updateBasicInfo(
 {
     // userId源自于jwt，可保证有数据
     auto user = co_await userRepository_->getById(userId, true);
-    co_await userUpdater_->updateBasicInfo(*user, request);
-    co_await userRepository_->save(*user);
+
+    const bool isUpdated = user->updateBasicInfo(request.nickname(),
+                                                 request.sex(),
+                                                 request.phoneNumber(),
+                                                 request.email());
+    if (isUpdated)
+    {
+        co_await userRepository_->save(*user);
+    }
 }
 
 drogon::Task<> UserCenterService::changePassword(

@@ -6,29 +6,35 @@
         return field##_;               \
     }
 
-#define ENTITY_SET(entity, field, ...)                           \
-    do                                                           \
-    {                                                            \
-        if (request.field() && entity.field != *request.field()) \
-        {                                                        \
-            entity.field = *request.field();                     \
-            __VA_ARGS__;                                         \
-        }                                                        \
+#define GETTER_STR_VIEW(field)                     \
+    const std::string_view field() const noexcept \
+    {                                              \
+        return field##_;                           \
+    }
+
+#define ENTITY_SET(field, ...)           \
+    do                                   \
+    {                                    \
+        if (field && field##_ != *field) \
+        {                                \
+            this->field##_ = *field;     \
+            __VA_ARGS__;                 \
+        }                                \
     } while (0)
 
-#define ENTITY_SET_OR_NULL(entity, field, ...)                   \
-    do                                                           \
-    {                                                            \
-        if (request.field() && entity.field != *request.field()) \
-        {                                                        \
-            entity.field = *request.field();                     \
-            __VA_ARGS__;                                         \
-        }                                                        \
-        else if (request.field().isNull() && entity.field)       \
-        {                                                        \
-            entity.field = nullopt;                              \
-            __VA_ARGS__;                                         \
-        }                                                        \
+#define ENTITY_SET_OR_NULL(field, ...)       \
+    do                                       \
+    {                                        \
+        if (field && field##_ != *field)     \
+        {                                    \
+            field##_ = *field;               \
+            __VA_ARGS__;                     \
+        }                                    \
+        else if (field.isNull() && field##_) \
+        {                                    \
+            field##_ = nullopt;              \
+            __VA_ARGS__;                     \
+        }                                    \
     } while (0)
 
 #define INIT(field, Field)        \

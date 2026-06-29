@@ -1,10 +1,13 @@
 #include "UserAssembler.h"
 
 #include "BCryptCpp/BCrypt.h"
+#include <ranges>
+#include "common/util/rangesUtils.hpp"
 
 using namespace std;
 using namespace drogon;
 using namespace BCryptCpp;
+using namespace drogon_admin;
 
 Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
                                             const int32_t createdBy) const
@@ -38,20 +41,15 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
               createdBy};
 
     // 可选参数
-    if (const auto phoneNumber = request.phoneNumber())
-    {
-        user.phoneNumber = *phoneNumber;
-    }
-    if (const auto email = request.email())
-    {
-        user.email = *email;
-    }
+    user.constructOptionalFields(request.phoneNumber(), request.email());
     if (const auto roleIds = request.roleIds())
     {
-        for (const auto roleId : *roleIds)
-        {
-            user.addUserRole(UserRole{roleId, createdBy});
-        }
+        const auto roles = *request.roleIds() |
+                           views::transform([createdBy](int32_t roleId) {
+                               return UserRole{roleId, createdBy};
+                           }) |
+                           ranges_utils::to<vector>();
+        user.setUserRoles(roles);
     }
     user.markNew();
     co_return user;

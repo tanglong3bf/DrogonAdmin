@@ -40,7 +40,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     vector<std::int32_t> userIdList{};
     for (const auto &user : userList)
     {
-        userIdList.push_back(*user.userId);
+        userIdList.push_back(*user.userId());
     }
 
     auto userRolesList = co_await userRoleMapper().findBy(
@@ -49,7 +49,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     {
         for (const auto &userRole : userRolesList)
         {
-            if (userRole.getValueOfUserId() == user.userId)
+            if (userRole.getValueOfUserId() == user.userId())
             {
                 user.addUserRole(UserRole{userRole});
             }

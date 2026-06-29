@@ -1,11 +1,14 @@
 #include "User.h"
 
 #include "common/exception/BusinessException.h"
+#include "common/util/Utilities.hpp"
 #include "common/util/third_party/BCryptCpp/BCrypt.h"
+#include <unordered_set>
 
 using namespace std;
 using namespace trantor;
 using namespace BCryptCpp;
+using namespace drogon_admin::util;
 
 bool matches(string_view raw, string_view mask)
 {
@@ -19,12 +22,12 @@ User::User(string_view username,
            int32_t deptId,
            Status status)
     : username_{std::move(username)},
-      password{password},
-      nickname{std::move(nickname)},
-      avatar{"#"},
-      sex{sex},
-      deptId{deptId},
-      status{status}
+      password_{password},
+      nickname_{std::move(nickname)},
+      avatar_{"#"},
+      sex_{sex},
+      deptId_{deptId},
+      status_{status}
 {
 }
 
@@ -36,27 +39,27 @@ User::User(std::string_view username,
            Status status,
            int32_t createdBy)
     : username_{std::move(username)},
-      password{password},
-      nickname{std::move(nickname)},
-      avatar{"#"},
-      sex{sex},
-      deptId{deptId},
-      status{status},
+      password_{password},
+      nickname_{std::move(nickname)},
+      avatar_{"#"},
+      sex_{sex},
+      deptId_{deptId},
+      status_{status},
       AuditableEntity{AUDITABLE_INIT}
 {
 }
 
 User::User(const SysUser &model)
-    : OPT_INIT(userId, UserId),
+    : OPT_INIT(userId_, UserId),
       INIT(username_, Username),
-      INIT(password, Password),
-      INIT(nickname, Nickname),
-      INIT(avatar, Avatar),
-      ENUM_INIT(Sex, sex, Sex),
-      INIT(deptId, DeptId),
-      OPT_OV_INIT(PhoneNumber, phoneNumber, PhoneNumber),
-      OPT_OV_INIT(Email, email, Email),
-      ENUM_INIT(Status, status, Status),
+      INIT(password_, Password),
+      INIT(nickname_, Nickname),
+      INIT(avatar_, Avatar),
+      ENUM_INIT(Sex, sex_, Sex),
+      INIT(deptId_, DeptId),
+      OPT_OV_INIT(PhoneNumber, phoneNumber_, PhoneNumber),
+      OPT_OV_INIT(Email, email_, Email),
+      ENUM_INIT(Status, status_, Status),
       AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
@@ -64,30 +67,30 @@ User::User(const SysUser &model)
 User::operator SysUser() const
 {
     SysUser model;
-    SET_OPT(userId, UserId);
+    SET_OPT(userId_, UserId);
     SET_VAL(username_, Username);
-    SET_VAL(password, Password);
-    SET_VAL(nickname, Nickname);
-    SET_VAL(avatar, Avatar);
-    SET_VAL_CAST(int16_t, sex, Sex);
-    SET_VAL(deptId, DeptId);
-    if (phoneNumber)
+    SET_VAL(password_, Password);
+    SET_VAL(nickname_, Nickname);
+    SET_VAL(avatar_, Avatar);
+    SET_VAL_CAST(int16_t, sex_, Sex);
+    SET_VAL(deptId_, DeptId);
+    if (phoneNumber_)
     {
-        model.setPhoneNumber(phoneNumber->value());
+        model.setPhoneNumber(phoneNumber_->value());
     }
     else
     {
         model.setPhoneNumberToNull();
     }
-    if (email)
+    if (email_)
     {
-        model.setEmail(email->value());
+        model.setEmail(email_->value());
     }
     else
     {
         model.setEmailToNull();
     }
-    SET_VAL_CAST(int16_t, status, Status);
+    SET_VAL_CAST(int16_t, status_, Status);
     SET_OPT(createdBy(), CreatedBy);
     SET_OPT(createdTime(), CreatedTime);
     SET_OPT(updatedBy(), UpdatedBy);
@@ -97,9 +100,16 @@ User::operator SysUser() const
     return model;
 }
 
+void User::constructOptionalFields(optional<PhoneNumber> phoneNumber,
+                                   optional<Email> email)
+{
+    phoneNumber_ = phoneNumber;
+    email_ = email;
+}
+
 void User::updatePassword(string_view oldPassword, string_view newPassword)
 {
-    if (!matches(oldPassword, password))
+    if (!matches(oldPassword, password_))
     {
         throw BusinessException("旧密码不正确");
     }
@@ -108,20 +118,99 @@ void User::updatePassword(string_view oldPassword, string_view newPassword)
     const auto hashedPassword =
         BCrypt::HashPassword(static_cast<string>(newPassword), salt);
 
-    this->password = hashedPassword;
-    this->markUpdatedBy(*this->userId);
-    this->markUpdated();
+    password_ = hashedPassword;
+    markUpdatedBy(*userId_);
+    markUpdated();
+}
+
+bool User::updateBasicInfo(optional<string_view> nickname,
+                           optional<Sex> sex,
+                           NullableValue<PhoneNumber> phoneNumber,
+                           NullableValue<Email> email,
+                           std::int32_t updatedBy)
+{
+    bool changed = false;
+
+    ENTITY_SET(nickname, changed = true);
+    ENTITY_SET(sex, changed = true);
+    ENTITY_SET_OR_NULL(phoneNumber, changed = true);
+    ENTITY_SET_OR_NULL(email, changed = true);
+
+    if (changed)
+    {
+        markUpdatedBy(updatedBy > 0 ? updatedBy : *this->userId_);
+        markUpdated();
+    }
+
+    return changed;
+}
+
+bool User::updateStatus(Status status, int32_t updatedBy)
+{
+    if (status != status_) [[likely]]
+    {
+        status_ = status;
+        markUpdatedBy(updatedBy);
+        markUpdated();
+        return true;
+    }
+    return false;
+}
+
+bool User::assignToDept(std::int32_t deptId, std::int32_t updatedBy)
+{
+    if (deptId != deptId_) [[likely]]
+    {
+        deptId_ = deptId;
+        markUpdatedBy(updatedBy);
+        markUpdated();
+        return true;
+    }
+    return false;
+}
+
+void User::updateUserRoles(const vector<int32_t> &newRoleIds,
+                           const int32_t updatedBy)
+{
+    unordered_set<int32_t> newRoleSet(newRoleIds.begin(), newRoleIds.end());
+
+    // 标记删除
+    for (auto &ur : userRoles_)
+    {
+        if (newRoleSet.find(ur.roleId()) == newRoleSet.end())
+        {
+            ur.markDeleted();
+        }
+    }
+
+    // 准备已存在的角色id
+    unordered_set<int32_t> existingRoleIds;
+    for (const auto &rd : userRoles_)
+    {
+        existingRoleIds.insert(rd.roleId());
+    }
+
+    for (int32_t roleId : newRoleIds)
+    {
+        // 没有在已拥有的角色id列表寻找到
+        if (existingRoleIds.find(roleId) == existingRoleIds.end())
+        {
+            // 新增
+            UserRole newUR(roleId, updatedBy);
+            newUR.userId = userId_;
+            newUR.markNew();
+            userRoles_.push_back(std::move(newUR));
+        }
+    }
 }
 
 void User::setUserRoles(const std::vector<UserRole> &userRoles)
 {
-    this->userRoles.clear();
-    std::copy(userRoles.begin(),
-              userRoles.end(),
-              std::back_inserter(this->userRoles));
+    userRoles_.clear();
+    copy(userRoles.begin(), userRoles.end(), back_inserter(userRoles_));
 }
 
 void User::addUserRole(const UserRole &userRole)
 {
-    this->userRoles.push_back(userRole);
+    userRoles_.push_back(userRole);
 }

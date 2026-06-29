@@ -56,10 +56,10 @@ drogon::Task<> UserRepository::save(User &user) const
             const auto trans = co_await dbClient()->newTransactionCoro();
             auto model = static_cast<SysUser>(user);
             const auto userInDb = co_await userMapper(trans).insert(model);
-            if (user.userRoles.size() > 0)
+            if (user.userRoles().size() > 0)
             {
                 Json::Value data;
-                for (auto &userRole : user.userRoles)
+                for (auto &userRole : user.userRoles())
                 {
                     const_cast<UserRole &>(userRole).userId =
                         userInDb.getValueOfUserId();
@@ -82,7 +82,7 @@ drogon::Task<> UserRepository::save(User &user) const
             Json::Value toInsert{Json::arrayValue};
             Json::Value toDelete{Json::arrayValue};
 
-            for (auto &userRole : user.userRoles)
+            for (auto &userRole : user.userRoles())
             {
                 const auto status = userRole.changingStatus();
                 const auto item = static_cast<SysUserRole>(userRole);
@@ -126,7 +126,7 @@ drogon::Task<> UserRepository::save(User &user) const
             co_await userMapper(trans).update(model);
             // 关联数据删除
             co_await userRoleMapper(trans).deleteBy(
-                Criteria{SysUserRole::Cols::_user_id, *user.userId});
+                Criteria{SysUserRole::Cols::_user_id, *user.userId()});
 
             co_return;
         }
