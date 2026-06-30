@@ -60,7 +60,7 @@ Task<> UserService::deleteUser(const std::int32_t userId,
     auto user = co_await userRepository_->getById(userId, true);
     if (user != nullopt)
     {
-        co_await userHandler_->deleteUser(*user, deletedBy);
+        user->remove(deletedBy);
         co_await userRepository_->save(*user);
     }
 }

@@ -69,6 +69,8 @@ class User : public AuditableEntity, public ChangeableEntity
 
     bool assignToDept(std::int32_t deptId, std::int32_t updatedBy);
 
+    void remove(const std::int32_t deletedBy);
+
     GETTER(userId)
     GETTER_STR_VIEW(username)
     GETTER_STR_VIEW(password)

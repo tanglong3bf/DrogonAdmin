@@ -172,6 +172,20 @@ bool User::assignToDept(std::int32_t deptId, std::int32_t updatedBy)
     return false;
 }
 
+void User::remove(const std::int32_t deletedBy)
+{
+    if (changingStatus() == ChangingStatus::DELETED)
+    {
+        throw BusinessException("用户已删除");
+    }
+    markDeletedBy(deletedBy);
+    markDeleted();
+    for (auto &role : userRoles_)
+    {
+        role.markDeleted();
+    }
+}
+
 void User::appendRoles(const std::vector<int32_t> &newRoleIds,
                        const int32_t createdBy)
 {
@@ -179,6 +193,7 @@ void User::appendRoles(const std::vector<int32_t> &newRoleIds,
         newRoleIds | views::transform([createdBy, this](const int32_t roleId) {
             UserRole ur{roleId, createdBy};
             ur.userId_ = userId_;
+            ur.markNew();
             return ur;
         }) |
         ranges_utils::to<vector>();
