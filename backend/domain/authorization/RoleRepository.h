@@ -48,12 +48,12 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     /**
      * @brief 按照名称统计角色数量
      */
-    drogon::Task<std::size_t> countByName(const std::string &name) const;
+    drogon::Task<std::size_t> countByName(std::string_view name) const;
 
     /**
      * @brief 按照角色代码统计角色数量
      */
-    drogon::Task<std::size_t> countByCode(const std::string &code) const;
+    drogon::Task<std::size_t> countByCode(std::string_view code) const;
 
     /**
      * @brief 按照id列表统计角色数量

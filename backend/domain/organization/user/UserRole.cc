@@ -10,24 +10,24 @@ UserRole::UserRole(const int32_t roleId) : roleId_{roleId}
 }
 
 UserRole::UserRole(const int32_t roleId, int32_t createdBy)
-    : roleId_{roleId}, createdBy{createdBy}, createdTime{Date::now()}
+    : roleId_{roleId}, createdBy_{createdBy}, createdTime_{Date::now()}
 {
 }
 
 UserRole::UserRole(const SysUserRole &model)
-    : INIT(userId, UserId),
+    : INIT(userId_, UserId),
       INIT(roleId_, RoleId),
-      OPT_INIT(createdBy, CreatedBy),
-      OPT_INIT(createdTime, CreatedTime)
+      OPT_INIT(createdBy_, CreatedBy),
+      OPT_INIT(createdTime_, CreatedTime)
 {
 }
 
 UserRole::operator SysUserRole() const
 {
     SysUserRole model;
-    SET_OPT(userId, UserId);
+    SET_OPT(userId_, UserId);
     SET_VAL(roleId_, RoleId);
-    SET_OPT(createdBy, CreatedBy);
-    SET_OPT(createdTime, CreatedTime);
+    SET_OPT(createdBy_, CreatedBy);
+    SET_OPT(createdTime_, CreatedTime);
     return model;
 }

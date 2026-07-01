@@ -109,10 +109,6 @@ class UserRepository : public DrAdminObject<UserRepository>
         std::string_view username,
         bool withRelation = false) const;
 
-  protected:
-    std::vector<UserRole> buildUserRoleList(
-        const std::vector<SysUserRole> &sysUserRoles) const;
-
   private:
     static SqlGenerator *sqlGenerator();
     static DbClientPtr dbClient();

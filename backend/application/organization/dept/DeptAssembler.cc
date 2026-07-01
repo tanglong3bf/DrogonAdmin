@@ -25,10 +25,8 @@ Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
               createdBy};
 
     // 可选参数
-    if (request.parentId())
-    {
-        dept.parentId = *request.parentId();
-    }
+    dept.setParentId(request.parentId());
+
     dept.markNew();
     co_return dept;
 }

@@ -26,13 +26,13 @@ Json::Value toJsonArray(const vector<RoleDeptResponse> &depts)
 }
 
 RoleResponse::RoleResponse(const Role &role)
-    : roleId_{role.roleId != nullopt ? *role.roleId : -1},
-      name_{role.name},
-      code_{role.code},
-      description_{role.description},
-      userQuota_{role.userQuota},
-      quotaType_{role.quotaType},
-      relationType_{role.relationType}
+    : roleId_{role.roleId() != nullopt ? *role.roleId() : -1},
+      name_{role.name()},
+      code_{role.code()},
+      description_{role.description()},
+      userQuota_{role.userQuota()},
+      quotaType_{role.quotaType()},
+      relationType_{role.relationType()}
 {
 }
 

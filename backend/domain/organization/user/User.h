@@ -6,16 +6,25 @@
 #include "Status.h"
 #include "UserRole.h"
 #include "domain/models/SysUser.h"
+#include "common/util/ParamGetter.hpp"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include <drogon/HttpRequest.h>
+#include "domain/models/SysUserRole.h"
 #include <optional>
 #include <string>
+#include <vector>
 #include <cstdint>
 
+/**
+ * @brief 用户实体类
+ *
+ * @note 密码存储的是密文
+ */
 class User : public AuditableEntity, public ChangeableEntity
 {
     using SysUser = drogon_model::drogon_admin_db::SysUser;
+    using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
 
   public:
     explicit User(std::string_view username,
@@ -41,27 +50,74 @@ class User : public AuditableEntity, public ChangeableEntity
      */
     drogon::Task<std::string> updateAvatar(const drogon::HttpRequestPtr &req);
 
-    std::string_view username() const noexcept
-    {
-        return username_;
-    }
+    void constructOptionalFields(const std::optional<PhoneNumber> &phoneNumber,
+                                 const std::optional<Email> &email);
 
-    void setUserRoles(const std::vector<UserRole> &userRoles);
-    void addUserRole(const UserRole &userRole);
+    /**
+     * @brief 更新密码
+     */
+    void updatePassword(std::string_view oldPassword,
+                        std::string_view newPassword);
 
-    std::optional<std::int32_t> userId;
+    /**
+     * @brief 个人中心更新基本信息
+     *
+     * @param updatedBy 更新者id，非正值表示自己更新
+     */
+    bool updateBasicInfo(
+        std::optional<std::string_view> nickname,
+        std::optional<Sex> sex,
+        const drogon_admin::util::NullableValue<PhoneNumber> &phoneNumber,
+        const drogon_admin::util::NullableValue<Email> &email,
+        std::int32_t updatedBy = -1);
+
+    bool updateStatus(Status status, int32_t updatedBy);
+
+    bool assignToDept(std::int32_t deptId, std::int32_t updatedBy);
+
+    void remove(const std::int32_t deletedBy);
+
+    GETTER(userId)
+    GETTER_STR_VIEW(username)
+    GETTER_STR_VIEW(password)
+    GETTER_STR_VIEW(nickname)
+    GETTER_STR_VIEW(avatar)
+    GETTER(sex)
+    GETTER(deptId)
+    GETTER(phoneNumber)
+    GETTER(email)
+    GETTER(status)
+    GETTER(userRoles)
+
+    /**
+     * @brief 追加角色（仅新增，不删除已有角色）
+     * @param newRoleIds 待新增角色ID列表
+     * @param createdBy 操作人ID，用于填充新建角色审计字段
+     */
+    void appendRoles(const std::vector<int32_t> &newRoleIds,
+                     const int32_t createdBy);
+
+    /**
+     * @brief 差量对齐更新角色：保留交集、删除不在新列表的旧角色、新增缺少角色
+     * @param newRoleIds 最终需要持有的角色ID集合
+     * @param updatedBy 本次更新操作人
+     */
+    void replaceRoles(const std::vector<int32_t> &roleIds,
+                      const int32_t updatedBy);
+
+    // 仓储重建聚合时调用
+    void restoreRoles(const std::vector<SysUserRole> &sysUserRoles);
 
   private:
+    std::optional<std::int32_t> userId_;
     std::string username_;
-
-  public:
-    std::string password;
-    std::string nickname;
-    std::string avatar;
-    Sex sex;
-    std::int32_t deptId;
-    std::optional<PhoneNumber> phoneNumber;
-    std::optional<Email> email;
-    Status status;
-    std::vector<UserRole> userRoles;
+    std::string password_;
+    std::string nickname_;
+    std::string avatar_;
+    Sex sex_;
+    std::int32_t deptId_;
+    std::optional<PhoneNumber> phoneNumber_;
+    std::optional<Email> email_;
+    Status status_;
+    std::vector<UserRole> userRoles_;
 };

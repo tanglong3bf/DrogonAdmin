@@ -3,13 +3,16 @@
 #include "domain/organization/user/UserRole.h"
 #include "domain/models/SysUser.h"
 #include "common/util/AttrUtils.hpp"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
+using namespace drogon_admin;
 
 Task<size_t> UserCqrsRepo::countByQueryReq(
     const UserQueryRequest &request) const
@@ -18,6 +21,7 @@ Task<size_t> UserCqrsRepo::countByQueryReq(
     co_return co_await userMapper().count(criteria);
 }
 
+// 可用插件重构？？？
 Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     const UserQueryRequest &request,
     const std::int32_t maxPage,
@@ -40,20 +44,18 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
     vector<std::int32_t> userIdList{};
     for (const auto &user : userList)
     {
-        userIdList.push_back(*user.userId);
+        userIdList.push_back(*user.userId());
     }
 
-    auto userRolesList = co_await userRoleMapper().findBy(
+    const auto userRolesList = co_await userRoleMapper().findBy(
         Criteria{SysUserRole::Cols::_user_id, CompareOperator::In, userIdList});
     for (auto &user : userList)
     {
-        for (const auto &userRole : userRolesList)
-        {
-            if (userRole.getValueOfUserId() == user.userId)
-            {
-                user.addUserRole(UserRole{userRole});
-            }
-        }
+        user.restoreRoles(userRolesList |
+                          views::filter([&user](const SysUserRole &ur) {
+                              return ur.getValueOfUserId() == user.userId();
+                          }) |
+                          ranges_utils::to<vector<SysUserRole>>());
     }
     co_return buildUserResponseList(userList);
 }

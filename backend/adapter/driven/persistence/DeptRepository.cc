@@ -15,6 +15,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl;
 using namespace tl::sql;
+using namespace drogon_admin;
 
 Task<std::optional<std::int32_t>> DeptRepository::getMaxSubDeptSortNum(
     const optional<std::int32_t> parentId,

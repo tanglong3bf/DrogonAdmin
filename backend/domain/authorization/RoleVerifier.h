@@ -20,12 +20,12 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
     /**
      * @brief 验证角色名称是否重复
      */
-    drogon::Task<> verifyRoleNameNotDuplicated(const std::string &name) const;
+    drogon::Task<> verifyRoleNameNotDuplicated(std::string_view name) const;
 
     /**
      * @brief 验证角色代码是否重复
      */
-    drogon::Task<> verifyRoleCodeNotDuplicated(const std::string &code) const;
+    drogon::Task<> verifyRoleCodeNotDuplicated(std::string_view code) const;
 
     /**
      * @brief 验证指定角色列表是否全部存在

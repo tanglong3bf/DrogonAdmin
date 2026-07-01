@@ -44,9 +44,9 @@ class RoleCqrsRepo : public DrAdminObject<RoleCqrsRepo>
         const std::int32_t deptId) const;
 
   protected:
-    std::vector<RoleResponse> buildList(
-        const drogon::orm::Result &dbResult) const;
-
+    std::vector<Role> buildList(const drogon::orm::Result &dbResult) const;
+    std::vector<RoleResponse> buildRoleResponseList(
+        const std::vector<Role> &roleList) const;
     std::vector<AssignableRoleResponse> buildAssignableList(
         const drogon::orm::Result &dbResult) const;
 
