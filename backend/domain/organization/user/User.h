@@ -44,8 +44,8 @@ class User : public AuditableEntity, public ChangeableEntity
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
 
-    void constructOptionalFields(std::optional<PhoneNumber> phoneNumber,
-                                 std::optional<Email> email);
+    void constructOptionalFields(const std::optional<PhoneNumber> &phoneNumber,
+                                 const std::optional<Email> &email);
 
     /**
      * @brief 更新密码
@@ -61,8 +61,8 @@ class User : public AuditableEntity, public ChangeableEntity
     bool updateBasicInfo(
         std::optional<std::string_view> nickname,
         std::optional<Sex> sex,
-        drogon_admin::util::NullableValue<PhoneNumber> phoneNumber,
-        drogon_admin::util::NullableValue<Email> email,
+        const drogon_admin::util::NullableValue<PhoneNumber> &phoneNumber,
+        const drogon_admin::util::NullableValue<Email> &email,
         std::int32_t updatedBy = -1);
 
     bool updateStatus(Status status, int32_t updatedBy);
@@ -85,9 +85,8 @@ class User : public AuditableEntity, public ChangeableEntity
 
     /**
      * @brief 追加角色（仅新增，不删除已有角色）
-     * @param roleIds 待新增角色ID列表
+     * @param newRoleIds 待新增角色ID列表
      * @param createdBy 操作人ID，用于填充新建角色审计字段
-     * @throw DomainException 存在重复角色ID / 非法roleId
      */
     void appendRoles(const std::vector<int32_t> &newRoleIds,
                      const int32_t createdBy);

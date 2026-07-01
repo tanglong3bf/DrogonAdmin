@@ -103,8 +103,8 @@ User::operator SysUser() const
     return model;
 }
 
-void User::constructOptionalFields(optional<PhoneNumber> phoneNumber,
-                                   optional<Email> email)
+void User::constructOptionalFields(const optional<PhoneNumber> &phoneNumber,
+                                   const optional<Email> &email)
 {
     phoneNumber_ = phoneNumber;
     email_ = email;
@@ -128,8 +128,8 @@ void User::updatePassword(string_view oldPassword, string_view newPassword)
 
 bool User::updateBasicInfo(optional<string_view> nickname,
                            optional<Sex> sex,
-                           NullableValue<PhoneNumber> phoneNumber,
-                           NullableValue<Email> email,
+                           const NullableValue<PhoneNumber> &phoneNumber,
+                           const NullableValue<Email> &email,
                            std::int32_t updatedBy)
 {
     bool changed = false;

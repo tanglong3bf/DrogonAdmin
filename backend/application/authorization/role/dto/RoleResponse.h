@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoleDeptResponse.h"
-#include "domain/authorization/DeptScopeType.h"
+#include "domain/authorization/RelationType.h"
 #include "domain/authorization/Role.h"
 #include "common/util/Utilities.hpp"
 #include <drogon/orm/Result.h>

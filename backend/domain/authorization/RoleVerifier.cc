@@ -16,7 +16,7 @@ Task<> RoleVerifier::verifyNoRolesBelongToDept(const int32_t deptId) const
     }
 }
 
-Task<> RoleVerifier::verifyRoleNameNotDuplicated(const string &name) const
+Task<> RoleVerifier::verifyRoleNameNotDuplicated(string_view name) const
 {
     const auto count = co_await roleRepository_->countByName(name);
     if (count > 0)
@@ -25,7 +25,7 @@ Task<> RoleVerifier::verifyRoleNameNotDuplicated(const string &name) const
     }
 }
 
-Task<> RoleVerifier::verifyRoleCodeNotDuplicated(const string &code) const
+Task<> RoleVerifier::verifyRoleCodeNotDuplicated(string_view code) const
 {
     const auto count = co_await roleRepository_->countByCode(code);
     if (count > 0)
@@ -55,19 +55,19 @@ Task<> RoleVerifier::verifyRolesBelongToDept(
 
     const auto hasWhiteList =
         roles | views::filter([](const Role &role) {
-            return role.relationType == RelationType::Whitelist;
+            return role.relationType() == RelationType::Whitelist;
         }) |
         ranges_utils::to<vector>();
 
     const auto hasBlackList =
         roles | views::filter([](const Role &role) {
-            return role.relationType == RelationType::Blacklist;
+            return role.relationType() == RelationType::Blacklist;
         }) |
         ranges_utils::to<vector>();
 
     for (const auto &role : hasWhiteList)
     {
-        const auto &deptIds = role.roleDepts |
+        const auto &deptIds = role.roleDepts() |
                               views::transform([](const RoleDept &roleDept) {
                                   return roleDept.deptId();
                               }) |
@@ -80,7 +80,7 @@ Task<> RoleVerifier::verifyRolesBelongToDept(
 
     for (const auto &role : hasBlackList)
     {
-        const auto &deptIds = role.roleDepts |
+        const auto &deptIds = role.roleDepts() |
                               views::transform([](const RoleDept &roleDept) {
                                   return roleDept.deptId();
                               }) |
@@ -111,14 +111,15 @@ Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
                                                                 roleIds);
 
     for (const auto &role : rolesInDb | views::filter([](const Role &role) {
-                                return role.quotaType ==
+                                return role.quotaType() ==
                                        QuotaType::PerDeptLimit;
                             }) | ranges_utils::to<vector>())
     {
         // 检查每个部门使用当前角色的用户数量是否超过限制
-        const size_t userCountInRole =
-            userCount.contains(*role.roleId) ? userCount.at(*role.roleId) : 0;
-        if (userCountInRole + 1 > *role.userQuota)
+        const size_t userCountInRole = userCount.contains(*role.roleId())
+                                           ? userCount.at(*role.roleId())
+                                           : 0;
+        if (userCountInRole + 1 > *role.userQuota())
         {
             throw BusinessException("使用当前角色的用户数量已达限制");
         }
@@ -126,18 +127,18 @@ Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
 
     const auto totalLimitRoles =
         rolesInDb | views::filter([](const Role &role) {
-            return role.quotaType == QuotaType::TotalLimit;
+            return role.quotaType() == QuotaType::TotalLimit;
         }) |
         ranges_utils::to<vector>();
     auto totalLimitUserCount = co_await userRepository_->countByRoleList(
         totalLimitRoles |
-        views::transform([](const Role &role) { return *role.roleId; }) |
+        views::transform([](const Role &role) { return *role.roleId(); }) |
         ranges_utils::to<vector>());
 
     for (const auto &role : totalLimitRoles)
     {
         // 检查所有使用当前角色的用户数量是否超过限制
-        if (totalLimitUserCount[*role.roleId] + 1 > *role.userQuota)
+        if (totalLimitUserCount[*role.roleId()] + 1 > *role.userQuota())
         {
             throw BusinessException("使用当前角色的用户数量已达限制");
         }
@@ -158,29 +159,30 @@ Task<> RoleVerifier::verifyDeptRolesAllowedForNewUser(
 Task<> RoleVerifier::checkQuota(const Role &role,
                                 const Role & /* ignore */) const
 {
-    const auto deptIds = role.roleDepts |
+    const auto deptIds = role.roleDepts() |
                          views::transform([](const RoleDept &roleDept) {
                              return roleDept.deptId();
                          }) |
                          ranges_utils::to<vector>();
-    if (role.quotaType == QuotaType::TotalLimit)
+    if (role.quotaType() == QuotaType::TotalLimit)
     {
         // 检查所有使用当前角色的用户数量是否超过限制
-        const auto count = co_await userRepository_->countByRole(*role.roleId);
-        if (count > *role.userQuota)
+        const auto count =
+            co_await userRepository_->countByRole(*role.roleId());
+        if (count > *role.userQuota())
         {
             throw BusinessException("使用当前角色的用户数量已达限制");
         }
     }
-    else if (role.quotaType == QuotaType::PerDeptLimit)
+    else if (role.quotaType() == QuotaType::PerDeptLimit)
     {
         // 检查每个部门使用当前角色的用户数量是否超过限制
         const std::unordered_map<std::int32_t, std::size_t> count =
             co_await userRepository_->countUsersWithRolePerDepartment(
-                *role.roleId);
+                *role.roleId());
         for (const auto &[deptId, deptCount] : count)
         {
-            if (deptCount > *role.userQuota)
+            if (deptCount > *role.userQuota())
             {
                 throw BusinessException("使用当前角色的用户数量已达限制");
             }
@@ -188,8 +190,8 @@ Task<> RoleVerifier::checkQuota(const Role &role,
     }
     // 使用当前角色的用户所在的部门id列表
     const std::vector<std::int32_t> usedDeptIds =
-        co_await userRepository_->getDeptIdsByRoleId(*role.roleId);
-    if (role.relationType == RelationType::Whitelist)
+        co_await userRepository_->getDeptIdsByRoleId(*role.roleId());
+    if (role.relationType() == RelationType::Whitelist)
     {
         // 检查所有使用当前角色的用户是否都在白名单部门中
         for (const auto &deptId : usedDeptIds)
@@ -200,7 +202,7 @@ Task<> RoleVerifier::checkQuota(const Role &role,
             }
         }
     }
-    else if (role.relationType == RelationType::Blacklist)
+    else if (role.relationType() == RelationType::Blacklist)
     {
         // 检查所有使用当前角色的用户是否都不在黑名单部门中
         for (const auto &deptId : usedDeptIds)

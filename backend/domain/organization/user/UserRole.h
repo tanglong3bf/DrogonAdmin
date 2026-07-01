@@ -25,10 +25,7 @@ class UserRole : public ChangeableEntity
 
     /// @group 和model类互转
     /// @{
-  private:
     explicit UserRole(const SysUserRole &model);
-
-  public:
     explicit operator SysUserRole() const;
     /// @}
 

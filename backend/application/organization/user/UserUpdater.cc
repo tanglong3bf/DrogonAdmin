@@ -14,16 +14,16 @@ Task<> UserUpdater::updateUser(User &user,
     LOG_TRACE << "更新用户，userId=" << *user.userId()
               << ", updatedBy=" << updatedBy;
 
-    bool isUpdated = user.updateBasicInfo(request.nickname(),
-                                          request.sex(),
-                                          request.phoneNumber(),
-                                          request.email(),
-                                          updatedBy);
+    user.updateBasicInfo(request.nickname(),
+                         request.sex(),
+                         request.phoneNumber(),
+                         request.email(),
+                         updatedBy);
 
     // 状态
     if (const auto statusOpt = request.status(); statusOpt)
     {
-        isUpdated |= user.updateStatus(*statusOpt, updatedBy);
+        user.updateStatus(*statusOpt, updatedBy);
     }
 
     // 部门id
@@ -32,7 +32,7 @@ Task<> UserUpdater::updateUser(User &user,
         deptIdOpt && user.deptId() != *deptIdOpt)
     {
         co_await deptVerifier_->verifyDepartmentExists(*deptIdOpt);
-        isUpdated |= user.assignToDept(*deptIdOpt, updatedBy);
+        user.assignToDept(*deptIdOpt, updatedBy);
     }
     const auto newDeptId = user.deptId();
 
@@ -41,7 +41,6 @@ Task<> UserUpdater::updateUser(User &user,
     {
         co_await roleVerifier_->verifyRolesExists(*request.roleIds());
         user.replaceRoles(*request.roleIds(), updatedBy);
-        isUpdated = true;
     }
     const auto allRoleIds =
         user.userRoles() | views::filter([](const auto &ur) {
