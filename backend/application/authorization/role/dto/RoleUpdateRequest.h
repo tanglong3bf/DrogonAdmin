@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/util/ParamGetter.hpp"
-#include "domain/authorization/DeptScopeType.h"
+#include "domain/authorization/RelationType.h"
 #include "domain/authorization/QuotaType.h"
 #include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>

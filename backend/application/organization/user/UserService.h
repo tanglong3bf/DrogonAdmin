@@ -7,7 +7,6 @@
 #include "dto/UserQueryRequest.h"
 #include "dto/UserResponse.h"
 #include "dto/UserUpdateRequest.h"
-#include "domain/organization/user/UserHandler.h"
 #include "domain/organization/user/UserRepository.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "common/util/PaginatedResponse.hpp"
@@ -55,8 +54,6 @@ class UserService : public DrAdminObject<UserService>
         drogon::DrClassMap::getSingleInstance<UserRepository>()};
     UserUpdaterPtr userUpdater_{
         drogon::DrClassMap::getSingleInstance<UserUpdater>()};
-    UserHandlerPtr userHandler_{
-        drogon::DrClassMap::getSingleInstance<UserHandler>()};
 };
 
 using UserServicePtr = std::shared_ptr<UserService>;

@@ -10,10 +10,18 @@
 class UserRole : public ChangeableEntity
 {
     using SysUserRole = drogon_model::drogon_admin_db::SysUserRole;
+    friend class User;
+    friend class UserRepository;
 
   public:
+    GETTER(userId)
+    GETTER(roleId)
+    GETTER(createdBy)
+    GETTER(createdTime)
+
+  private:
     UserRole(const std::int32_t roleId);
-    UserRole(const std::int32_t roleId, int32_t createdBy);
+    UserRole(const std::int32_t roleId, std::int32_t createdBy);
 
     /// @group 和model类互转
     /// @{
@@ -21,14 +29,9 @@ class UserRole : public ChangeableEntity
     explicit operator SysUserRole() const;
     /// @}
 
-    GETTER(roleId)
-
-  public:
     // 创建用户时可能没有id
-    std::optional<std::int32_t> userId;  ///< 用户id
-  private:
-    std::int32_t roleId_;  ///< 角色id
-  public:
-    std::optional<std::int32_t> createdBy;
-    std::optional<trantor::Date> createdTime;
+    std::optional<std::int32_t> userId_;  ///< 用户id
+    std::int32_t roleId_;                 ///< 角色id
+    std::optional<std::int32_t> createdBy_;
+    std::optional<trantor::Date> createdTime_;
 };

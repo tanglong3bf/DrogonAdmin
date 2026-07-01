@@ -4,14 +4,17 @@
 #include "domain/authorization/Role.h"
 #include "domain/models/SysRole.h"
 #include "common/util/AttrUtils.hpp"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Criteria.h>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
+using namespace drogon_admin;
 
 Task<size_t> RoleCqrsRepo::countByNameAndDeptId(
     const optional<string> &name,
@@ -62,24 +65,22 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
     vector<std::int32_t> roleIds{};
     for (const auto &role : roleList)
     {
-        roleIds.push_back(role.roleId());
+        roleIds.push_back(*role.roleId());
     }
 
     auto roleDeptList = co_await roleDeptMapper().findBy(
         Criteria{SysRoleDept::Cols::_role_id, CompareOperator::In, roleIds});
 
-    for (const auto &roleDept : roleDeptList)
+    for (auto &role : roleList)
     {
-        for (auto &role : roleList)
-        {
-            if (role.roleId() == roleDept.getValueOfRoleId())
-            {
-                role.addRoleDept(RoleDept{roleDept});
-            }
-        }
+        role.restoreDepts(roleDeptList |
+                          views::filter([&role](const SysRoleDept &rd) {
+                              return rd.getValueOfRoleId() == role.roleId();
+                          }) |
+                          ranges_utils::to<vector<SysRoleDept>>());
     }
 
-    co_return roleList;
+    co_return buildRoleResponseList(roleList);
 }
 
 Task<vector<AssignableRoleResponse>> RoleCqrsRepo::getAssignableRoles(
@@ -90,15 +91,30 @@ Task<vector<AssignableRoleResponse>> RoleCqrsRepo::getAssignableRoles(
     co_return buildAssignableList(dbResult);
 }
 
-vector<RoleResponse> RoleCqrsRepo::buildList(const Result &dbResult) const
+vector<Role> RoleCqrsRepo::buildList(const Result &dbResult) const
 {
-    vector<RoleResponse> result;
+    vector<Role> result;
     for (const auto &row : dbResult)
     {
-        RoleResponse roleResponse{Role{SysRole{row}}};
-        result.push_back(roleResponse);
+        Role role{SysRole{row}};
+        result.push_back(role);
     }
     return result;
+}
+
+std::vector<RoleResponse> RoleCqrsRepo::buildRoleResponseList(
+    const std::vector<Role> &roleList) const
+{
+    return roleList | views::transform([this](const auto &role) {
+               RoleResponse roleResponse{role};
+               for (const auto dept : role.roleDepts())
+               {
+                   roleResponse.addRoleDept(
+                       static_cast<RoleDeptResponse>(dept));
+               }
+               return roleResponse;
+           }) |
+           ranges_utils::to<vector>();
 }
 
 vector<AssignableRoleResponse> RoleCqrsRepo::buildAssignableList(

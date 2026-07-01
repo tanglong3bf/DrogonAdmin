@@ -16,6 +16,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl;
 using namespace tl::sql;
+using namespace drogon_admin;
 
 Task<size_t> RoleRepository::countBelongDept(const std::int32_t deptId,
                                              const DbClientPtr &dbClient) const
@@ -84,14 +85,14 @@ Task<> RoleRepository::saveRoleDepts(const vector<RoleDept> &roleDeptList,
     }
 }
 
-Task<size_t> RoleRepository::countByName(const string &name) const
+Task<size_t> RoleRepository::countByName(string_view name) const
 {
     Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysRole::Cols::_name, name};
     co_return co_await roleMapper().count(criteria);
 }
 
-Task<size_t> RoleRepository::countByCode(const string &code) const
+Task<size_t> RoleRepository::countByCode(string_view code) const
 {
     Criteria criteria{SysRole::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysRole::Cols::_code, code};
@@ -112,13 +113,12 @@ Task<size_t> RoleRepository::countByIds(const vector<int32_t> &roleIds) const
 
 Task<> RoleRepository::save(Role &role) const
 {
-    // 由于这里涉及到多表操作，一定需要开启事务
-    // 如果由外界传入，则无法保证
-    const auto trans = co_await app().getDbClient()->newTransactionCoro();
     switch (role.changingStatus())
     {
         case ChangingStatus::NEW:
         {
+            const auto trans =
+                co_await app().getDbClient()->newTransactionCoro();
             const auto sysRole = static_cast<SysRole>(role);
             // 插入本体
             const auto sysRoleInDb = co_await roleMapper(trans).insert(sysRole);
@@ -126,14 +126,14 @@ Task<> RoleRepository::save(Role &role) const
             const auto roleId = sysRoleInDb.getValueOfRoleId();
 
             // 处理关联数据
-            auto roleDepts = role.roleDepts;
+            auto roleDepts = role.roleDepts();
             if (roleDepts.size() == 0)
             {
                 co_return;
             }
             for (auto &dept : roleDepts)
             {
-                dept.roleId = roleId;
+                dept.roleId_ = roleId;
             }
 
             // 关联数据转json
@@ -144,22 +144,24 @@ Task<> RoleRepository::save(Role &role) const
                 data.append(sysRoleDept.toJson());
             }
 
-            auto sql = sqlGenerator()->getSql("multi_insert_role_dept",
-                                              {{"data", data}});
+            const auto sql = sqlGenerator()->getSql("multi_insert_role_dept",
+                                                    {{"data", data}});
             co_await trans->execSqlCoro(sql);
             co_return;
         }
         case ChangingStatus::DELETED:
         {
+            const auto trans =
+                co_await app().getDbClient()->newTransactionCoro();
             // 删除本体
             co_await roleMapper(trans).updateBy({SysRole::Cols::_deleted_by,
                                                  SysRole::Cols::_deleted_time},
                                                 {SysRole::Cols::_role_id,
-                                                 *role.roleId},
+                                                 *role.roleId()},
                                                 *role.deletedBy(),
                                                 *role.deletedTime());
             // 处理关联数据
-            auto roleDepts = role.roleDepts;
+            auto roleDepts = role.roleDepts();
             if (roleDepts.size() == 0)
             {
                 co_return;
@@ -169,7 +171,7 @@ Task<> RoleRepository::save(Role &role) const
             for (const auto &dept : roleDepts)
             {
                 Json::Value json{Json::objectValue};
-                json["role_id"] = *dept.roleId;
+                json["role_id"] = *dept.roleId();
                 json["dept_id"] = dept.deptId();
                 data.append(json);
             }
@@ -180,11 +182,13 @@ Task<> RoleRepository::save(Role &role) const
         }
         case ChangingStatus::UPDATED:
         {
+            const auto trans =
+                co_await app().getDbClient()->newTransactionCoro();
             SysRole sysRole = static_cast<SysRole>(role);
             co_await roleMapper(trans).update(sysRole);
 
             // 处理关联数据
-            if (role.roleDepts.size() == 0)
+            if (role.roleDepts().size() == 0)
             {
                 co_return;
             }
@@ -192,15 +196,16 @@ Task<> RoleRepository::save(Role &role) const
             // 关联数据转json
             Json::Value toDelete{Json::arrayValue};
             Json::Value newDepts{Json::arrayValue};
-            for (const auto &dept : role.roleDepts)
+            for (const auto &dept : role.roleDepts())
             {
                 Json::Value json{Json::objectValue};
-                json["role_id"] = *dept.roleId;
+                json["role_id"] = *dept.roleId();
                 json["dept_id"] = dept.deptId();
                 if (dept.isNew())
                 {
-                    json["created_by"] = *dept.createdBy;
-                    json["created_time"] = dept.createdTime->toDbStringLocal();
+                    json["created_by"] = *dept.createdBy();
+                    json["created_time"] =
+                        dept.createdTime()->toDbStringLocal();
                     newDepts.append(json);
                 }
                 else if (dept.isDeleted())
@@ -246,7 +251,7 @@ Task<optional<Role>> RoleRepository::getById(const std::int32_t roleId) const
     }
     const auto &[role, roleDepts] = roleInDb[0];
     Role result{role};
-    result.setRoleDepts(buildRoleDeptList(roleDepts));
+    result.restoreDepts(roleDepts);
     co_return result;
 }
 
@@ -272,7 +277,7 @@ drogon::Task<std::vector<Role>> RoleRepository::getByIds(
     co_return rolesInDb | views::transform([this](const auto &roleInDb) {
         const auto &[role, roleDepts] = roleInDb;
         Role result{role};
-        result.setRoleDepts(buildRoleDeptList(roleDepts));
+        result.restoreDepts(roleDepts);
         return result;
     }) | ranges_utils::to<std::vector>();
 }

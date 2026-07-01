@@ -17,6 +17,10 @@ class UserCenterController : public drogon::HttpController<UserCenterController>
                   "/user_center/change_password",
                   drogon::Patch,
                   drogon::Options);
+    ADD_METHOD_TO(UserCenterController::uploadAvatar,
+                  "/user_center/upload_avatar",
+                  drogon::Post,
+                  drogon::Options);
     METHOD_LIST_END
 
     /**
@@ -25,9 +29,19 @@ class UserCenterController : public drogon::HttpController<UserCenterController>
     drogon::Task<drogon::HttpResponsePtr> updateBasicInfo(
         const drogon::HttpRequestPtr req,
         const UserInfoUpdateRequest request) const;
+
+    /**
+     * @brief 更新用户密码
+     */
     drogon::Task<drogon::HttpResponsePtr> changePassword(
         const drogon::HttpRequestPtr req,
         const ChangePasswordRequest request) const;
+
+    /**
+     * @brief 上传用户头像
+     */
+    drogon::Task<drogon::HttpResponsePtr> uploadAvatar(
+        const drogon::HttpRequestPtr req) const;
 
   private:
     UserCenterServicePtr userCenterService_{

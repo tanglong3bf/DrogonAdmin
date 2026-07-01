@@ -53,6 +53,7 @@ Task<> DeptService::deleteDept(const std::int32_t deptId,
     try
     {
         co_await deptRepository_->save(*dept, trans);
+        // 跨聚合删除关联数据
         co_await roleService_->deleteExcludingDept(deptId, trans);
     }
     catch (const drogon::orm::DrogonDbException &e)

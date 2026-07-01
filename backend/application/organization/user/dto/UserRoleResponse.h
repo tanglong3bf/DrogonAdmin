@@ -11,7 +11,7 @@
 struct UserRoleResponse
 {
     UserRoleResponse(const UserRole &entity)
-        : userId_{*entity.userId}, roleId_{entity.roleId()}
+        : userId_{*entity.userId()}, roleId_{entity.roleId()}
     {
     }
 

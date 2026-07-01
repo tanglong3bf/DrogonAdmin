@@ -10,7 +10,7 @@ import { UploadAvatarResponse } from '@/types/user'
  */
 if (mockConfig.user_center.update_basic_info) {
   mock
-    .onPatch(/^http:\/\/localhost:8000\/user_center\/basic_info/)
+    .onPatch('/user_center/basic_info')
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {
@@ -34,7 +34,7 @@ if (mockConfig.user_center.update_basic_info) {
  */
 if (mockConfig.user_center.change_password) {
   mock
-    .onPatch(/^http:\/\/localhost:8000\/user_center\/change_password$/)
+    .onPatch('/user_center/change_password')
     .reply((config: AxiosRequestConfig): [number, ResponseBody<any>?] => {
       console.log(config)
       if (config.data === undefined || config.data.length === 0) {
@@ -54,7 +54,7 @@ let times = 0
  */
 if (mockConfig.user_center.upload_avatar) {
   mock
-    .onPost(/^http:\/\/localhost:8000\/user_center\/upload_avatar$/)
+    .onPost('/user_center/upload_avatar')
     .reply(
       (
         config: AxiosRequestConfig

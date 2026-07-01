@@ -3,7 +3,7 @@
 #include <iterator>
 #include <utility>
 
-namespace tl::ranges_utils
+namespace drogon_admin::ranges_utils
 {
 template <typename C, typename R>
 concept constructible_from_range =
@@ -104,4 +104,4 @@ constexpr ToTemplateClosure<Tpl> to()
     return {};
 }
 
-}  // namespace tl::ranges_utils
+}  // namespace drogon_admin::ranges_utils

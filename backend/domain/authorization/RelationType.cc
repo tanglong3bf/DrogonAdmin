@@ -1,4 +1,4 @@
-#include "DeptScopeType.h"
+#include "RelationType.h"
 
 #include <trantor/utils/Logger.h>
 

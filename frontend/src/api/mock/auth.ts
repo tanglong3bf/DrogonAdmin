@@ -10,7 +10,7 @@ import { AxiosRequestConfig } from 'axios'
  */
 if (mockConfig.auth.login) {
   mock
-    .onPost('http://localhost:8000/login')
+    .onPost('/login')
     .reply(
       (config: AxiosRequestConfig): [number, ResponseBody<LoginResponse>] => {
         console.log(config)

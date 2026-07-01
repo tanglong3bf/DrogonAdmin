@@ -62,10 +62,55 @@ class NullableValue
         return NullableValue(std::forward<T>(val));
     }
 
-    static constexpr NullableValue value(const T &val) noexcept(
+    [[nodiscard]] static constexpr NullableValue value(const T &val) noexcept(
         std::is_nothrow_copy_constructible_v<T>)
     {
         return NullableValue(val);
+    }
+
+    template <
+        typename U,
+        typename = std::enable_if_t<!std::is_same_v<U, T> &&
+                                    std::is_constructible_v<T, const U &>>>
+    constexpr explicit(!std::is_convertible_v<const U &, T>)
+        NullableValue(const NullableValue<U> &other) noexcept(
+            std::is_nothrow_constructible_v<T, const U &>)
+        : data_()
+    {
+        if (other.isAbsent())
+        {
+            data_.template emplace<std::monostate>();
+        }
+        else if (other.isNull())
+        {
+            data_.template emplace<NullTag>();
+        }
+        else
+        {
+            data_.template emplace<T>(other.value());
+        }
+    }
+
+    template <typename U,
+              typename = std::enable_if_t<!std::is_same_v<U, T> &&
+                                          std::is_constructible_v<T, U &&>>>
+    constexpr explicit(!std::is_convertible_v<U &&, T>)
+        NullableValue(NullableValue<U> &&other) noexcept(
+            std::is_nothrow_constructible_v<T, U &&>)
+        : data_()
+    {
+        if (other.isAbsent())
+        {
+            data_.template emplace<std::monostate>();
+        }
+        else if (other.isNull())
+        {
+            data_.template emplace<NullTag>();
+        }
+        else
+        {
+            data_.template emplace<T>(std::move(other).value());
+        }
     }
 
     [[nodiscard]] constexpr bool isAbsent() const noexcept
@@ -84,17 +129,10 @@ class NullableValue
     }
 
     template <typename D>
-    [[nodiscard]] constexpr NullableValue<D> to() const noexcept
+    [[nodiscard]] constexpr NullableValue<D> to() const
+        noexcept(std::is_nothrow_constructible_v<D, const T &>)
     {
-        if (isNull())
-        {
-            return NullableValue<D>::null();
-        }
-        else if (isAbsent())
-        {
-            return NullableValue<D>::absent();
-        }
-        return NullableValue<D>::value(std::get<T>(data_));
+        return NullableValue<D>(*this);
     }
 
     [[nodiscard]] constexpr const T &value() const &

@@ -56,14 +56,13 @@ drogon::Task<> UserRepository::save(User &user) const
             const auto trans = co_await dbClient()->newTransactionCoro();
             auto model = static_cast<SysUser>(user);
             const auto userInDb = co_await userMapper(trans).insert(model);
-            if (user.userRoles.size() > 0)
+            if (user.userRoles().size() > 0)
             {
                 Json::Value data;
-                for (auto &userRole : user.userRoles)
+                for (auto &userRole : user.userRoles())
                 {
-                    const_cast<UserRole &>(userRole).userId =
-                        userInDb.getValueOfUserId();
-                    const auto item = static_cast<SysUserRole>(userRole);
+                    auto item = static_cast<SysUserRole>(userRole);
+                    item.setUserId(userInDb.getValueOfUserId());
                     data.append(item.toJson());
                 }
                 const auto sql =
@@ -82,7 +81,7 @@ drogon::Task<> UserRepository::save(User &user) const
             Json::Value toInsert{Json::arrayValue};
             Json::Value toDelete{Json::arrayValue};
 
-            for (auto &userRole : user.userRoles)
+            for (auto &userRole : user.userRoles())
             {
                 const auto status = userRole.changingStatus();
                 const auto item = static_cast<SysUserRole>(userRole);
@@ -126,7 +125,7 @@ drogon::Task<> UserRepository::save(User &user) const
             co_await userMapper(trans).update(model);
             // 关联数据删除
             co_await userRoleMapper(trans).deleteBy(
-                Criteria{SysUserRole::Cols::_user_id, *user.userId});
+                Criteria{SysUserRole::Cols::_user_id, *user.userId()});
 
             co_return;
         }
@@ -156,7 +155,7 @@ Task<optional<User>> UserRepository::getById(const std::int32_t userId,
         }
         const auto &[sysUser, sysUserRoles] = userInDb[0];
         User user{sysUser};
-        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        user.restoreRoles(sysUserRoles);
         co_return user;
     }
     else
@@ -332,7 +331,7 @@ Task<optional<User>> UserRepository::getByUsername(std::string_view username,
         }
         const auto &[sysUser, sysUserRoles] = userInDb[0];
         User user{sysUser};
-        user.setUserRoles(buildUserRoleList(sysUserRoles));
+        user.restoreRoles(sysUserRoles);
         co_return user;
     }
     else
@@ -350,17 +349,6 @@ Task<optional<User>> UserRepository::getByUsername(std::string_view username,
             co_return nullopt;
         }
     }
-}
-
-vector<UserRole> UserRepository::buildUserRoleList(
-    const vector<SysUserRole> &sysUserRoles) const
-{
-    vector<UserRole> userRoles;
-    for (const auto &sysUserRole : sysUserRoles)
-    {
-        userRoles.push_back(UserRole{sysUserRole});
-    }
-    return userRoles;
 }
 
 inline SqlGenerator *UserRepository::sqlGenerator()

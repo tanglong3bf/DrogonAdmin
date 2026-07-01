@@ -1,17 +1,12 @@
 #include "AuthService.h"
 
 #include "DrogonJwtUtil/src/JwtUtil.h"
-#include "BCryptCpp/BCrypt.h"
 #include "common/exception/BusinessException.h"
 
 using namespace std;
 using namespace drogon;
-using namespace BCryptCpp;
 
-bool matches(string_view raw, string_view mask)
-{
-    return BCrypt::CheckPassword(string(raw), string(mask));
-}
+bool matches(string_view raw, string_view mask);
 
 Task<LoginResponse> AuthService::login(const LoginRequest &request) const
 {
@@ -22,7 +17,7 @@ Task<LoginResponse> AuthService::login(const LoginRequest &request) const
         throw BusinessException{"用户不存在，登录失败"};
     }
 
-    if (!matches(request.password(), user->password))
+    if (!matches(request.password(), user->password()))
     {
         throw BusinessException{"密码错误，登录失败"};
     }
@@ -31,7 +26,7 @@ Task<LoginResponse> AuthService::login(const LoginRequest &request) const
 
     // 暂时只存userId，后续会存权限
     Json::Value jwtData;
-    jwtData["user_id"] = *user->userId;
+    jwtData["user_id"] = *user->userId();
     const auto token = jwtUtil->encode(jwtData);
     co_return LoginResponse{token, UserResponse{*user}};
 }
