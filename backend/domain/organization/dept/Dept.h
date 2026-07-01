@@ -31,10 +31,31 @@ class Dept : public AuditableEntity, public ChangeableEntity
     explicit operator SysDept() const;
     /// @}
 
-  public:
+    GETTER(deptId)
+    GETTER(name)
+    GETTER(sortNum)
+    GETTER(parentId)
+
+    void setParentId(const std::optional<std::int32_t> parentId);
+
+    /**
+     * @brief 更新名称
+     */
+    void updateName(std::string_view name, const int32_t updatedBy);
+
+    void updateSortNum(const std::int32_t sortNum, const std::int32_t updatedBy)
+    {
+        sortNum_ = sortNum;
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+
+    void remove(const std::int32_t deletedBy);
+
+  private:
     // 新增时没有id
-    std::optional<std::int32_t> deptId;    ///< 部门id
-    std::string name;                      ///< 部门名称
-    std::int32_t sortNum;                  ///< 排序
-    std::optional<std::int32_t> parentId;  ///< 父部门id
+    std::optional<std::int32_t> deptId_;    ///< 部门id
+    std::string name_;                      ///< 部门名称
+    std::int32_t sortNum_;                  ///< 排序
+    std::optional<std::int32_t> parentId_;  ///< 父部门id
 };
