@@ -45,10 +45,7 @@ class User : public AuditableEntity, public ChangeableEntity
     explicit User(const SysUser &sysUser);
     explicit operator SysUser() const;
 
-    /**
-     * @brief 更新头像
-     */
-    drogon::Task<std::string> updateAvatar(const drogon::HttpRequestPtr &req);
+    void setAvatar(const std::string &avatarUrl);
 
     void constructOptionalFields(const std::optional<PhoneNumber> &phoneNumber,
                                  const std::optional<Email> &email);

@@ -1,4 +1,5 @@
 #include "UploadAvatarResponse.h"
+
 #include <drogon/HttpResponse.h>
 
 namespace drogon

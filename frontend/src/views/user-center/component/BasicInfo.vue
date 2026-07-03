@@ -108,6 +108,7 @@ const handleConfirmUpload = () => {
     return
   }
   uploadRef.value?.submit()
+  ElMessage.success('头像更新成功！')
 }
 
 /**
@@ -134,6 +135,16 @@ const avatarPreviewUrl = computed(() => {
     }
   }
   return IMG_BASE_URL + userInfo.value.avatar
+})
+
+const email = computed(() => {
+  return userInfo.value.email === undefined ? '(未设置)' : userInfo.value.email
+})
+
+const phoneNumber = computed(() => {
+  return userInfo.value.phone_number === undefined
+    ? '(未设置)'
+    : userInfo.value.phone_number
 })
 </script>
 
@@ -203,14 +214,14 @@ const avatarPreviewUrl = computed(() => {
       </li>
       <li class="user-info-item">
         <div class="text">
-          <el-icon><Icon icon="ep:message" /></el-icon>
-          <span class="value">{{ userInfo.email }}</span>
+          <el-icon><Icon icon="ep:phone" /></el-icon>
+          <span class="value">{{ phoneNumber }}</span>
         </div>
       </li>
       <li class="user-info-item">
         <div class="text">
-          <el-icon><Icon icon="ep:phone" /></el-icon>
-          <span class="value">{{ userInfo.phone_number }}</span>
+          <el-icon><Icon icon="ep:message" /></el-icon>
+          <span class="value">{{ email }}</span>
         </div>
       </li>
     </ul>
