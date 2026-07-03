@@ -8,7 +8,8 @@
  */
 struct UploadAvatarResponse
 {
-    UploadAvatarResponse(std::string_view filePath) : filePath_{filePath}
+    explicit UploadAvatarResponse(std::string_view filePath)
+        : filePath_{filePath}
     {
     }
 

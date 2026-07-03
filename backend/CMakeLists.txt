@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
 message(STATUS "use c++20")
 
 aux_source_directory(adapter/driven/persistence REPO_SRC)
+aux_source_directory(adapter/driven/storage STORAGE_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application/auth AUTH_SERVICE_SRC)
 aux_source_directory(application/authorization/role ROLE_SERVICE_SRC)
@@ -54,13 +55,14 @@ target_sources(
   ${PROJECT_NAME}
   PRIVATE ${SRC_DIR}
           ${REPO_SRC}
+          ${STORAGE_SRC}
           ${CTL_SRC}
           ${AUTH_SERVICE_SRC}
           ${ROLE_SERVICE_SRC}
           ${ROLE_DTO_SRC}
           ${DEPT_SERVICE_SRC}
           ${USER_SERVICE_SRC}
-	  ${USER_DTO_SRC}
+          ${USER_DTO_SRC}
           ${MODEL_SRC}
           ${AUTHORIZATION_DOMAIN_SRC}
           ${DEPT_DOMAIN_SRC}

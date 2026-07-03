@@ -107,30 +107,11 @@ User::operator SysUser() const
     return model;
 }
 
-Task<string> User::updateAvatar(const HttpRequestPtr &req)
+void User::setAvatar(const std::string &avatarUrl)
 {
-    MultiPartParser parser;
-    parser.parse(req);
-    const auto files = parser.getFilesMap();
-    if (!files.contains("avatar"))
-    {
-        throw BusinessException("缺少头像文件");
-    }
-
-    const HttpFile &avatarFile = files.at("avatar");
-    const string_view extension = avatarFile.getFileExtension();
-    const string fileName =
-        avatarFile.getMd5() + "." + static_cast<string>(extension);
-    avatarFile.saveAs(fileName);
-
-    const auto imgPrefix =
-        app().getCustomConfig().get("img_prefix", "/uploads/").asString();
-    avatar_ = imgPrefix + fileName;
-
-    this->markUpdated();
-    this->markUpdatedBy(*this->userId_);
-
-    co_return avatar_;
+    avatar_ = avatarUrl;
+    markUpdated();
+    markUpdatedBy(*userId_);
 }
 
 void User::constructOptionalFields(const optional<PhoneNumber> &phoneNumber,

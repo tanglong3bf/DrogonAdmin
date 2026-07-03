@@ -32,10 +32,11 @@ Task<> UserCenterService::changePassword(
 
 Task<UploadAvatarResponse> UserCenterService::uploadAvatar(
     const std::int32_t userId,
-    const HttpRequestPtr &req) const
+    const AvatarFileData &file) const
 {
     auto user = co_await userRepository_->getById(userId);
-    const string avatar_path = co_await user->updateAvatar(req);
+    auto avatar_path = co_await avatarStorage_->saveAvatar(file);
+    user->setAvatar(avatar_path);
     co_await userRepository_->save(*user);
     co_return UploadAvatarResponse{avatar_path};
 }
