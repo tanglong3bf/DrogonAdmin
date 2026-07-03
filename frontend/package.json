@@ -1,6 +1,6 @@
 {
   "name": "drogon-admin-front-end",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
