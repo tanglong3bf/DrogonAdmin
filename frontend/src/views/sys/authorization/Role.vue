@@ -209,7 +209,11 @@ const submit = async (form?: FormInstance) => {
     const data: RoleFormData = {
       name: nameChanged ? role.name : undefined,
       code: codeChanged ? role.code : undefined,
-      description: descChanged ? role.description : undefined,
+      description: descChanged
+        ? role.description === ''
+          ? null
+          : role.description
+        : undefined,
       quota_type: quotaTypeChanged ? role.quota_type : undefined,
       user_quota: userQuotaChanged
         ? role.user_quota

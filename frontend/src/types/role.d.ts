@@ -34,7 +34,7 @@ export interface RoleFormData {
   role_id?: number
   name?: string
   code?: string
-  description?: string
+  description?: string | null
   quota_type?: QuotaType
   user_quota?: number | null
   relation_type?: RelationType
