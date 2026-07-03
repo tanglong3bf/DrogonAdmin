@@ -145,10 +145,11 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
       userInfo.sex = formData.sex
     }
     if (phoneNumberChanged) {
-      userInfo.phone_number = formData.phoneNumber
+      userInfo.phone_number =
+        formData.phoneNumber === '' ? undefined : formData.phoneNumber
     }
     if (emailChanged) {
-      userInfo.email = formData.email
+      userInfo.email = formData.email === '' ? undefined : formData.email
     }
     authStore.setUserInfo(userInfo)
   }
@@ -163,8 +164,8 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
     label-position="top"
     ref="formRef"
   >
-    <el-form-item label="昵称" prop="nickname" placeholder="请输入你的昵称">
-      <el-input v-model="formData.nickname" />
+    <el-form-item label="昵称" prop="nickname">
+      <el-input v-model="formData.nickname" placeholder="请输入你的昵称" />
     </el-form-item>
     <el-form-item label="性别" prop="sex">
       <el-select v-model="formData.sex" placeholder="请选择你的性别">
@@ -173,15 +174,14 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
         <el-option label="保密" :value="Sex.Secrecy" />
       </el-select>
     </el-form-item>
-    <el-form-item
-      label="手机号码"
-      prop="phone_number"
-      placeholder="请输入你的手机号码"
-    >
-      <el-input v-model="formData.phoneNumber" />
+    <el-form-item label="手机号码" prop="phone_number">
+      <el-input
+        v-model="formData.phoneNumber"
+        placeholder="请输入你的手机号码"
+      />
     </el-form-item>
-    <el-form-item label="邮箱" prop="email" placeholder="请输入你的邮箱">
-      <el-input v-model="formData.email" />
+    <el-form-item label="邮箱" prop="email">
+      <el-input v-model="formData.email" placeholder="请输入你的邮箱" />
     </el-form-item>
     <div class="update-btn">
       <el-button :disabled="!isBtnAvailable" @click="updateBasicInfo(formRef)"
