@@ -1,9 +1,9 @@
 #pragma once
 
-#include "application/organization/dept/DeptService.h"
-#include "application/organization/dept/DeptCreateRequest.h"
-#include "application/organization/dept/DeptSortRequest.h"
-#include "application/organization/dept/DeptUpdateRequest.h"
+#include "application/org/dept/DeptService.h"
+#include "application/org/dept/DeptCreateRequest.h"
+#include "application/org/dept/DeptSortRequest.h"
+#include "application/org/dept/DeptUpdateRequest.h"
 #include <drogon/HttpController.h>
 #include <drogon/DrClassMap.h>
 

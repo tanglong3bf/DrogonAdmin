@@ -1,7 +1,5 @@
-#include "application/organization/user/UserCqrsRepo.h"
+#include "application/org/user/UserCqrsRepo.h"
 
-#include "domain/organization/user/UserRole.h"
-#include "domain/models/SysUser.h"
 #include "common/util/AttrUtils.hpp"
 #include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>

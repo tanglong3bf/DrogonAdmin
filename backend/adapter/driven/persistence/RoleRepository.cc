@@ -1,7 +1,5 @@
-#include "domain/authorization/RoleRepository.h"
+#include "domain/iam/role/RoleRepository.h"
 
-#include "domain/models/SysRole.h"
-#include "domain/models/SysRoleDept.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "common/util/plugins/RelationQuery/src/RelationQuery.hpp"
 #include "common/util/rangesUtils.hpp"

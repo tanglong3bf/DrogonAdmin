@@ -1,6 +1,5 @@
 #include "UserController.h"
 
-#include "application/organization/user/dto/UserQueryRequest.h"
 #include "common/util/ApiResponse.hpp"
 
 using namespace std;

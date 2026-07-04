@@ -1,7 +1,5 @@
-#include "domain/organization/user/UserRepository.h"
+#include "domain/org/user/UserRepository.h"
 
-#include "domain/models/SysUser.h"
-#include "domain/models/SysUserRole.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "RelationQuery/src/RelationQuery.hpp"
 #include <drogon/orm/Exception.h>
