@@ -4,6 +4,7 @@ import type { Department } from './department'
 import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
 import { MenuType } from './enums'
+import { Module } from './module'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isArray = (data: unknown, callback: any) =>
@@ -74,7 +75,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
         !isContainKey(menuData, 'component') &&
         !isContainKey(menuData, 'children')
       )
-  } 
+  }
 }
 export function isUploadAvatarResponse(
   data: unknown
@@ -154,4 +155,20 @@ export function isPaginatedResponse<T>(
       isArrayField(data, 'list', isItemValid)
     )
   }
+}
+
+export function isModule(data: unknown): data is Module {
+  return (
+    isObject(data) &&
+    isNumberField(data, 'module_id') &&
+    isStringField(data, 'name') &&
+    isStringOrUndefinedField(data, 'description') &&
+    isNumberField(data, 'sort_num') &&
+    isNumberOrUndefinedField(data, 'parent_id') &&
+    isArrayOrUndefinedField(data, 'children', isModule)
+  )
+}
+
+export function isModuleTree(data: unknown): data is Module[] {
+  return isArray(data, isModule)
 }

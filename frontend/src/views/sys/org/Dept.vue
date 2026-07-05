@@ -62,7 +62,7 @@ const queryParams = reactive<{ name: string }>({
 
 /**
  * 过滤部门树：返回包含 keyword 的节点及其所有父级（路径上所有祖先），并维持树结构
- * @param nodes 原始部门树（扁平或嵌套均可，但此处按嵌套树设计）
+ * @param nodes 原始部门树
  * @param keyword 搜索关键词（模糊匹配 name 字段）
  * @returns 过滤后的部门树（只含匹配节点 + 必要祖先 + 必要后代子树）
  */

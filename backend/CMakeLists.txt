@@ -34,11 +34,13 @@ aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application/iam/auth AUTH_SERVICE_SRC)
 aux_source_directory(application/iam/role ROLE_SERVICE_SRC)
 aux_source_directory(application/iam/role/dto ROLE_DTO_SRC)
+aux_source_directory(application/iam/module MODULE_SERVICE_SRC)
 aux_source_directory(application/org/dept DEPT_SERVICE_SRC)
 aux_source_directory(application/org/user USER_SERVICE_SRC)
 aux_source_directory(application/org/user/dto USER_DTO_SRC)
 aux_source_directory(domain/models MODEL_SRC)
 aux_source_directory(domain/iam/role ROLE_DOMAIN_SRC)
+aux_source_directory(domain/iam/module MODULE_DOMAIN_SRC)
 aux_source_directory(domain/org/dept DEPT_DOMAIN_SRC)
 aux_source_directory(domain/org/user USER_DOMAIN_SRC)
 aux_source_directory(common/exception EXCEPTION_SRC)
@@ -60,11 +62,13 @@ target_sources(
           ${AUTH_SERVICE_SRC}
           ${ROLE_SERVICE_SRC}
           ${ROLE_DTO_SRC}
+          ${MODULE_SERVICE_SRC}
           ${DEPT_SERVICE_SRC}
           ${USER_SERVICE_SRC}
           ${USER_DTO_SRC}
           ${MODEL_SRC}
           ${ROLE_DOMAIN_SRC}
+          ${MODULE_DOMAIN_SRC}
           ${DEPT_DOMAIN_SRC}
           ${USER_DOMAIN_SRC}
           ${EXCEPTION_SRC}

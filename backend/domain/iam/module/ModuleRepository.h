@@ -1,0 +1,45 @@
+#pragma once
+
+#include "Module.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
+#include <drogon/utils/coroutine.h>
+#include <drogon/HttpAppFramework.h>
+
+/**
+ * @brief 模块数据仓库
+ */
+class ModuleRepository : public DrAdminObject<ModuleRepository>
+{
+    using DbClientPtr = drogon::orm::DbClientPtr;
+    using SqlGenerator = tl::sql::SqlGenerator;
+    using SysModule = drogon_model::drogon_admin_db::SysModule;
+    using SysModuleMapper = drogon::orm::CoroMapper<SysModule>;
+
+  public:
+    /**
+     * @brief 存储模块数据
+     */
+    drogon::Task<> save(
+        const Module &module,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
+
+    /**
+     * @brief 根据模块id获取数据
+     */
+    drogon::Task<std::optional<Module>> getById(
+        const std::int32_t moduleId,
+        const bool withRelation = false) const;
+
+    /**
+     * @brief 获取指定模块的子模块数量
+     */
+    drogon::Task<std::size_t> countSubModule(const std::int32_t moduleId) const;
+
+  private:
+    static SqlGenerator *sqlGenerator();
+    static SysModuleMapper moduleMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
+};
+
+using ModuleRepositoryPtr = std::shared_ptr<ModuleRepository>;
