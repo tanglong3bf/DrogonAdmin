@@ -4,6 +4,8 @@
 
 using namespace std;
 
+Json::Value toJsonArray(const vector<FunctionResponse> &data);
+
 Json::Value toJsonArray(const vector<ModuleResponse> &data)
 {
     Json::Value array(Json::arrayValue);
@@ -31,7 +33,6 @@ ModuleResponse::ModuleResponse(const Module &module)
       description_(module.description()),
       sortNum_(module.sortNum()),
       parentId_(module.parentId())
-
 {
 }
 
@@ -53,7 +54,16 @@ Json::Value ModuleResponse::toJson() const
     {
         json["children"] = toJsonArray(children_);
     }
+    if (functions_.size() > 0)
+    {
+        json["functions"] = toJsonArray(functions_);
+    }
     return json;
+}
+
+void ModuleResponse::appendFunction(FunctionResponse &func)
+{
+    functions_.emplace_back(func);
 }
 
 void ModuleResponse::addChild(ModuleResponse &child)

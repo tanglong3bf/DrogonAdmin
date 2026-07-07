@@ -464,11 +464,12 @@
             "group": "GROUP BY ur.role_id"
           },
           "get_module_tree": {
-            "main": "WITH RECURSIVE module_ancestor AS ( @current() UNION @sub() ) SELECT * FROM module_ancestor @order()",
+            "main": "SELECT m.*, f.* FROM(@recursive()) m LEFT JOIN sys_function f ON m.module_id = f.module_id @order()",
+            "recursive": "WITH RECURSIVE module_ancestor AS ( @current() UNION @sub() ) SELECT * FROM module_ancestor",
             "current": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
             "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s @inner_join()",
             "inner_join": "INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY \"level\", parent_id, sort_num, module_id"
+            "order": "ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id, f.sort_num, f.function_id"
           }
         }
       }

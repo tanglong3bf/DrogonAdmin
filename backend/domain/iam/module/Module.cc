@@ -1,6 +1,12 @@
 #include "Module.h"
 
+#include "common/exception/BusinessException.h"
+#include "common/util/rangesUtils.hpp"
+#include <ranges>
+
+using namespace std;
 using namespace trantor;
+using namespace drogon_admin;
 
 Module::Module(std::string_view name, const std::int32_t sortNum)
     : name_(name), sortNum_(sortNum)
@@ -43,6 +49,38 @@ Module::operator SysModule() const
 
 void Module::remove(const int32_t deletedBy)
 {
+    for (Function &func : functions_)
+    {
+        func.markDeletedBy(deletedBy);
+        func.markDeleted();
+    }
     markDeletedBy(deletedBy);
     markDeleted();
+}
+
+void Module::appendFunctions(std::vector<Function> &functions,
+                             const int32_t createdBy)
+{
+    // 仅有已存储到数据库中的模块可以添加功能
+    assert(moduleId_.has_value());
+    for (auto &func : functions)
+    {
+        func.moduleId_ = *moduleId_;
+        func.createdBy_ = createdBy;
+    }
+    functions_.insert(functions_.end(), functions.begin(), functions.end());
+}
+
+void Module::replaceFunctions(const std::vector<Function> &newFunctions,
+                              const int32_t updatedBy)
+{
+    throw BusinessException("函数未实现");
+}
+
+void Module::restoreFunctions(const std::vector<SysFunction> &sysFunctions)
+{
+    functions_ =
+        sysFunctions |
+        views::transform([](const SysFunction &f) { return Function{f}; }) |
+        ranges_utils::to<vector>();
 }

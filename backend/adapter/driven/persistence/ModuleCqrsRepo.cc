@@ -1,5 +1,7 @@
 #include "application/iam/module/ModuleCqrsRepo.h"
 
+#include "application/iam/module/FunctionResponse.h"
+#include "domain/models/SysFunction.h"
 #include <drogon/HttpAppFramework.h>
 
 using namespace std;
@@ -54,17 +56,35 @@ vector<ModuleResponse> ModuleCqrsRepo::buildTree(const Result &dbResult) const
 {
     vector<ModuleResponse> result;
     result.reserve(10);
+    ModuleResponse *lastModule = nullptr;
     for (const auto &row : dbResult)
     {
-        ModuleResponse item{Module{SysModule{row}}};
-        if (item.parentId())
+        if (lastModule &&
+            row["module_id"].as<std::int32_t>() == lastModule->moduleId())
         {
-            auto *parent = findById(result, *item.parentId());
-            parent->addChild(item);
+            // 两个表之间多了一个level列，所以要+1
+            auto func = FunctionResponse{
+                Function{SysFunction(row, SysModule::getColumnNumber() + 1)}};
+            if (func.functionId())
+            {
+                lastModule->appendFunction(func);
+            }
         }
         else
         {
-            result.emplace_back(item);
+            ModuleResponse item{Module{SysModule{row}}};
+            if (item.parentId())
+            {
+                auto *parent = findById(result, *item.parentId());
+                parent->addChild(item);
+                lastModule =
+                    const_cast<ModuleResponse *>(&parent->children().back());
+            }
+            else
+            {
+                result.emplace_back(item);
+                lastModule = &result.back();
+            }
         }
     }
     return result;

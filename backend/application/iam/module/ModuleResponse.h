@@ -1,10 +1,11 @@
 #pragma once
 
+#include "FunctionResponse.h"
 #include "domain/iam/module/Module.h"
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 /**
  * @brief 模块响应
@@ -30,6 +31,8 @@ class ModuleResponse
     GETTER(parentId)
     GETTER(children)
 
+    void appendFunction(FunctionResponse &func);
+
     /**
      * @brief 新增一个子节点
      *
@@ -48,5 +51,5 @@ class ModuleResponse
     const std::optional<std::int32_t> parentId_;    ///< 父模块id
     ModuleResponse *parent_;                        ///< 父模块
     std::vector<ModuleResponse> children_;          ///< 子模块列表
-    // const std::vector<ActionResponse> actions_;
+    std::vector<FunctionResponse> functions_;       ///< 功能列表
 };

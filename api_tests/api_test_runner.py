@@ -118,24 +118,36 @@ def replace_vars(data: Any, pool: Dict[str, Any]) -> Any:
         return data
 
 
-auth_datas: dict = read_yaml("cases/auth_test_case.yaml")
-# 提取用例 name 做展示名
-case_names = [case_item["name"] for case_item in auth_datas["auth_cases"]]
-
-dept_datas: dict = read_yaml("cases/dept_test_case.yaml")
-case_names += [case_item["name"] for case_item in dept_datas["dept_cases"]]
-
-role_datas: dict = read_yaml("cases/role_test_case.yaml")
-case_names += [case_item["name"] for case_item in role_datas["role_cases"]]
-
-user_datas: dict = read_yaml("cases/user_test_case.yaml")
-case_names += [case_item["name"] for case_item in user_datas["user_cases"]]
-
-user_center_datas: dict = read_yaml("cases/user_center_test_case.yaml")
-case_names += [case_item["name"] for case_item in user_center_datas["user_center_cases"]]
+USE_AUTH = True          # 是否使用 auth 模块用例
+USE_DEPT = True          # 是否使用 dept 模块用例
+USE_ROLE = True          # 是否使用 role 模块用例
+USE_USER = True          # 是否使用 user 模块用例
+USE_USER_CENTER = True   # 是否使用 user_center 模块用例
+USE_MODULE = True        # 是否使用 module 模块用例
 
 
-@pytest.mark.parametrize("case_item", auth_datas["auth_cases"] + dept_datas["dept_cases"] + role_datas["role_cases"] + user_datas["user_cases"] + user_center_datas["user_center_cases"],  ids=case_names)
+module_configs = [
+    ("cases/auth_test_case.yaml", "auth_cases", USE_AUTH),
+    ("cases/dept_test_case.yaml", "dept_cases", USE_DEPT),
+    ("cases/role_test_case.yaml", "role_cases", USE_ROLE),
+    ("cases/user_test_case.yaml", "user_cases", USE_USER),
+    ("cases/user_center_test_case.yaml", "user_center_cases", USE_USER_CENTER),
+    ("cases/module_test_case.yaml", "module_cases", USE_MODULE),
+]
+
+
+all_cases = []       # 存放所有启用的测试用例数据
+case_names = []      # 存放所有用例的展示名
+
+for file_path, case_key, enabled in module_configs:
+    if enabled:
+        datas = read_yaml(file_path)
+        current_cases = datas[case_key]
+        all_cases.extend(current_cases)
+        case_names.extend([case_item["name"] for case_item in current_cases])
+
+
+@pytest.mark.parametrize("case_item", all_cases, ids=case_names)
 def test_dept_cases(case_item):
     # 部分接口需要提前准备数据
     if "sql_file" in case_item:

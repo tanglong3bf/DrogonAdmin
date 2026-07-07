@@ -1,0 +1,70 @@
+module_cases:
+  # 查询模块树 {{{
+  - name: 查询模块树-没有模块
+    sql_file: empty_module_tree.sql
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data: []
+    validate_schema: module_tree.yaml
+  - name: 查询模块树-正常查询
+    sql_file: normal_module_tree.sql
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 1
+        $.data[0].name: 系统管理
+        $.data[0].children[0].name: 组织架构
+        $.data[0].children[0].children[0].name: 部门管理
+        $.data[0].children[0].children[1].name: 用户管理
+        $.data[0].children[1].name: 权限管理
+        $.data[0].children[1].children[0].name: 角色管理
+        $.data[0].children[1].children[1].name: 权限分配
+    validate_schema: module_tree.yaml
+  - name: 查询模块树-多个根节点
+    sql_file: multi_root_module_tree.sql
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 3
+        len:$.data[0].children: 2
+        len:$.data[1].children: 1
+        len:$.data[2].children: 1
+    validate_schema: module_tree.yaml
+  - name: 查询模块树-软删除数据不应被展示
+    sql_file: have_deleted_data_module_tree.sql
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[0].children: 2 # 三个数据，软删除一个
+    validate_schema: module_tree.yaml
+  - name: 查询模块树-有关联的功能
+    sql_file: module_tree_with_function.sql
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[0].children[0].children[0].functions: 5
+        len:$.data[0].children[0].children[1].functions: 4
+        len:$.data[0].children[1].children[0].functions: 4
+    validate_schema: module_tree.yaml
+  # }}}
