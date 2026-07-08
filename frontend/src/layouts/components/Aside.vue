@@ -3,7 +3,7 @@ import { useRoute, useRouter } from 'vue-router/dist/vue-router.mjs'
 import { useCommonStore } from '@/stores/common'
 import MenuItem from './MenuItem.vue'
 
-const Logo = '@/assets/drogon-logo.svg'
+import Logo from '/public/drogon-logo.svg'
 
 const router = useRouter()
 const route = useRoute()

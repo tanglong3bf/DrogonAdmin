@@ -7,6 +7,9 @@ import { uploadAvatar } from '@/api/user_center'
 import { Icon } from '@iconify/vue'
 import { Sex } from '@/types/enums'
 import { IMG_BASE_URL } from '@/config'
+import avatarDefault from '@/assets/avatar/default.svg'
+import avatarMale from '@/assets/avatar/male.jpeg'
+import avatarFemale from '@/assets/avatar/female.jpeg'
 
 const authStore = useAuthStore()
 
@@ -127,11 +130,11 @@ const avatarPreviewUrl = computed(() => {
   if (userInfo.value.avatar === '#') {
     switch (userInfo.value.sex) {
       case Sex.Secrecy:
-        return new URL(`@/assets/avatar/drogon-logo.svg`, import.meta.url).href
+        return avatarDefault
       case Sex.Male:
-        return new URL(`@/assets/avatar/male.jpeg`, import.meta.url).href
+        return avatarMale
       case Sex.Female:
-        return new URL(`@/assets/avatar/female.jpeg`, import.meta.url).href
+        return avatarFemale
     }
   }
   return IMG_BASE_URL + userInfo.value.avatar
