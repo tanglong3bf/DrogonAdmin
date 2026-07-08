@@ -8,7 +8,8 @@ import { SidebarMenu } from '@/types/menu'
 
 const menuExpand = ref(true)
 
-// TODO: 刷新后控制台依然会报错，感觉很不优雅，想改，不知道咋改
+const viewsComponents = import.meta.glob('/src/views/**/*.vue')
+
 onMounted(() => {
   const router = useRouter()
   const commonStore = useCommonStore()
@@ -16,17 +17,18 @@ onMounted(() => {
   // 生成路由配置
   const generateRoutes = (menuList: SidebarMenu[]): RouteRecordRaw[] => {
     return menuList.flatMap(menu => {
-      const currentRoute: RouteRecordRaw[] =
-        menu.path && menu.component
-          ? [
-              {
-                path: menu.path,
-                name: menu.name,
-                component: () =>
-                  import(/* @vite-ignore */ `/src/views${menu.component}.vue`)
-              }
-            ]
-          : []
+      let currentRoute: RouteRecordRaw[] = []
+      if (menu.path && menu.component) {
+        const componentPath = `/src/views${menu.component}.vue`
+        const component = viewsComponents[componentPath]
+        currentRoute = [
+          {
+            path: menu.path,
+            name: menu.name,
+            component
+          }
+        ]
+      }
       const childRoutes = menu.children ? generateRoutes(menu.children) : []
       return [...currentRoute, ...childRoutes]
     })

@@ -3,6 +3,8 @@ import { useRoute, useRouter } from 'vue-router/dist/vue-router.mjs'
 import { useCommonStore } from '@/stores/common'
 import MenuItem from './MenuItem.vue'
 
+const Logo = '@/assets/drogon-logo.svg'
+
 const router = useRouter()
 const route = useRoute()
 const commonStore = useCommonStore()
@@ -22,7 +24,7 @@ const menuSelect = (to: string) => {
 
 <template>
   <div class="header">
-    <el-image class="logo" src="/src/assets/drogon-logo.svg" fit="fill" />
+    <el-image class="logo" :src="Logo" fit="fill" />
     <el-text v-if="menuExpand" class="website-name" size="large" line-clamp="1"
       >Drogon Admin</el-text
     >
