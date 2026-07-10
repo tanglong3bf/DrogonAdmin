@@ -26,5 +26,9 @@
     "update_role": true,
     "delete_role": true,
     "get_role_option": true
+  },
+  "module": {
+    "get_module_tree": true,
+    "delete_module": true
   }
 }
