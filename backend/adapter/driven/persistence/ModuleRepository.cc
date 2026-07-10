@@ -9,18 +9,30 @@ using namespace tl::sql;
 drogon::Task<> ModuleRepository::save(const Module &module,
                                       const DbClientPtr &dbClient) const
 {
-    const auto sysModule = static_cast<SysModule>(module);
-
-    auto mapper = moduleMapper(dbClient);
-
     switch (module.changingStatus())
     {
         case ChangingStatus::NEW:
             co_return;
         case ChangingStatus::DELETED:
         {
+            auto trans = co_await dbClient->newTransactionCoro();
+            auto mapper = moduleMapper(trans);
+
+            const auto sysModule = static_cast<SysModule>(module);
             co_await mapper.update(sysModule);
-            // 完成功能管理时，删除该模块的所有功能
+
+            if (module.functions().size() > 0)
+            {
+                Json::Value data{Json::arrayValue};
+                for (const auto func : module.functions())
+                {
+                    data.append(static_cast<SysFunction>(func).toJson());
+                }
+
+                const auto sql = sqlGenerator()->getSql("multi_update_function",
+                                                        {{"data", data}});
+                co_await trans->execSqlCoro(sql);
+            }
             co_return;
         }
         case ChangingStatus::UPDATED:
@@ -39,7 +51,12 @@ Task<optional<Module>> ModuleRepository::getById(const std::int32_t moduleId,
     try
     {
         const auto sysModule = co_await moduleMapper().findOne(criteria);
-        co_return static_cast<Module>(sysModule);
+        auto module = static_cast<Module>(sysModule);
+        if (withRelation)
+        {
+            module.restoreFunctions(co_await functionMapper().findBy(criteria));
+        }
+        co_return module;
     }
     catch (const UnexpectedRows & /*ignore*/)
     {
@@ -65,4 +82,10 @@ inline CoroMapper<SysModule> ModuleRepository::moduleMapper(
     const DbClientPtr &dbClient)
 {
     return CoroMapper<SysModule>{dbClient};
+}
+
+inline CoroMapper<SysFunction> ModuleRepository::functionMapper(
+    const DbClientPtr &dbClient)
+{
+    return CoroMapper<SysFunction>{dbClient};
 }

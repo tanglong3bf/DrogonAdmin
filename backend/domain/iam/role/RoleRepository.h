@@ -2,6 +2,7 @@
 
 #include "Role.h"
 #include "RoleDept.h"
+#include "domain/models/SysPermission.h"
 #include "domain/models/SysRoleDept.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
@@ -22,6 +23,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     using RoleMapper = drogon::orm::CoroMapper<SysRole>;
     using SysRoleDept = drogon_model::drogon_admin_db::SysRoleDept;
     using RoleDeptMapper = drogon::orm::CoroMapper<SysRoleDept>;
+    using SysPermission = drogon_model::drogon_admin_db::SysPermission;
+    using PermissionMapper = drogon::orm::CoroMapper<SysPermission>;
 
   public:
     /**
@@ -77,6 +80,12 @@ class RoleRepository : public DrAdminObject<RoleRepository>
         const std::vector<std::int32_t> &roleIds,
         const bool withRelation) const;
 
+    /**
+     * @brief 统计指定功能列表被使用的次数
+     */
+    drogon::Task<std::size_t> countPermissionByFunctionIds(
+        const std::vector<int32_t> &functionIds) const;
+
   protected:
     std::vector<Role> buildRoleList(
         const std::vector<SysRole> &sysRoleList) const;
@@ -90,6 +99,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     static RoleMapper roleMapper(
         const DbClientPtr &dbClient = drogon::app().getDbClient());
     static RoleDeptMapper roleDeptMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
+    static PermissionMapper permissionMapper(
         const DbClientPtr &dbClient = drogon::app().getDbClient());
 };
 

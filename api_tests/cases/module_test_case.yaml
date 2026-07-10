@@ -68,3 +68,58 @@ module_cases:
         len:$.data[0].children[1].children[0].functions: 4
     validate_schema: module_tree.yaml
   # }}}
+  # 删除模块 {{{
+  - name: 删除模块-不存在的数据
+    sql_file: module_to_delete.sql
+    url: http://localhost:8000/module/233
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除模块-软删除的数据
+    url: http://localhost:8000/module/1
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除模块-有子模块的模块
+    url: http://localhost:8000/module/2
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定模块包含子模块
+  - name: 删除模块-有功能的模块(功能均未被使用)
+    url: http://localhost:8000/module/4
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 删除模块-功能被分配了权限
+    url: http://localhost:8000/module/5
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 功能已被使用
+  - name: 删除模块-功能被菜单使用
+    url: http://localhost:8000/module/6
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 功能已被使用
+  # }}}
+# vim: set foldmethod=marker foldlevel=0:

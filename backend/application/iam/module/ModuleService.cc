@@ -11,7 +11,7 @@ Task<vector<ModuleResponse>> ModuleService::getModuleTree() const
 Task<> ModuleService::deleteModule(const std::int32_t moduleId,
                                    const std::int32_t deletedBy) const
 {
-    auto module = co_await moduleRepository_->getById(moduleId);
+    auto module = co_await moduleRepository_->getById(moduleId, true);
     if (!module)
     {
         // 没有数据，无需操作

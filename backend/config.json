@@ -470,6 +470,34 @@
             "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s @inner_join()",
             "inner_join": "INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
             "order": "ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id, f.sort_num, f.function_id"
+          },
+          // 批量更新功能，包括软删除
+          "multi_update_function": {
+            "main": {
+              "sql": "UPDATE sys_function f SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE f.function_id = s.function_id",
+              "params": {
+                "fields_list": [
+                  "function_id",
+                  "name",
+                  "code",
+                  "description",
+                  "sort_num",
+                  "module_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
+            "values": "(@for(item in data, separator='), (') ${item.function_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "string_value": "@if(value && value != null) '${value}' @else NULL::String @endif",
+            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           }
         }
       }

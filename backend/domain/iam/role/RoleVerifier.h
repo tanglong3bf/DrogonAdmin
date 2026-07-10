@@ -54,6 +54,12 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
      */
     drogon::Task<> checkQuota(const Role &role, const Role &oldData) const;
 
+    /**
+     * @brief 验证指定功能没有被任何角色使用
+     */
+    drogon::Task<> verifyFunctionNotUsed(
+        const std::vector<int32_t> &functionIds) const;
+
   private:
     /**
      * @brief 验证指定部门是否可用所有角色

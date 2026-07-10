@@ -2,6 +2,8 @@
 
 #include "Module.h"
 #include "ModuleVerifier.h"
+#include "domain/iam/menu/MenuVerifier.h"
+#include "domain/iam/role/RoleVerifier.h"
 #include "common/framework/DrAdminObject.hpp"
 
 /**
@@ -18,6 +20,10 @@ class ModuleHandler : public DrAdminObject<ModuleHandler>
   private:
     ModuleVerifierPtr moduleVerifier_{
         drogon::DrClassMap::getSingleInstance<ModuleVerifier>()};
+    RoleVerifierPtr roleVerifier_{
+        drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
+    MenuVerifierPtr menuVerifier_{
+        drogon::DrClassMap::getSingleInstance<MenuVerifier>()};
 };
 
 using ModuleHandlerPtr = std::shared_ptr<ModuleHandler>;

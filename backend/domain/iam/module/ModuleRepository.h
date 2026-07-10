@@ -15,6 +15,8 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
     using SqlGenerator = tl::sql::SqlGenerator;
     using SysModule = drogon_model::drogon_admin_db::SysModule;
     using SysModuleMapper = drogon::orm::CoroMapper<SysModule>;
+    using SysFunction = drogon_model::drogon_admin_db::SysFunction;
+    using SysFunctionMapper = drogon::orm::CoroMapper<SysFunction>;
 
   public:
     /**
@@ -39,6 +41,8 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
   private:
     static SqlGenerator *sqlGenerator();
     static SysModuleMapper moduleMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
+    static SysFunctionMapper functionMapper(
         const DbClientPtr &dbClient = drogon::app().getDbClient());
 };
 

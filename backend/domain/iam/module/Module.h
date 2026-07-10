@@ -48,6 +48,7 @@ class Module : public AuditableEntity, public ChangeableEntity
     GETTER(description);
     GETTER(sortNum);
     GETTER(parentId);
+    GETTER(functions);
 
     /**
      * @brief 追加功能（仅新增，不删除已有角色）
