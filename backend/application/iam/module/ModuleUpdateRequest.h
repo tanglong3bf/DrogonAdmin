@@ -5,9 +5,6 @@
 #include <json/value.h>
 #include <optional>
 
-using namespace std;
-using namespace drogon_admin::util;
-
 struct ModuleUpdateRequest
 {
     ModuleUpdateRequest() = default;
@@ -17,6 +14,6 @@ struct ModuleUpdateRequest
     GETTER(description)
 
   private:
-    optional<string> name_;
-    NullableValue<string> description_;
+    std::optional<std::string> name_;
+    drogon_admin::util::NullableValue<std::string> description_;
 };

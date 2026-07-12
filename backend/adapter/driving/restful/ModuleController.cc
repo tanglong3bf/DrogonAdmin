@@ -15,7 +15,7 @@ Task<HttpResponsePtr> ModuleController::createModule(
 {
     const auto createdBy = req->getAttributes()->get<int32_t>("userId");
     co_await moduleService_->createModule(request, createdBy);
-    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+    co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
 
 Task<HttpResponsePtr> ModuleController::updateModule(

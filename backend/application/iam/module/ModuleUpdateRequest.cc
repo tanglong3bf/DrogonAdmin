@@ -22,7 +22,7 @@ ModuleUpdateRequest fromRequest(const HttpRequest &req)
 
 ModuleUpdateRequest::ModuleUpdateRequest(const Json::Value &json)
 {
-    name_ = getParam<std::string, true>(json, "name", {1, -1});
+    name_ = getParam<std::string>(json, "name", {1, -1});
     description_ =
         getParam<std::string, false, true>(json, "description", {1, -1});
     if (!name_ && description_.isAbsent())

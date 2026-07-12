@@ -119,10 +119,10 @@ def replace_vars(data: Any, pool: Dict[str, Any]) -> Any:
 
 
 USE_AUTH = True          # 是否使用 auth 模块用例
-USE_DEPT = True          # 是否使用 dept 模块用例
-USE_ROLE = True          # 是否使用 role 模块用例
-USE_USER = True          # 是否使用 user 模块用例
-USE_USER_CENTER = True   # 是否使用 user_center 模块用例
+USE_DEPT = False         # 是否使用 dept 模块用例
+USE_ROLE = False         # 是否使用 role 模块用例
+USE_USER = False         # 是否使用 user 模块用例
+USE_USER_CENTER = False  # 是否使用 user_center 模块用例
 USE_MODULE = True        # 是否使用 module 模块用例
 
 

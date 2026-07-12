@@ -122,4 +122,134 @@ module_cases:
         $.code: lt 0
         $.error: 功能已被使用
   # }}}
+  # 新增模块 {{{
+  - name: 新增模块-正常新增
+    sql_file: module_to_create.sql
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-1
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增模块-设置描述
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-2
+      description: 模块-2的描述
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增模块-设置父模块
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-1-1
+      parent_id: 1
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增模块-不同父部门的name可重复
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-1
+      parent_id: 2
+    params: ''
+    expect:
+      status_code: 201
+  - name: 新增模块-name冲突
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 模块名称冲突
+  - name: 新增模块-父模块不存在
+    url: http://localhost:8000/module
+    method: POST
+    json:
+      name: 模块-233
+      parent_id: 233
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的模块id不存在
+  - name: 新增模块-数据检查
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 4 # 2个自带2个新增
+        $.data[1].children[0].name: 模块-1 # 与下一条不平级，可有重复的名称
+        $.data[2].name: 模块-1 # 新增的
+        $.data[3].name: 模块-2 # 新增的
+  # }}}
+  # 更新模块 {{{
+  - name: 更新模块-未传递参数
+    sql_file: module_to_update.sql
+    url: http://localhost:8000/module/1
+    method: PATCH
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 请至少指定一个需要更新的字段
+  - name: 更新模块-只修改name且与旧值相同
+    url: http://localhost:8000/module/1
+    method: PATCH
+    json:
+      name: 模块-1
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新模块-只修改name
+    url: http://localhost:8000/module/1
+    method: PATCH
+    json:
+      name: 新名称
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新模块-数据检查-1
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data[0].name: 新名称
+        $.data[0].description: 未修改的描述
+  - name: 更新模块-清空描述
+    url: http://localhost:8000/module/1
+    method: PATCH
+    json:
+      description: null
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新模块-数据检查-2
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        $.data[0].name: 新名称
+        len:$.data[0].description: 0
+  # }}}
 # vim: set foldmethod=marker foldlevel=0:

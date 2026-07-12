@@ -36,7 +36,14 @@ Module::operator SysModule() const
     SysModule model;
     SET_OPT(moduleId_, ModuleId);
     SET_VAL(name_, Name);
-    SET_OPT(description_, Description);
+    if (description_)
+    {
+        model.setDescription(*description_);
+    }
+    else
+    {
+        model.setDescriptionToNull();
+    }
     SET_VAL(sortNum_, SortNum);
     SET_OPT(parentId_, ParentId);
     SET_OPT(createdBy(), CreatedBy);
