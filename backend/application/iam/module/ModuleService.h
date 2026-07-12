@@ -2,6 +2,10 @@
 
 #include "ModuleResponse.h"
 #include "ModuleCqrsRepo.h"
+#include "ModuleCreateRequest.h"
+#include "ModuleUpdateRequest.h"
+#include "ModuleAssembler.h"
+#include "ModuleUpdater.h"
 #include "domain/iam/module/ModuleHandler.h"
 #include "domain/iam/module/ModuleRepository.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -19,6 +23,19 @@ class ModuleService : public DrAdminObject<ModuleService>
     drogon::Task<std::vector<ModuleResponse>> getModuleTree() const;
 
     /**
+     * @brief 创建模块
+     */
+    drogon::Task<> createModule(const ModuleCreateRequest &request,
+                                const std::int32_t createdBy) const;
+
+    /**
+     * @brief 更新模块
+     */
+    drogon::Task<> updateModule(const std::int32_t deptId,
+                                const ModuleUpdateRequest &request,
+                                const std::int32_t updatedBy) const;
+
+    /**
      * @brief 删除指定模块
      */
     drogon::Task<> deleteModule(const std::int32_t moduleId,
@@ -31,6 +48,10 @@ class ModuleService : public DrAdminObject<ModuleService>
         drogon::DrClassMap::getSingleInstance<ModuleRepository>()};
     ModuleHandlerPtr moduleHandler_{
         drogon::DrClassMap::getSingleInstance<ModuleHandler>()};
+    ModuleAssemblerPtr moduleAssembler_{
+        drogon::DrClassMap::getSingleInstance<ModuleAssembler>()};
+    ModuleUpdaterPtr moduleUpdater_{
+        drogon::DrClassMap::getSingleInstance<ModuleUpdater>()};
 };
 
 using ModuleServicePtr = std::shared_ptr<ModuleService>;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Function.h"
+#include "common/util/ParamGetter.hpp"
 #include "domain/models/SysModule.h"
 #include "common/framework/domain/AuditableEntity.h"
 #include "common/framework/domain/ChangeableEntity.h"
@@ -42,6 +43,14 @@ class Module : public AuditableEntity, public ChangeableEntity
      */
     void remove(const int32_t deletedBy);
 
+    /**
+     * @brief 更新基础信息
+     */
+    void updateBasicInfo(
+        const std::optional<std::string> &name,
+        const drogon_admin::util::NullableValue<std::string> &description,
+        const std::int32_t updatedBy);
+
   public:
     GETTER(moduleId);
     GETTER_STR_VIEW(name);
@@ -49,6 +58,11 @@ class Module : public AuditableEntity, public ChangeableEntity
     GETTER(sortNum);
     GETTER(parentId);
     GETTER(functions);
+
+    void setParentId(const std::optional<std::int32_t> parentId)
+    {
+        parentId_ = parentId;
+    }
 
     /**
      * @brief 追加功能（仅新增，不删除已有角色）

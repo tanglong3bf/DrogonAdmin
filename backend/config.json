@@ -498,6 +498,11 @@
             "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
             "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          // 指定父模块id，获取最大的sort_num
+          "get_max_sub_module_sort_num": {
+            "main": "SELECT MAX(sort_num) FROM sys_module @condition(parent_id)",
+            "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           }
         }
       }

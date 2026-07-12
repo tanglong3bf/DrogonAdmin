@@ -18,6 +18,7 @@ Module::Module(std::string_view name,
                const std::int32_t createdBy)
     : name_(name), sortNum_(sortNum), AuditableEntity(AUDITABLE_INIT)
 {
+    markNew();
 }
 
 Module::Module(const SysModule &model)
@@ -56,6 +57,34 @@ void Module::remove(const int32_t deletedBy)
     }
     markDeletedBy(deletedBy);
     markDeleted();
+}
+
+void Module::updateBasicInfo(
+    const std::optional<std::string> &name,
+    const drogon_admin::util::NullableValue<std::string> &description,
+    const std::int32_t updatedBy)
+{
+    bool isUpdated = false;
+    if (name && name_ != *name)
+    {
+        name_ = *name;
+        isUpdated = true;
+    }
+    if (description && description_ != *description)
+    {
+        description_ = *description;
+        isUpdated = true;
+    }
+    else if (description.isNull() && description_)
+    {
+        description_ = nullopt;
+        isUpdated = true;
+    }
+    if (isUpdated)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
 }
 
 void Module::appendFunctions(std::vector<Function> &functions,

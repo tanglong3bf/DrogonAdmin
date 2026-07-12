@@ -1,6 +1,8 @@
 #pragma once
 
 #include "application/iam/module/ModuleService.h"
+#include "application/iam/module/ModuleCreateRequest.h"
+#include "application/iam/module/ModuleUpdateRequest.h"
 #include <drogon/HttpController.h>
 
 class ModuleController : public drogon::HttpController<ModuleController>
@@ -11,6 +13,14 @@ class ModuleController : public drogon::HttpController<ModuleController>
                   "/module/tree",
                   drogon::Get,
                   drogon::Options);
+    ADD_METHOD_TO(ModuleController::createModule,
+                  "/module",
+                  drogon::Post,
+                  drogon::Options);
+    ADD_METHOD_VIA_REGEX(ModuleController::updateModule,
+                         "/module/([1-9]\\d*)",
+                         drogon::Patch,
+                         drogon::Options);
     ADD_METHOD_VIA_REGEX(ModuleController::deleteModule,
                          "/module/([1-9]\\d*)",
                          drogon::Delete,
@@ -22,6 +32,21 @@ class ModuleController : public drogon::HttpController<ModuleController>
      */
     drogon::Task<drogon::HttpResponsePtr> getModuleTree(
         const drogon::HttpRequestPtr req) const;
+
+    /**
+     * @brief 新增模块
+     */
+    drogon::Task<drogon::HttpResponsePtr> createModule(
+        const drogon::HttpRequestPtr req,
+        const ModuleCreateRequest request) const;
+
+    /**
+     * 更新模块
+     */
+    drogon::Task<drogon::HttpResponsePtr> updateModule(
+        const drogon::HttpRequestPtr req,
+        const std::int32_t moduleId,
+        const ModuleUpdateRequest request) const;
 
     /**
      * @brief 删除模块

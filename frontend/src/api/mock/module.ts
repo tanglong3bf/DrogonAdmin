@@ -2,16 +2,8 @@ import { mock } from '@/utils/request'
 import mockConfig from './mock.config.json'
 import type { AxiosRequestConfig } from 'axios'
 import { ResponseBody } from '@/types/common'
+import { Module } from '@/types/module'
 
-interface Module {
-  module_id: number // 模块ID
-  name: string // 模块名称
-  description?: string // 模块描述
-  sort_num: number // 模块排序
-  parent_id?: number // 父级ID
-  children?: Module[] // 子模块
-  child_count?: number // 子模块数量
-}
 /**
  * 获取模块树接口mock
  */
@@ -84,6 +76,28 @@ if (mockConfig.module.get_module_tree) {
           ]
         }
       ]
+    })
+}
+
+/**
+ * 新增模块接口mock
+ */
+if (mockConfig.module.new_module) {
+  mock.onPost('/module').reply((config: AxiosRequestConfig): [number] => {
+    console.log(config)
+    return [201]
+  })
+}
+
+/**
+ * 更新模块接口mock
+ */
+if (mockConfig.module.update_module) {
+  mock
+    .onPatch(/^\/module\/[1-9]\d*$/)
+    .reply((config: AxiosRequestConfig): [number] => {
+      console.log(config)
+      return [204]
     })
 }
 

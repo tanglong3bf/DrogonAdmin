@@ -29,6 +29,8 @@
   },
   "module": {
     "get_module_tree": true,
+    "new_module": true,
+    "update_module": true,
     "delete_module": true
   }
 }

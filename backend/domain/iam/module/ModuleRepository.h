@@ -38,6 +38,20 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
      */
     drogon::Task<std::size_t> countSubModule(const std::int32_t moduleId) const;
 
+    /**
+     * @brief 指定父模块id，获取最大的sort_num，传空表示根
+     */
+    drogon::Task<std::optional<std::int32_t>> getMaxSubModuleSortNum(
+        const std::optional<std::int32_t> parentId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
+
+    /**
+     * @brief 统计指定父模块id下指定名称的数量
+     */
+    drogon::Task<std::int32_t> countNameByParentId(
+        const std::string &name,
+        const std::optional<std::int32_t> &parentId) const;
+
   private:
     static SqlGenerator *sqlGenerator();
     static SysModuleMapper moduleMapper(

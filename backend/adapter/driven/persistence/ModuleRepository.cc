@@ -12,6 +12,8 @@ drogon::Task<> ModuleRepository::save(const Module &module,
     switch (module.changingStatus())
     {
         case ChangingStatus::NEW:
+            co_await moduleMapper(dbClient).insert(
+                static_cast<SysModule>(module));
             co_return;
         case ChangingStatus::DELETED:
         {
@@ -36,7 +38,14 @@ drogon::Task<> ModuleRepository::save(const Module &module,
             co_return;
         }
         case ChangingStatus::UPDATED:
+        {
+            auto trans = co_await dbClient->newTransactionCoro();
+            auto mapper = moduleMapper(trans);
+
+            const auto sysModule = static_cast<SysModule>(module);
+            co_await mapper.update(sysModule);
             co_return;
+        }
         case ChangingStatus::UNCHANGED:
             co_return;
     }
@@ -70,6 +79,46 @@ Task<size_t> ModuleRepository::countSubModule(const std::int32_t moduleId) const
     criteria = criteria && Criteria{SysModule::Cols::_parent_id, moduleId};
 
     co_return co_await moduleMapper().count(criteria);
+}
+
+Task<std::int32_t> ModuleRepository::countNameByParentId(
+    const string &name,
+    const optional<std::int32_t> &parentId) const
+{
+    Criteria criteria{SysModule::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysModule::Cols::_name, name};
+    if (parentId)
+    {
+        criteria = criteria && Criteria{SysModule::Cols::_parent_id, parentId};
+    }
+    else
+    {
+        criteria = criteria && Criteria{SysModule::Cols::_parent_id,
+                                        CompareOperator::IsNull};
+    }
+
+    co_return co_await moduleMapper().count(criteria);
+}
+
+Task<optional<std::int32_t>> ModuleRepository::getMaxSubModuleSortNum(
+    const optional<std::int32_t> parentId,
+    const DbClientPtr &dbClient) const
+{
+    ParamList paramList;
+    if (parentId)
+    {
+        paramList = {{"parent_id", *parentId}};
+    }
+
+    const auto sql =
+        sqlGenerator()->getSql("get_max_sub_module_sort_num", paramList);
+
+    const auto dbResult = co_await dbClient->execSqlCoro(sql);
+    if (dbResult[0][0].isNull())
+    {
+        co_return std::nullopt;
+    }
+    co_return dbResult[0][0].as<std::int32_t>();
 }
 
 inline SqlGenerator *ModuleRepository::sqlGenerator()

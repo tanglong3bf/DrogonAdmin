@@ -1,9 +1,19 @@
 <script lang="ts" setup>
 import { Search, Refresh } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus/es'
+import {
+  ElMessage,
+  ElMessageBox,
+  FormInstance,
+  FormRules
+} from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
 import type { Module, ModuleFormData, ModuleSortItem } from '@/types/module'
-import { deleteModule, getModuleTree } from '@/api/module'
+import {
+  getModuleTree,
+  newModule,
+  updateModule,
+  deleteModule
+} from '@/api/module'
 
 /**
  * 从后端返回的真实数据
@@ -156,6 +166,18 @@ enum DialogType {
 const dialogType = ref<DialogType>(DialogType.ADD)
 
 /**
+ * 模块表单实例
+ */
+const moduleForm = ref<FormInstance>()
+
+/**
+ * 表单验证规则
+ */
+const rules = reactive<FormRules<ModuleFormData>>({
+  name: [{ required: true, message: '请输入模块名称', trigger: 'blur' }]
+})
+
+/**
  * 新增模块按钮
  */
 const newModuleBtn = () => {
@@ -169,7 +191,14 @@ const newModuleBtn = () => {
 }
 
 /**
- * 根据部门id查找到原始数据
+ * 取消更新/新增
+ */
+const cancel = () => {
+  dialogVisible.value = false
+}
+
+/**
+ * 根据模块id查找到原始数据
  */
 const findOriginal = (
   moduleList: Module[],
@@ -187,6 +216,69 @@ const findOriginal = (
     }, undefined)
 
   return deepFind(moduleList)
+}
+
+/**
+ * 处理新增模块
+ */
+const handleAddModule = async (module: ModuleFormData): Promise<boolean> => {
+  if (!module.name.trim()) {
+    ElMessage.error('模块名称不可为空')
+    return false
+  }
+  if (module.description === null) {
+    module.description = undefined
+  }
+  await newModule(module.name, module.description, module.parent_id)
+  dialogVisible.value = false
+  await getModuleData()
+  resetQuery()
+  return true
+}
+
+/**
+ * 处理更新模块
+ */
+const handleUpdateModule = async (
+  module: ModuleFormData,
+  data: Module[]
+): Promise<boolean> => {
+  const original = findOriginal(data, module.module_id)
+
+  if (!original) {
+    ElMessage.error('更新失败')
+    console.error('没有查找到原始数据')
+    return false
+  }
+
+  if (
+    module.name === original.name &&
+    module.description === original.description
+  ) {
+    ElMessage.warning('数据未发生变化，无需更新')
+    return false
+  }
+
+  await updateModule(module.module_id!, module.name, module.description)
+  ElMessage.success('更新成功')
+  original.name = module.name // 仍需修改原对象（业务逻辑要求）
+  original.description = module.description ?? undefined
+  dialogVisible.value = false
+  return true
+}
+
+/**
+ * 提交更新/新增
+ */
+const submit = async (formEl?: FormInstance) => {
+  if (!(await formEl?.validate())) return
+
+  const actionHandlers = {
+    [DialogType.ADD]: () => handleAddModule(module),
+    [DialogType.UPDATE]: () => handleUpdateModule(module, moduleTree.value)
+  }
+
+  await actionHandlers[dialogType.value]?.()
 }
 
 /**
@@ -234,7 +326,7 @@ const getSortSubModuleData = (
   parentId: number | undefined,
   moduleData: Module[]
 ): { data: ModuleSortItem[]; visible: boolean } => {
-  // 无父ID：处理顶级部门
+  // 无父ID：处理顶级模块
   if (parentId === undefined) {
     const data = moduleData.map(item => ({
       module_id: item.module_id,
@@ -369,6 +461,48 @@ const deleteModuleBtn = async (moduleId: number) => {
       </el-table-column>
     </el-table>
   </dg-card>
+  <!-- 新增/更新 对话框 -->
+  <el-dialog
+    :title="dialogType ? '更新模块' : '新增模块'"
+    v-model="dialogVisible"
+    width="400px"
+  >
+    <el-form ref="moduleForm" :rules="rules" :model="module" label-width="80px">
+      <el-form-item label="模块名称" prop="name">
+        <el-input v-model="module.name" placeholder="请输入模块名称" />
+      </el-form-item>
+      <el-form-item label="模块描述" prop="description">
+        <el-input
+          v-model="module.description"
+          placeholder="请输入模块描述"
+          type="textarea"
+        />
+      </el-form-item>
+      <el-form-item
+        v-if="dialogType === DialogType.ADD"
+        label="所属模块"
+        prop="parent_id"
+      >
+        <el-cascader
+          v-model="module.parent_id"
+          :options="moduleTree"
+          clearable
+          placeholder="请选择父模块，可为空"
+          :props="{
+            checkStrictly: true,
+            emitPath: false,
+            value: 'module_id',
+            label: 'name',
+            children: 'children'
+          }"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="cancel()">取 消</el-button>
+      <el-button type="primary" @click="submit(moduleForm)">提 交</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">

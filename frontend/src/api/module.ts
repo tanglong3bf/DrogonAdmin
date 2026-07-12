@@ -10,6 +10,28 @@ export const getModuleTree = () => {
 }
 
 /**
+ * 新增一个模块
+ */
+export const newModule = (
+  name: string,
+  description?: string,
+  parent_id?: number
+) => {
+  return request.post('/module', { name, description, parent_id })
+}
+
+/**
+ * 更新指定模块
+ */
+export const updateModule = (
+  module_id: number,
+  name?: string,
+  description?: string | null
+) => {
+  return request.patch(`/module/${module_id}`, { name, description })
+}
+
+/**
  * 删除指定模块
  */
 export const deleteModule = (module_id: number) => {

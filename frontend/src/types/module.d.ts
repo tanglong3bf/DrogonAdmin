@@ -17,7 +17,7 @@ export interface Module {
 export interface ModuleFormData {
   module_id?: number // 新增时为空，更新时需指定ID
   name: string // 模块名称（可更新）
-  description?: string // 模块描述
+  description?: string | null // 模块描述
   parent_id?: number // 新增时可设置父模块，不可更新
 }
 
