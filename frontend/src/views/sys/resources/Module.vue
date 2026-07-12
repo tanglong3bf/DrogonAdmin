@@ -259,10 +259,15 @@ const handleUpdateModule = async (
     return false
   }
 
-  await updateModule(module.module_id!, module.name, module.description)
+  await updateModule(
+    module.module_id!,
+    module.name,
+    module.description === '' ? null : module.description
+  )
   ElMessage.success('更新成功')
-  original.name = module.name // 仍需修改原对象（业务逻辑要求）
-  original.description = module.description ?? undefined
+  original.name = module.name
+  original.description =
+    module.description === null ? undefined : module.description
   dialogVisible.value = false
   return true
 }
