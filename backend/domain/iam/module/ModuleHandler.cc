@@ -18,10 +18,13 @@ drogon::Task<> ModuleHandler::deleteModule(Module &module,
         drogon_admin::ranges_utils::to<vector>();
     LOG_DEBUG << functionIds.size();
 
-    // 检查模块的功能没有被分配权限
-    co_await roleVerifier_->verifyFunctionNotUsed(functionIds);
-    // 检查模块的功能没有被菜单使用
-    co_await menuVerifier_->verifyFunctionNotUsed(functionIds);
+    if (functionIds.size() > 0)
+    {
+        // 检查模块的功能没有被分配权限
+        co_await roleVerifier_->verifyFunctionNotUsed(functionIds);
+        // 检查模块的功能没有被菜单使用
+        co_await menuVerifier_->verifyFunctionNotUsed(functionIds);
+    }
 
     // 标记删除
     module.remove(deletedBy);

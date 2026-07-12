@@ -335,7 +335,7 @@ OWNED BY "public"."sys_user"."user_id";
 SELECT setval('"public"."sys_user_user_id_seq"', 1, true);
 ALTER SEQUENCE "public"."sys_module_module_id_seq"
 OWNED BY "public"."sys_module"."module_id";
-SELECT setval('"public"."sys_module_module_id_seq"', 4, true);
+SELECT setval('"public"."sys_module_module_id_seq"', 7, true);
 ALTER SEQUENCE "public"."sys_function_function_id_seq"
 OWNED BY "public"."sys_function"."function_id";
 SELECT setval('"public"."sys_function_function_id_seq"', 16, true);
