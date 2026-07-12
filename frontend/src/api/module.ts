@@ -37,3 +37,13 @@ export const updateModule = (
 export const deleteModule = (module_id: number) => {
   return request.delete(`/module/${module_id}`)
 }
+
+/**
+ * 排序模块
+ */
+export const sortModule = (
+  parent_id: number | undefined,
+  module_ids: number[]
+) => {
+  return request.post('/module/sort', { parent_id, module_ids })
+}

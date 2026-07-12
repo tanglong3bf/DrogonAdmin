@@ -6,6 +6,7 @@
 #include "ModuleUpdateRequest.h"
 #include "ModuleAssembler.h"
 #include "ModuleUpdater.h"
+#include "ModuleSortRequest.h"
 #include "domain/iam/module/ModuleHandler.h"
 #include "domain/iam/module/ModuleRepository.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -40,6 +41,12 @@ class ModuleService : public DrAdminObject<ModuleService>
      */
     drogon::Task<> deleteModule(const std::int32_t moduleId,
                                 const std::int32_t deletedBy) const;
+
+    /**
+     * @brief 排序指定模块
+     */
+    drogon::Task<> sortModule(const ModuleSortRequest &request,
+                              const std::int32_t updatedBy) const;
 
   private:
     ModuleCqrsRepoPtr moduleCqrsRepo_{

@@ -17,6 +17,19 @@ class ModuleHandler : public DrAdminObject<ModuleHandler>
      */
     drogon::Task<> deleteModule(Module &module, const int32_t deletedBy) const;
 
+    /**
+     * @brief 排序模块
+     */
+    drogon::Task<std::vector<Module>> sortModule(
+        const std::optional<std::int32_t> &parentId,
+        const std::vector<int32_t> &deptIds,
+        const int32_t updatedBy) const;
+
+  protected:
+    void validateModuleIdsInAllModules(
+        const std::vector<std::int32_t> &moduleIds,
+        const std::vector<Module> &allModules) const;
+
   private:
     ModuleVerifierPtr moduleVerifier_{
         drogon::DrClassMap::getSingleInstance<ModuleVerifier>()};
@@ -24,6 +37,8 @@ class ModuleHandler : public DrAdminObject<ModuleHandler>
         drogon::DrClassMap::getSingleInstance<RoleVerifier>()};
     MenuVerifierPtr menuVerifier_{
         drogon::DrClassMap::getSingleInstance<MenuVerifier>()};
+    ModuleRepositoryPtr moduleRepository_{
+        drogon::DrClassMap::getSingleInstance<ModuleRepository>()};
 };
 
 using ModuleHandlerPtr = std::shared_ptr<ModuleHandler>;

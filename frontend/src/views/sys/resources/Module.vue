@@ -12,8 +12,10 @@ import {
   getModuleTree,
   newModule,
   updateModule,
-  deleteModule
+  deleteModule,
+  sortModule
 } from '@/api/module'
+import { VueDraggable } from 'vue-draggable-plus'
 
 /**
  * 从后端返回的真实数据
@@ -365,6 +367,27 @@ const sortSubModuleBtn = (parentId?: number) => {
 }
 
 /**
+ * 取消排序
+ */
+const sortCancel = () => {
+  sortDialogVisible.value = false
+}
+
+/**
+ * 提交排序
+ */
+const sortSubmit = async () => {
+  const moduleIds = sortableData.value.map(item => {
+    return item.module_id
+  })
+  await sortModule(currentParentId.value, moduleIds)
+
+  ElMessage.success('排序成功')
+  await getModuleData()
+  sortDialogVisible.value = false
+}
+
+/**
  * 表格内更新模块按钮
  */
 const updateModuleBtn = (row: Module) => {
@@ -506,6 +529,18 @@ const deleteModuleBtn = async (moduleId: number) => {
     <template #footer>
       <el-button @click="cancel()">取 消</el-button>
       <el-button type="primary" @click="submit(moduleForm)">提 交</el-button>
+    </template>
+  </el-dialog>
+  <!-- 子模块排序对话框 -->
+  <el-dialog title="排序" v-model="sortDialogVisible" width="400px">
+    <VueDraggable ref="drag" v-model="sortableData">
+      <div class="sort-item" v-for="item in sortableData">
+        {{ item.name }}
+      </div>
+    </VueDraggable>
+    <template #footer>
+      <el-button @click="sortCancel()">取 消</el-button>
+      <el-button type="primary" @click="sortSubmit()">提 交</el-button>
     </template>
   </el-dialog>
 </template>

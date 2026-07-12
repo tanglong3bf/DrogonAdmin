@@ -112,3 +112,13 @@ if (mockConfig.module.delete_module) {
       return [204]
     })
 }
+
+/**
+ * 排序模块接口mock
+ */
+if (mockConfig.module.sort_module) {
+  mock.onPost('/module/sort').reply((config: AxiosRequestConfig): [number] => {
+    console.log(config)
+    return [204]
+  })
+}

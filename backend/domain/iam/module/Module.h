@@ -51,7 +51,13 @@ class Module : public AuditableEntity, public ChangeableEntity
         const drogon_admin::util::NullableValue<std::string> &description,
         const std::int32_t updatedBy);
 
-  public:
+    void updateSortNum(const std::int32_t sortNum, const std::int32_t updatedBy)
+    {
+        sortNum_ = sortNum;
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+
     GETTER(moduleId);
     GETTER_STR_VIEW(name);
     GETTER(description);

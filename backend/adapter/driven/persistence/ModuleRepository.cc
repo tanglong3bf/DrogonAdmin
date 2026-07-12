@@ -1,10 +1,14 @@
 #include "domain/iam/module/ModuleRepository.h"
 
+#include "common/util/rangesUtils.hpp"
+#include <ranges>
+
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
+using namespace drogon_admin;
 
 drogon::Task<> ModuleRepository::save(const Module &module,
                                       const DbClientPtr &dbClient) const
@@ -119,6 +123,61 @@ Task<optional<std::int32_t>> ModuleRepository::getMaxSubModuleSortNum(
         co_return std::nullopt;
     }
     co_return dbResult[0][0].as<std::int32_t>();
+}
+
+Task<vector<Module>> ModuleRepository::getByParentId(
+    const optional<int32_t> &parentId) const
+{
+    Criteria criteria{SysModule::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria =
+        criteria && (parentId ? Criteria{SysModule::Cols::_parent_id, *parentId}
+                              : Criteria{SysModule::Cols::_parent_id,
+                                         CompareOperator::IsNull});
+    const auto moduleInDb = co_await moduleMapper().findBy(criteria);
+    co_return moduleInDb |
+        views::transform([](const auto &data) { return Module{data}; }) |
+        ranges_utils::to<vector>();
+}
+
+drogon::Task<> ModuleRepository::multiSave(const std::vector<Module> &modules,
+                                           const DbClientPtr &dbClient) const
+{
+    // 暂只考虑批量更新
+    vector<SysModule> toUpdate;
+    toUpdate.reserve(modules.size());
+    for (const auto &module : modules)
+    {
+        if (module.changingStatus() == ChangingStatus::UPDATED)
+        {
+            toUpdate.push_back(static_cast<SysModule>(module));
+        }
+    }
+    if (toUpdate.size() == 0)
+    {
+        LOG_WARN << "multiSave被调用，但没有需要更新的数据，请检查代码逻辑";
+        co_return;
+    }
+    Json::Value dataList;
+
+    for (const auto &module : toUpdate)
+    {
+        Json::Value item;
+        item = module.toJson();
+        // SqlGenerator 太垃圾了
+        for (const auto &key : item.getMemberNames())
+        {
+            if (item[key].isNull())
+            {
+                item.removeMember(key);
+            }
+        }
+        dataList.append(item);
+    }
+
+    const auto sql = sqlGenerator()->getSql("multi_update_module",
+                                            ParamList{{"data_list", dataList}});
+
+    co_await dbClient->execSqlCoro(sql);
 }
 
 inline SqlGenerator *ModuleRepository::sqlGenerator()

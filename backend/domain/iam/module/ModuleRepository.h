@@ -52,6 +52,19 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
         const std::string &name,
         const std::optional<std::int32_t> &parentId) const;
 
+    /**
+     * @brief 获取指定模块下的所有子模块
+     */
+    drogon::Task<std::vector<Module>> getByParentId(
+        const std::optional<std::int32_t> &parentId) const;
+
+    /**
+     * @brief 批量存储模块（新增、更新、删除）
+     */
+    drogon::Task<> multiSave(
+        const std::vector<Module> &modules,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
+
   private:
     static SqlGenerator *sqlGenerator();
     static SysModuleMapper moduleMapper(

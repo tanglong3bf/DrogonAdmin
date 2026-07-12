@@ -3,6 +3,7 @@
 #include "application/iam/module/ModuleService.h"
 #include "application/iam/module/ModuleCreateRequest.h"
 #include "application/iam/module/ModuleUpdateRequest.h"
+#include "application/iam/module/ModuleSortRequest.h"
 #include <drogon/HttpController.h>
 
 class ModuleController : public drogon::HttpController<ModuleController>
@@ -24,6 +25,10 @@ class ModuleController : public drogon::HttpController<ModuleController>
     ADD_METHOD_VIA_REGEX(ModuleController::deleteModule,
                          "/module/([1-9]\\d*)",
                          drogon::Delete,
+                         drogon::Options);
+    ADD_METHOD_VIA_REGEX(ModuleController::sortModule,
+                         "/module/sort",
+                         drogon::Post,
                          drogon::Options);
     METHOD_LIST_END
 
@@ -54,6 +59,13 @@ class ModuleController : public drogon::HttpController<ModuleController>
     drogon::Task<drogon::HttpResponsePtr> deleteModule(
         const drogon::HttpRequestPtr req,
         const std::int32_t moduleId) const;
+
+    /**
+     * @brief 排序模块
+     */
+    drogon::Task<drogon::HttpResponsePtr> sortModule(
+        const drogon::HttpRequestPtr req,
+        const ModuleSortRequest request) const;
 
   private:
     ModuleServicePtr moduleService_{

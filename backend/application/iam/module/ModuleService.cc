@@ -41,3 +41,13 @@ Task<> ModuleService::deleteModule(const std::int32_t moduleId,
     co_await moduleHandler_->deleteModule(*module, deletedBy);
     co_await moduleRepository_->save(*module);
 }
+
+Task<> ModuleService::sortModule(const ModuleSortRequest &request,
+                                 const std::int32_t updatedBy) const
+{
+    auto sortResult = co_await moduleHandler_->sortModule(request.parentId(),
+                                                          request.moduleIds(),
+                                                          updatedBy);
+
+    co_await moduleRepository_->multiSave(sortResult);
+}

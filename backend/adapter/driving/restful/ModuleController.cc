@@ -36,3 +36,12 @@ Task<HttpResponsePtr> ModuleController::deleteModule(
     co_await moduleService_->deleteModule(moduleId, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
+
+Task<HttpResponsePtr> ModuleController::sortModule(
+    const HttpRequestPtr req,
+    const ModuleSortRequest request) const
+{
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
+    co_await moduleService_->sortModule(request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

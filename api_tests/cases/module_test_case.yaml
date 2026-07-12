@@ -252,4 +252,103 @@ module_cases:
         $.data[0].name: 新名称
         len:$.data[0].description: 0
   # }}}
+  # 排序模块 {{{
+  - name: 排序模块-正常排序
+    sql_file: module_to_sort.sql
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      parent_id: 1
+      module_ids: [3, 2, 4]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序模块-检查排序结果
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        $.data[0].children[0].name: 模块-1-2
+        $.data[0].children[1].name: 模块-1-1
+        $.data[0].children[2].name: 模块-1-3
+  - name: 排序模块-排序根模块
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      module_ids: [5, 1]
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序模块-检查排序结果2
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        $.data[0].name: 模块-2
+        $.data[1].name: 模块-1
+  - name: 排序模块-指定部分子模块id
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      parent_id: 1
+      module_ids: [4, 2] # 不全
+    params: ''
+    expect:
+      status_code: 204
+  - name: 排序模块-检查排序结果3
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data: 2
+        # 公司被排序过
+        $.data[1].children[0].name: 模块-1-3
+        $.data[1].children[1].name: 模块-1-1
+        $.data[1].children[2].name: 模块-1-2
+  - name: 排序模块-不存在的父模块id
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      parent_id: 233
+      module_ids: [1, 5]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 父模块不存在
+  - name: 排序模块-子模块不是指定父模块的子模块
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      module_ids: [2, 4, 3]
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 部分模块不是指定模块的子模块
+  - name: 排序模块-缺少必备参数
+    url: http://localhost:8000/module/sort
+    method: POST
+    json:
+      parent_id: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 缺少必备参数：module_ids
+  # }}}
 # vim: set foldmethod=marker foldlevel=0:
