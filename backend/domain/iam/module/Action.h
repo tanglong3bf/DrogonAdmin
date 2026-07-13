@@ -18,6 +18,7 @@ class Action : public AuditableEntity, public ChangeableEntity
     Action(std::string_view name,
            const std::string_view code,
            const std::int32_t sortNum,
+           const bool hasDataPermission,
            const std::int32_t moduleId);
 
     /**
@@ -26,6 +27,7 @@ class Action : public AuditableEntity, public ChangeableEntity
     Action(std::string_view name,
            const std::string_view code,
            const std::int32_t sortNum,
+           const bool hasDataPermission,
            const std::int32_t moduleId,
            const std::int32_t createdBy);
 
@@ -41,6 +43,7 @@ class Action : public AuditableEntity, public ChangeableEntity
     GETTER_STR_VIEW(code);
     GETTER(description);
     GETTER(sortNum);
+    GETTER(hasDataPermission);
     GETTER(moduleId);
 
   private:
@@ -49,5 +52,6 @@ class Action : public AuditableEntity, public ChangeableEntity
     std::string code_;
     std::optional<std::string> description_;
     std::int32_t sortNum_;
+    bool hasDataPermission_;
     std::int32_t moduleId_;
 };

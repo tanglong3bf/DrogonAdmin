@@ -20,6 +20,7 @@ ActionResponse::ActionResponse(const Action &action)
       code_{action.code()},
       description_{action.description()},
       sortNum_{action.sortNum()},
+      hasDataPermission_{action.hasDataPermission()},
       moduleId_{action.moduleId()}
 {
 }
@@ -35,6 +36,7 @@ Json::Value ActionResponse::toJson() const
         json["description"] = *description_;
     }
     json["sort_num"] = sortNum_;
+    json["has_data_permission"] = hasDataPermission_;
     json["module_id"] = moduleId_;
     return json;
 }

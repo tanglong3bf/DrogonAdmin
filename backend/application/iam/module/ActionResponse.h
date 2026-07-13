@@ -33,5 +33,6 @@ class ActionResponse
     std::string code_;
     std::optional<std::string> description_;
     std::int32_t sortNum_;
+    bool hasDataPermission_;
     std::int32_t moduleId_;
 };

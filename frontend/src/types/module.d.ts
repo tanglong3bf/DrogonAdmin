@@ -1,4 +1,13 @@
 /**
+ * 功能项
+ */
+export interface Action {
+  action_id: number
+  name: string
+  has_data_permission: boolean
+  sort_num: number
+}
+/**
  * 模块
  */
 export interface Module {
@@ -9,6 +18,7 @@ export interface Module {
   parent_id?: number // 父级ID
   children?: Module[] // 子模块
   child_count?: number // 子模块数量
+  actions?: Action[]
 }
 
 /**

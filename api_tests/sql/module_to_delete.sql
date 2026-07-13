@@ -117,6 +117,7 @@ CREATE TABLE "public"."sys_action" (
   "code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "sort_num" int4 NOT NULL,
+  "has_data_permission" bool NOT NULL DEFAULT false,
   "module_id" int4 NOT NULL,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
@@ -131,6 +132,7 @@ COMMENT ON COLUMN "public"."sys_action"."name" IS '功能名称';
 COMMENT ON COLUMN "public"."sys_action"."code" IS '功能代码';
 COMMENT ON COLUMN "public"."sys_action"."description" IS '功能描述';
 COMMENT ON COLUMN "public"."sys_action"."sort_num" IS '功能排序';
+COMMENT ON COLUMN "public"."sys_action"."has_data_permission" IS '是否有数据权限';
 COMMENT ON COLUMN "public"."sys_action"."module_id" IS '所属模块id';
 COMMENT ON COLUMN "public"."sys_action"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_action"."created_time" IS '创建时间';
@@ -189,11 +191,11 @@ INSERT INTO public.sys_module VALUES (5, '模块-5', '功能被分配了权限',
 INSERT INTO public.sys_module VALUES (6, '模块-6', '功能被菜单使用', 3, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 功能表数据
-INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', NULL, 0, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_action VALUES (2, '新增部门', 'dept:create', NULL, 1, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_action VALUES (3, '浏览用户管理页面', 'user:view', NULL, 0, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_action VALUES (4, '新增用户', 'user:create', NULL, 1, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_action VALUES (5, '浏览角色管理页面', 'role:view', '被菜单使用', 0, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', NULL, 0, false, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (2, '新增部门', 'dept:create', NULL, 1, false, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (3, '浏览用户管理页面', 'user:view', NULL, 0, false, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (4, '新增用户', 'user:create', NULL, 1, false, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (5, '浏览角色管理页面', 'role:view', '被菜单使用', 0, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 菜单表数据
 INSERT INTO public.sys_menu VALUES (1, 5, NULL, '/role', NULL, '角色管理', 0, '/path', 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);

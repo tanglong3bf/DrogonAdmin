@@ -7,7 +7,12 @@ import {
   FormRules
 } from 'element-plus/es'
 import { onMounted, reactive, ref } from 'vue'
-import type { Module, ModuleFormData, ModuleSortItem } from '@/types/module'
+import type {
+  Module,
+  ModuleFormData,
+  ModuleSortItem,
+  Action
+} from '@/types/module'
 import {
   getModuleTree,
   newModule,
@@ -421,6 +426,29 @@ const deleteModuleBtn = async (moduleId: number) => {
     }
   )
 }
+
+const actionDialogVisible = ref(false)
+
+const sortableAction = ref<Action[] | undefined>([])
+
+const assignAction = (module_id: number) => {
+  const original: Module | undefined = findOriginal(moduleTree.value, module_id)
+  sortableAction.value = original?.actions?.map(item => ({
+    action_id: item.action_id,
+    name: item.name,
+    sort_num: item.sort_num,
+    has_data_permission: item.has_data_permission
+  }))
+  actionDialogVisible.value = true
+}
+
+const assignCancel = () => {
+  actionDialogVisible.value = false
+}
+
+const assignSubmit = () => {
+  actionDialogVisible.value = false
+}
 </script>
 
 <template>
@@ -469,6 +497,9 @@ const deleteModuleBtn = async (moduleId: number) => {
         <template v-slot="{ row }">
           <el-button plain type="primary" @click="updateModuleBtn(row)"
             >更新</el-button
+          >
+          <el-button plain type="warning" @click="assignAction(row.module_id)"
+            >设置功能</el-button
           >
           <el-button
             v-if="row.child_count > 0"
@@ -541,6 +572,14 @@ const deleteModuleBtn = async (moduleId: number) => {
     <template #footer>
       <el-button @click="sortCancel()">取 消</el-button>
       <el-button type="primary" @click="sortSubmit()">提 交</el-button>
+    </template>
+  </el-dialog>
+  <!-- 功能设置对话框 -->
+  <el-dialog title="设置功能" v-model="actionDialogVisible" width="400px">
+    {{ sortableAction }}
+    <template #footer>
+      <el-button @click="assignCancel()">取 消</el-button>
+      <el-button type="primary" @click="assignSubmit()">提 交</el-button>
     </template>
   </el-dialog>
 </template>

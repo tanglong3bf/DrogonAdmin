@@ -217,6 +217,7 @@ CREATE TABLE "public"."sys_action" (
   "code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "sort_num" int4 NOT NULL,
+  "has_data_permission" bool NOT NULL DEFAULT false,
   "module_id" int4 NOT NULL,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
@@ -231,6 +232,7 @@ COMMENT ON COLUMN "public"."sys_action"."name" IS '功能名称';
 COMMENT ON COLUMN "public"."sys_action"."code" IS '功能代码';
 COMMENT ON COLUMN "public"."sys_action"."description" IS '功能描述';
 COMMENT ON COLUMN "public"."sys_action"."sort_num" IS '功能排序';
+COMMENT ON COLUMN "public"."sys_action"."has_data_permission" IS '是否有数据权限';
 COMMENT ON COLUMN "public"."sys_action"."module_id" IS '所属模块id';
 COMMENT ON COLUMN "public"."sys_action"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_action"."created_time" IS '创建时间';
@@ -307,22 +309,22 @@ INSERT INTO public.sys_module VALUES (6, '角色管理', null, 0, 5, 1, '2026-07
 INSERT INTO public.sys_module VALUES (7, '权限分配', null, 1, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 
 -- 功能表数据
-INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', null, 0, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (2, '查询部门树', 'dept:query', null, 1, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (3, '新增部门', 'dept:create', null, 2, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (4, '排序部门', 'dept:sort', null, 3, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (5, '更新部门', 'dept:update', null, 4, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (6, '删除部门', 'dept:delete', null, 5, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (7, '浏览用户管理页面', 'user:view', null, 0, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (8, '新增用户', 'user:create', null, 1, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (9, '查询用户', 'user:query', null, 2, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (10, '更新用户', 'user:update', null, 3, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (11, '删除用户', 'user:delete', null, 4, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (12, '浏览角色管理页面', 'role:view', null, 0, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (13, '新增角色', 'role:create', null, 1, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (14, '查询角色', 'role:query', null, 2, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (15, '更新角色', 'role:update', null, 3, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (16, '删除角色', 'role:delete', null, 4, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', null, 0, false, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (2, '查询部门树', 'dept:query', null, 1, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (3, '新增部门', 'dept:create', null, 2, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (4, '排序部门', 'dept:sort', null, 3, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (5, '更新部门', 'dept:update', null, 4, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (6, '删除部门', 'dept:delete', null, 5, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (7, '浏览用户管理页面', 'user:view', null, 0, false, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (8, '新增用户', 'user:create', null, 1, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (9, '查询用户', 'user:query', null, 2, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (10, '更新用户', 'user:update', null, 3, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (11, '删除用户', 'user:delete', null, 4, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (12, '浏览角色管理页面', 'role:view', null, 0, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (13, '新增角色', 'role:create', null, 1, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (14, '查询角色', 'role:query', null, 2, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (15, '更新角色', 'role:update', null, 3, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (16, '删除角色', 'role:delete', null, 4, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";

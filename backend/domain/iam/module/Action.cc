@@ -6,19 +6,26 @@ using namespace trantor;
 Action::Action(string_view name,
                const string_view code,
                const int32_t sortNum,
+               const bool hasDataPermission,
                const int32_t moduleId)
-    : name_{name}, code_{code}, sortNum_{sortNum}, moduleId_{moduleId}
+    : name_{name},
+      code_{code},
+      sortNum_{sortNum},
+      hasDataPermission_{hasDataPermission},
+      moduleId_{moduleId}
 {
 }
 
 Action::Action(string_view name,
                const string_view code,
                const int32_t sortNum,
+               const bool hasDataPermission,
                const int32_t moduleId,
                const int32_t createdBy)
     : name_{name},
       code_{code},
       sortNum_{sortNum},
+      hasDataPermission_{hasDataPermission},
       moduleId_{moduleId},
       AuditableEntity{AUDITABLE_INIT}
 {
@@ -29,6 +36,7 @@ Action::Action(const SysAction &model)
       name_{model.getValueOfName()},
       code_{model.getValueOfCode()},
       sortNum_{model.getValueOfSortNum()},
+      hasDataPermission_{model.getValueOfHasDataPermission()},
       moduleId_{model.getValueOfModuleId()},
       AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
@@ -42,6 +50,7 @@ Action::operator SysAction() const
     SET_VAL(code_, Code);
     SET_OPT(description_, Description);
     SET_VAL(sortNum_, SortNum);
+    SET_VAL(hasDataPermission_, HasDataPermission);
     SET_VAL(moduleId_, ModuleId);
     SET_OPT(createdBy(), CreatedBy);
     SET_OPT(createdTime(), CreatedTime);

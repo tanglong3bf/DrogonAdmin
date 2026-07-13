@@ -77,12 +77,13 @@ vector<ModuleResponse> ModuleCqrsRepo::buildTree(const Result &dbResult) const
             }
         }
         // 两个表之间多了一个level列，所以要+1
-        auto func = ActionResponse{
+        auto action = ActionResponse{
             Action{SysAction(row, SysModule::getColumnNumber() + 1)}};
-        if (func.actionId())
+        if (action.actionId())
         {
-            lastModule->appendAction(func);
+            lastModule->appendAction(action);
         }
     }
+
     return result;
 }
