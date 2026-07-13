@@ -27,15 +27,15 @@ drogon::Task<> ModuleRepository::save(const Module &module,
             const auto sysModule = static_cast<SysModule>(module);
             co_await mapper.update(sysModule);
 
-            if (module.functions().size() > 0)
+            if (module.actions().size() > 0)
             {
                 Json::Value data{Json::arrayValue};
-                for (const auto func : module.functions())
+                for (const auto func : module.actions())
                 {
-                    data.append(static_cast<SysFunction>(func).toJson());
+                    data.append(static_cast<SysAction>(func).toJson());
                 }
 
-                const auto sql = sqlGenerator()->getSql("multi_update_function",
+                const auto sql = sqlGenerator()->getSql("multi_update_action",
                                                         {{"data", data}});
                 co_await trans->execSqlCoro(sql);
             }
@@ -67,7 +67,7 @@ Task<optional<Module>> ModuleRepository::getById(const std::int32_t moduleId,
         auto module = static_cast<Module>(sysModule);
         if (withRelation)
         {
-            module.restoreFunctions(co_await functionMapper().findBy(criteria));
+            module.restoreActions(co_await actionMapper().findBy(criteria));
         }
         co_return module;
     }
@@ -192,8 +192,8 @@ inline CoroMapper<SysModule> ModuleRepository::moduleMapper(
     return CoroMapper<SysModule>{dbClient};
 }
 
-inline CoroMapper<SysFunction> ModuleRepository::functionMapper(
+inline CoroMapper<SysAction> ModuleRepository::actionMapper(
     const DbClientPtr &dbClient)
 {
-    return CoroMapper<SysFunction>{dbClient};
+    return CoroMapper<SysAction>{dbClient};
 }

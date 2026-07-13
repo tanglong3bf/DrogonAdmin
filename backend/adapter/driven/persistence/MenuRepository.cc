@@ -9,13 +9,13 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<std::size_t> MenuRepository::countByFunctionIds(
-    const vector<std::int32_t> &functionIds) const
+Task<std::size_t> MenuRepository::countByActionIds(
+    const vector<std::int32_t> &actionIds) const
 {
     Criteria criteria{SysMenu::Cols::_deleted_by, CompareOperator::IsNull};
     criteria =
         criteria &&
-        Criteria{SysMenu::Cols::_function_id, CompareOperator::In, functionIds};
+        Criteria{SysMenu::Cols::_action_id, CompareOperator::In, actionIds};
     co_return co_await menuMapper().count(criteria);
 }
 

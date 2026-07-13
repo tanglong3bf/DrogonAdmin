@@ -280,14 +280,14 @@ drogon::Task<std::vector<Role>> RoleRepository::getByIds(
     }) | ranges_utils::to<std::vector>();
 }
 
-Task<size_t> RoleRepository::countPermissionByFunctionIds(
-    const vector<int32_t> &functionIds) const
+Task<size_t> RoleRepository::countPermissionByActionIds(
+    const vector<int32_t> &actionIds) const
 {
     Criteria criteria{SysPermission::Cols::_deleted_by,
                       CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysPermission::Cols::_function_id,
+    criteria = criteria && Criteria{SysPermission::Cols::_action_id,
                                     CompareOperator::In,
-                                    functionIds};
+                                    actionIds};
     co_return co_await permissionMapper().count(criteria);
 }
 

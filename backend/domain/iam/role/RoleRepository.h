@@ -83,8 +83,8 @@ class RoleRepository : public DrAdminObject<RoleRepository>
     /**
      * @brief 统计指定功能列表被使用的次数
      */
-    drogon::Task<std::size_t> countPermissionByFunctionIds(
-        const std::vector<int32_t> &functionIds) const;
+    drogon::Task<std::size_t> countPermissionByActionIds(
+        const std::vector<int32_t> &actionIds) const;
 
   protected:
     std::vector<Role> buildRoleList(

@@ -7,8 +7,8 @@
 class MenuVerifier : public DrAdminObject<MenuVerifier>
 {
   public:
-    drogon::Task<> verifyFunctionNotUsed(
-        const std::vector<std::int32_t> &functionIds) const;
+    drogon::Task<> verifyActionNotUsed(
+        const std::vector<std::int32_t> &actionIds) const;
 
   private:
     MenuRepositoryPtr menuRepository_{

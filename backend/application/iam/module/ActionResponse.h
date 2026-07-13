@@ -1,18 +1,18 @@
 #pragma once
 
-#include "domain/iam/module/Function.h"
+#include "domain/iam/module/Action.h"
 #include <string>
 
 /**
  * @brief 模块响应
  */
-class FunctionResponse
+class ActionResponse
 {
   public:
     /**
      * @brief 实体类转当前类
      */
-    FunctionResponse(const Function &function);
+    ActionResponse(const Action &action);
 
     /**
      * @brief 转json
@@ -20,7 +20,7 @@ class FunctionResponse
     Json::Value toJson() const;
 
     // getters
-    GETTER(functionId)
+    GETTER(actionId)
     GETTER_STR_VIEW(name)
     GETTER_STR_VIEW(code)
     GETTER(description)
@@ -28,7 +28,7 @@ class FunctionResponse
     GETTER(moduleId)
 
   private:
-    std::int32_t functionId_;
+    std::int32_t actionId_;
     std::string name_;
     std::string code_;
     std::optional<std::string> description_;

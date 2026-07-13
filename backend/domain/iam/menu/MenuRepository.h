@@ -14,8 +14,8 @@ class MenuRepository : public DrAdminObject<MenuRepository>
     using DbClientPtr = drogon::orm::DbClientPtr;
 
   public:
-    drogon::Task<std::size_t> countByFunctionIds(
-        const std::vector<std::int32_t> &functionIds) const;
+    drogon::Task<std::size_t> countByActionIds(
+        const std::vector<std::int32_t> &actionIds) const;
 
   private:
     static SqlGenerator *sqlGenerator();

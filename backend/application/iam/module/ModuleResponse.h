@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FunctionResponse.h"
+#include "ActionResponse.h"
 #include "domain/iam/module/Module.h"
 #include <optional>
 #include <string>
@@ -31,7 +31,7 @@ class ModuleResponse
     GETTER(parentId)
     GETTER(children)
 
-    void appendFunction(FunctionResponse &func);
+    void appendAction(ActionResponse &func);
 
     /**
      * @brief 新增一个子节点
@@ -51,5 +51,5 @@ class ModuleResponse
     const std::optional<std::int32_t> parentId_;    ///< 父模块id
     ModuleResponse *parent_;                        ///< 父模块
     std::vector<ModuleResponse> children_;          ///< 子模块列表
-    std::vector<FunctionResponse> functions_;       ///< 功能列表
+    std::vector<ActionResponse> actions_;           ///< 功能列表
 };

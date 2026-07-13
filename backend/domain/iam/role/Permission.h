@@ -19,6 +19,6 @@ class Permission : public AuditableEntity, public ChangeableEntity
 {
   private:
     std::int32_t roleId_;
-    std::int32_t functionId_;
+    std::int32_t actionId_;
     Scope scope_;
 };

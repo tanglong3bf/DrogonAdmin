@@ -215,11 +215,10 @@ Task<> RoleVerifier::checkQuota(const Role &role,
     }
 }
 
-Task<> RoleVerifier::verifyFunctionNotUsed(
-    const vector<int32_t> &functionIds) const
+Task<> RoleVerifier::verifyActionNotUsed(const vector<int32_t> &actionIds) const
 {
     const auto count =
-        co_await roleRepository_->countPermissionByFunctionIds(functionIds);
+        co_await roleRepository_->countPermissionByActionIds(actionIds);
     if (count > 0)
     {
         throw BusinessException("功能已被使用");

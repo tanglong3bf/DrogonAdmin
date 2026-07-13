@@ -57,8 +57,8 @@ class RoleVerifier : public DrAdminObject<RoleVerifier>
     /**
      * @brief 验证指定功能没有被任何角色使用
      */
-    drogon::Task<> verifyFunctionNotUsed(
-        const std::vector<int32_t> &functionIds) const;
+    drogon::Task<> verifyActionNotUsed(
+        const std::vector<int32_t> &actionIds) const;
 
   private:
     /**

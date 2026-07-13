@@ -6,7 +6,6 @@ using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
-// Add definition of your processing function here
 Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                                            const string username,
                                            const string nickname,

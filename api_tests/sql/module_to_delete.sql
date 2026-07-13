@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS "public"."sys_role";
 DROP TABLE IF EXISTS "public"."sys_permission";
 DROP TABLE IF EXISTS "public"."sys_module";
-DROP TABLE IF EXISTS "public"."sys_function";
+DROP TABLE IF EXISTS "public"."sys_action";
 DROP TABLE IF EXISTS "public"."sys_menu";
 
 DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
@@ -18,8 +18,8 @@ MINVALUE  1
 MAXVALUE 2147483647
 START 1
 CACHE 1;
-DROP SEQUENCE IF EXISTS "public"."sys_function_function_id_seq";
-CREATE SEQUENCE "public"."sys_function_function_id_seq" 
+DROP SEQUENCE IF EXISTS "public"."sys_action_action_id_seq";
+CREATE SEQUENCE "public"."sys_action_action_id_seq" 
 INCREMENT 1
 MINVALUE  1
 MAXVALUE 2147483647
@@ -65,7 +65,7 @@ COMMENT ON COLUMN "public"."sys_role"."deleted_time" IS '删除时间';
 
 CREATE TABLE "public"."sys_permission" (
   "role_id" int4 NOT NULL,
-  "function_id" int4 NOT NULL,
+  "action_id" int4 NOT NULL,
   "scope" int2 NOT NULL,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE "public"."sys_permission" (
 )
 ;
 COMMENT ON COLUMN "public"."sys_permission"."role_id" IS '角色id';
-COMMENT ON COLUMN "public"."sys_permission"."function_id" IS '功能id';
+COMMENT ON COLUMN "public"."sys_permission"."action_id" IS '功能id';
 COMMENT ON COLUMN "public"."sys_permission"."scope" IS '权限范围';
 COMMENT ON COLUMN "public"."sys_permission"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_permission"."created_time" IS '创建时间';
@@ -111,8 +111,8 @@ COMMENT ON COLUMN "public"."sys_module"."updated_time" IS '最新一次更新时
 COMMENT ON COLUMN "public"."sys_module"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_module"."deleted_time" IS '删除时间';
 
-CREATE TABLE "public"."sys_function" (
-  "function_id" int4 NOT NULL DEFAULT nextval('sys_function_function_id_seq'::regclass),
+CREATE TABLE "public"."sys_action" (
+  "action_id" int4 NOT NULL DEFAULT nextval('sys_action_action_id_seq'::regclass),
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "description" varchar(255) COLLATE "pg_catalog"."default",
@@ -126,22 +126,22 @@ CREATE TABLE "public"."sys_function" (
   "deleted_time" timestamp(6)
 )
 ;
-COMMENT ON COLUMN "public"."sys_function"."function_id" IS '功能id';
-COMMENT ON COLUMN "public"."sys_function"."name" IS '功能名称';
-COMMENT ON COLUMN "public"."sys_function"."code" IS '功能代码';
-COMMENT ON COLUMN "public"."sys_function"."description" IS '功能描述';
-COMMENT ON COLUMN "public"."sys_function"."sort_num" IS '功能排序';
-COMMENT ON COLUMN "public"."sys_function"."module_id" IS '所属模块id';
-COMMENT ON COLUMN "public"."sys_function"."created_by" IS '创建者';
-COMMENT ON COLUMN "public"."sys_function"."created_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_function"."updated_by" IS '最新一次更新者';
-COMMENT ON COLUMN "public"."sys_function"."updated_time" IS '最新一次更新时间';
-COMMENT ON COLUMN "public"."sys_function"."deleted_by" IS '删除者';
-COMMENT ON COLUMN "public"."sys_function"."deleted_time" IS '删除时间';
+COMMENT ON COLUMN "public"."sys_action"."action_id" IS '功能id';
+COMMENT ON COLUMN "public"."sys_action"."name" IS '功能名称';
+COMMENT ON COLUMN "public"."sys_action"."code" IS '功能代码';
+COMMENT ON COLUMN "public"."sys_action"."description" IS '功能描述';
+COMMENT ON COLUMN "public"."sys_action"."sort_num" IS '功能排序';
+COMMENT ON COLUMN "public"."sys_action"."module_id" IS '所属模块id';
+COMMENT ON COLUMN "public"."sys_action"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_action"."created_time" IS '创建时间';
+COMMENT ON COLUMN "public"."sys_action"."updated_by" IS '最新一次更新者';
+COMMENT ON COLUMN "public"."sys_action"."updated_time" IS '最新一次更新时间';
+COMMENT ON COLUMN "public"."sys_action"."deleted_by" IS '删除者';
+COMMENT ON COLUMN "public"."sys_action"."deleted_time" IS '删除时间';
 
 CREATE TABLE "public"."sys_menu" (
   "menu_id" int4 NOT NULL DEFAULT nextval('sys_menu_menu_id_seq'::regclass),
-  "function_id" int4,
+  "action_id" int4,
   "parent_id" int4,
   "path" varchar(50) COLLATE "pg_catalog"."default",
   "icon" varchar(50) COLLATE "pg_catalog"."default",
@@ -158,7 +158,7 @@ CREATE TABLE "public"."sys_menu" (
 )
 ;
 COMMENT ON COLUMN "public"."sys_menu"."menu_id" IS '菜单id';
-COMMENT ON COLUMN "public"."sys_menu"."function_id" IS '功能id';
+COMMENT ON COLUMN "public"."sys_menu"."action_id" IS '功能id';
 COMMENT ON COLUMN "public"."sys_menu"."parent_id" IS '父菜单id';
 COMMENT ON COLUMN "public"."sys_menu"."path" IS '路径';
 COMMENT ON COLUMN "public"."sys_menu"."icon" IS '图标';
@@ -189,11 +189,11 @@ INSERT INTO public.sys_module VALUES (5, '模块-5', '功能被分配了权限',
 INSERT INTO public.sys_module VALUES (6, '模块-6', '功能被菜单使用', 3, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 功能表数据
-INSERT INTO public.sys_function VALUES (1, '浏览部门管理页面', 'dept:view', NULL, 0, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_function VALUES (2, '新增部门', 'dept:create', NULL, 1, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_function VALUES (3, '浏览用户管理页面', 'user:view', NULL, 0, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_function VALUES (4, '新增用户', 'user:create', NULL, 1, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_function VALUES (5, '浏览角色管理页面', 'role:view', '被菜单使用', 0, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', NULL, 0, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (2, '新增部门', 'dept:create', NULL, 1, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (3, '浏览用户管理页面', 'user:view', NULL, 0, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (4, '新增用户', 'user:create', NULL, 1, 5, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_action VALUES (5, '浏览角色管理页面', 'role:view', '被菜单使用', 0, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 菜单表数据
 INSERT INTO public.sys_menu VALUES (1, 5, NULL, '/role', NULL, '角色管理', 0, '/path', 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
@@ -204,15 +204,15 @@ SELECT setval('"public"."sys_role_role_id_seq"', 1, true);
 ALTER SEQUENCE "public"."sys_module_module_id_seq"
 OWNED BY "public"."sys_module"."module_id";
 SELECT setval('"public"."sys_module_module_id_seq"', 6, true);
-ALTER SEQUENCE "public"."sys_function_function_id_seq"
-OWNED BY "public"."sys_function"."function_id";
-SELECT setval('"public"."sys_function_function_id_seq"', 5, true);
+ALTER SEQUENCE "public"."sys_action_action_id_seq"
+OWNED BY "public"."sys_action"."action_id";
+SELECT setval('"public"."sys_action_action_id_seq"', 5, true);
 ALTER SEQUENCE "public"."sys_menu_menu_id_seq"
 OWNED BY "public"."sys_menu"."menu_id";
 SELECT setval('"public"."sys_menu_menu_id_seq"', 1, true);
 
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
-ALTER TABLE "public"."sys_permission" ADD CONSTRAINT "sys_permission_pkey" PRIMARY KEY ("role_id", "function_id");
+ALTER TABLE "public"."sys_permission" ADD CONSTRAINT "sys_permission_pkey" PRIMARY KEY ("role_id", "action_id");
 ALTER TABLE "public"."sys_module" ADD CONSTRAINT "sys_module_pkey" PRIMARY KEY ("module_id");
-ALTER TABLE "public"."sys_function" ADD CONSTRAINT "sys_function_pkey" PRIMARY KEY ("function_id");
+ALTER TABLE "public"."sys_action" ADD CONSTRAINT "sys_action_pkey" PRIMARY KEY ("action_id");
 ALTER TABLE "public"."sys_menu" ADD CONSTRAINT "sys_menu_pkey" PRIMARY KEY ("menu_id");

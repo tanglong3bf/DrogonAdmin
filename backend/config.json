@@ -464,20 +464,20 @@
             "group": "GROUP BY ur.role_id"
           },
           "get_module_tree": {
-            "main": "SELECT m.*, f.* FROM(@recursive()) m LEFT JOIN sys_function f ON m.module_id = f.module_id @order()",
+            "main": "SELECT m.*, f.* FROM(@recursive()) m LEFT JOIN sys_action f ON m.module_id = f.module_id @order()",
             "recursive": "WITH RECURSIVE module_ancestor AS ( @current() UNION @sub() ) SELECT * FROM module_ancestor",
             "current": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
             "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s @inner_join()",
             "inner_join": "INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id, f.sort_num, f.function_id"
+            "order": "ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id, f.sort_num, f.action_id"
           },
           // 批量更新功能，包括软删除
-          "multi_update_function": {
+          "multi_update_action": {
             "main": {
-              "sql": "UPDATE sys_function f SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE f.function_id = s.function_id",
+              "sql": "UPDATE sys_action f SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE f.action_id = s.action_id",
               "params": {
                 "fields_list": [
-                  "function_id",
+                  "action_id",
                   "name",
                   "code",
                   "description",
@@ -493,7 +493,7 @@
               }
             },
             "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
-            "values": "(@for(item in data, separator='), (') ${item.function_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "values": "(@for(item in data, separator='), (') ${item.action_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
             "string_value": "@if(value && value != null) '${value}' @else NULL::String @endif",
             "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
             "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",

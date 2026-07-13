@@ -1,7 +1,7 @@
 #include "application/iam/module/ModuleCqrsRepo.h"
 
-#include "application/iam/module/FunctionResponse.h"
-#include "domain/models/SysFunction.h"
+#include "application/iam/module/ActionResponse.h"
+#include "domain/models/SysAction.h"
 #include <drogon/HttpAppFramework.h>
 
 using namespace std;
@@ -59,18 +59,8 @@ vector<ModuleResponse> ModuleCqrsRepo::buildTree(const Result &dbResult) const
     ModuleResponse *lastModule = nullptr;
     for (const auto &row : dbResult)
     {
-        if (lastModule &&
-            row["module_id"].as<std::int32_t>() == lastModule->moduleId())
-        {
-            // 两个表之间多了一个level列，所以要+1
-            auto func = FunctionResponse{
-                Function{SysFunction(row, SysModule::getColumnNumber() + 1)}};
-            if (func.functionId())
-            {
-                lastModule->appendFunction(func);
-            }
-        }
-        else
+        if (!lastModule ||
+            row["module_id"].as<std::int32_t>() != lastModule->moduleId())
         {
             ModuleResponse item{Module{SysModule{row}}};
             if (item.parentId())
@@ -85,6 +75,13 @@ vector<ModuleResponse> ModuleCqrsRepo::buildTree(const Result &dbResult) const
                 result.emplace_back(item);
                 lastModule = &result.back();
             }
+        }
+        // 两个表之间多了一个level列，所以要+1
+        auto func = ActionResponse{
+            Action{SysAction(row, SysModule::getColumnNumber() + 1)}};
+        if (func.actionId())
+        {
+            lastModule->appendAction(func);
         }
     }
     return result;

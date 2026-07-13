@@ -1,21 +1,21 @@
-#include "Function.h"
+#include "Action.h"
 
 using namespace std;
 using namespace trantor;
 
-Function::Function(string_view name,
-                   const string_view code,
-                   const int32_t sortNum,
-                   const int32_t moduleId)
+Action::Action(string_view name,
+               const string_view code,
+               const int32_t sortNum,
+               const int32_t moduleId)
     : name_{name}, code_{code}, sortNum_{sortNum}, moduleId_{moduleId}
 {
 }
 
-Function::Function(string_view name,
-                   const string_view code,
-                   const int32_t sortNum,
-                   const int32_t moduleId,
-                   const int32_t createdBy)
+Action::Action(string_view name,
+               const string_view code,
+               const int32_t sortNum,
+               const int32_t moduleId,
+               const int32_t createdBy)
     : name_{name},
       code_{code},
       sortNum_{sortNum},
@@ -24,8 +24,8 @@ Function::Function(string_view name,
 {
 }
 
-Function::Function(const SysFunction &model)
-    : functionId_{model.getValueOfFunctionId()},
+Action::Action(const SysAction &model)
+    : actionId_{model.getValueOfActionId()},
       name_{model.getValueOfName()},
       code_{model.getValueOfCode()},
       sortNum_{model.getValueOfSortNum()},
@@ -34,10 +34,10 @@ Function::Function(const SysFunction &model)
 {
 }
 
-Function::operator SysFunction() const
+Action::operator SysAction() const
 {
-    SysFunction model;
-    SET_OPT(functionId_, FunctionId);
+    SysAction model;
+    SET_OPT(actionId_, ActionId);
     SET_VAL(name_, Name);
     SET_VAL(code_, Code);
     SET_OPT(description_, Description);

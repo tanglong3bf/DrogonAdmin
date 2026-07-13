@@ -14,17 +14,17 @@ Task<> ModuleHandler::deleteModule(Module &module,
     // 检查没有子模块
     co_await moduleVerifier_->verifyNoSubmodule(*module.moduleId());
 
-    const vector<std::int32_t> functionIds =
-        module.functions() |
-        views::transform([](const Function &f) { return *f.functionId(); }) |
+    const vector<std::int32_t> actionIds =
+        module.actions() |
+        views::transform([](const Action &f) { return *f.actionId(); }) |
         ranges_utils::to<vector>();
 
-    if (functionIds.size() > 0)
+    if (actionIds.size() > 0)
     {
         // 检查模块的功能没有被分配权限
-        co_await roleVerifier_->verifyFunctionNotUsed(functionIds);
+        co_await roleVerifier_->verifyActionNotUsed(actionIds);
         // 检查模块的功能没有被菜单使用
-        co_await menuVerifier_->verifyFunctionNotUsed(functionIds);
+        co_await menuVerifier_->verifyActionNotUsed(actionIds);
     }
 
     // 标记删除
