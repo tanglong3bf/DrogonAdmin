@@ -21,6 +21,7 @@ import {
   sortModule
 } from '@/api/module'
 import { VueDraggable } from 'vue-draggable-plus'
+import PermissionPriorityTopology from './components/PermissionPriorityTopology.vue'
 
 /**
  * 从后端返回的真实数据
@@ -427,19 +428,58 @@ const deleteModuleBtn = async (moduleId: number) => {
   )
 }
 
-const actionDialogVisible = ref(false)
+const actionsForm = ref<FormInstance>()
 
-const sortableAction = ref<Action[] | undefined>([])
+const sortableActionForm = reactive({
+  actions: [] as Action[]
+})
+
+const actionsLink = reactive([
+  { high: 1, low: 2 },
+  { high: 2, low: 3 },
+  { high: 3, low: 4 },
+  { high: 3, low: 5 },
+  { high: 5, low: 6 }
+])
+
+const actionDialogVisible = ref(false)
 
 const assignAction = (module_id: number) => {
   const original: Module | undefined = findOriginal(moduleTree.value, module_id)
-  sortableAction.value = original?.actions?.map(item => ({
-    action_id: item.action_id,
-    name: item.name,
-    sort_num: item.sort_num,
-    has_data_permission: item.has_data_permission
-  }))
+  sortableActionForm.actions =
+    original?.actions?.map(item => ({
+      action_id: item.action_id,
+      name: item.name,
+      sort_num: item.sort_num,
+      has_data_permission: item.has_data_permission
+    })) || []
   actionDialogVisible.value = true
+}
+
+const moveDownAction = (actionId: number) => {
+  const index = sortableActionForm.actions.findIndex(
+    item => item.action_id === actionId
+  )
+  if (index < sortableActionForm.actions.length - 1) {
+    sortableActionForm.actions[index] = sortableActionForm.actions.splice(
+      index + 1,
+      1,
+      sortableActionForm.actions[index]
+    )[0]
+  }
+}
+
+const moveUpAction = (actionId: number) => {
+  const index = sortableActionForm.actions.findIndex(
+    item => item.action_id === actionId
+  )
+  if (index > 0) {
+    sortableActionForm.actions[index] = sortableActionForm.actions.splice(
+      index - 1,
+      1,
+      sortableActionForm.actions[index]
+    )[0]
+  }
 }
 
 const assignCancel = () => {
@@ -448,6 +488,18 @@ const assignCancel = () => {
 
 const assignSubmit = () => {
   actionDialogVisible.value = false
+}
+
+const removeAction = (action_id: number) => {
+  if (
+    actionsLink.some(item => item.high === action_id || item.low === action_id)
+  ) {
+    ElMessage.warning('存在数据权限关联，无法删除')
+    return
+  }
+  sortableActionForm.actions = sortableActionForm.actions?.filter(
+    item => item.action_id !== action_id
+  )
 }
 </script>
 
@@ -575,8 +627,72 @@ const assignSubmit = () => {
     </template>
   </el-dialog>
   <!-- 功能设置对话框 -->
-  <el-dialog title="设置功能" v-model="actionDialogVisible" width="400px">
-    {{ sortableAction }}
+  <el-dialog title="设置功能" v-model="actionDialogVisible" width="521px">
+    <p style="margin-block: 0 15px; font-weight: bolder">
+      <span style="margin-left: 55px">功能名称</span>
+      <el-tooltip effect="light" placement="top">
+        <template #content>
+          为true表示在权限管理页面中<br />可以为此功能设置数据权限
+        </template>
+        <span style="margin-left: 85px">数据权限</span></el-tooltip
+      ><span style="margin-left: 55px">操作</span
+      ><span style="margin-left: 75px">优先级</span>
+    </p>
+    <div style="display: flex">
+      <el-form
+        ref="actionsForm"
+        style="max-width: 433px"
+        :model="sortableActionForm"
+        label-width="auto"
+        class="demo-dynamic"
+      >
+        <el-form-item
+          v-for="(action, index) in sortableActionForm.actions"
+          :key="action.action_id"
+          :prop="'actions.' + index + '.name'"
+          :rules="{
+            required: true,
+            message: '请输入功能名称',
+            trigger: 'blur'
+          }"
+        >
+          <el-input v-model="action.name" />
+          <el-switch
+            v-model="action.has_data_permission"
+            size="default"
+            style="--el-switch-on-color: #13ce66; margin-left: 20px"
+            inline-prompt
+          />
+          <el-button-group direction="horizontal" style="margin-left: 25px">
+            <el-button
+              type="primary"
+              size="small"
+              icon="SortDown"
+              :disabled="index === sortableActionForm.actions.length - 1"
+              @click="moveDownAction(action.action_id)"
+            />
+            <el-button
+              type="danger"
+              size="small"
+              icon="Delete"
+              @click="removeAction(action.action_id)"
+            />
+            <el-button
+              type="primary"
+              size="small"
+              icon="SortUp"
+              :disabled="index === 0"
+              @click="moveUpAction(action.action_id)"
+            />
+          </el-button-group>
+        </el-form-item>
+      </el-form>
+      <permission-priority-topology
+        :actions="sortableActionForm.actions"
+        v-model="actionsLink"
+        style="margin-left: 10px"
+      />
+    </div>
     <template #footer>
       <el-button @click="assignCancel()">取 消</el-button>
       <el-button type="primary" @click="assignSubmit()">提 交</el-button>
