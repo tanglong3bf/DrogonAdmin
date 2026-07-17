@@ -4,6 +4,67 @@ import type { AxiosRequestConfig } from 'axios'
 import { ResponseBody } from '@/types/common'
 import { Module } from '@/types/module'
 
+const actionPriority = [
+  [],
+  [],
+  [],
+  [
+    {
+      high: 2,
+      low: 3
+    },
+    {
+      high: 2,
+      low: 4
+    },
+    {
+      high: 2,
+      low: 5
+    },
+    {
+      high: 5,
+      low: 6
+    }
+  ],
+  [
+    {
+      high: 7,
+      low: 8
+    },
+    {
+      high: 8,
+      low: 9
+    },
+    {
+      high: 8,
+      low: 10
+    },
+    {
+      high: 10,
+      low: 11
+    }
+  ],
+  [],
+  [
+    {
+      high: 12,
+      low: 13
+    },
+    {
+      high: 13,
+      low: 14
+    },
+    {
+      high: 13,
+      low: 15
+    },
+    {
+      high: 15,
+      low: 16
+    }
+  ]
+]
+
 /**
  * 获取模块树接口mock
  */
@@ -17,61 +78,188 @@ if (mockConfig.module.get_module_tree) {
         {
           data: [
             {
-              module_id: 1,
-              name: '组织架构',
-              sort_num: 0,
               children: [
                 {
+                  children: [
+                    {
+                      actions: [
+                        {
+                          action_id: 1,
+                          code: 'dept:view',
+                          has_data_permission: false,
+                          module_id: 3,
+                          name: '浏览部门管理页面',
+                          sort_num: 0
+                        },
+                        {
+                          action_id: 2,
+                          code: 'dept:query',
+                          has_data_permission: true,
+                          module_id: 3,
+                          name: '查询部门树',
+                          sort_num: 1
+                        },
+                        {
+                          action_id: 3,
+                          code: 'dept:create',
+                          has_data_permission: true,
+                          module_id: 3,
+                          name: '新增部门',
+                          sort_num: 2
+                        },
+                        {
+                          action_id: 4,
+                          code: 'dept:sort',
+                          has_data_permission: true,
+                          module_id: 3,
+                          name: '排序部门',
+                          sort_num: 3
+                        },
+                        {
+                          action_id: 5,
+                          code: 'dept:update',
+                          has_data_permission: true,
+                          module_id: 3,
+                          name: '更新部门',
+                          sort_num: 4
+                        },
+                        {
+                          action_id: 6,
+                          code: 'dept:delete',
+                          has_data_permission: true,
+                          module_id: 3,
+                          name: '删除部门',
+                          sort_num: 5
+                        }
+                      ],
+                      action_priority: actionPriority[3],
+                      module_id: 3,
+                      name: '部门管理',
+                      parent_id: 2,
+                      sort_num: 0
+                    },
+                    {
+                      actions: [
+                        {
+                          action_id: 7,
+                          code: 'user:view',
+                          has_data_permission: false,
+                          module_id: 4,
+                          name: '浏览用户管理页面',
+                          sort_num: 0
+                        },
+                        {
+                          action_id: 8,
+                          code: 'user:query',
+                          has_data_permission: true,
+                          module_id: 4,
+                          name: '查询用户',
+                          sort_num: 1
+                        },
+                        {
+                          action_id: 9,
+                          code: 'user:create',
+                          has_data_permission: true,
+                          module_id: 4,
+                          name: '新增用户',
+                          sort_num: 2
+                        },
+                        {
+                          action_id: 10,
+                          code: 'user:update',
+                          has_data_permission: true,
+                          module_id: 4,
+                          name: '更新用户',
+                          sort_num: 3
+                        },
+                        {
+                          action_id: 11,
+                          code: 'user:delete',
+                          has_data_permission: true,
+                          module_id: 4,
+                          name: '删除用户',
+                          sort_num: 4
+                        }
+                      ],
+                      action_priority: actionPriority[4],
+                      module_id: 4,
+                      name: '用户管理',
+                      parent_id: 2,
+                      sort_num: 1
+                    }
+                  ],
                   module_id: 2,
-                  name: '部门管理',
-                  sort_num: 0,
-                  parent_id: 1
+                  name: '系统管理',
+                  parent_id: 1,
+                  sort_num: 0
                 },
                 {
-                  module_id: 3,
-                  name: '用户管理',
-                  sort_num: 1,
-                  parent_id: 1
-                }
-              ]
-            },
-            {
-              module_id: 4,
-              name: '权限管理',
-              sort_num: 1,
-              children: [
-                {
+                  children: [
+                    {
+                      actions: [
+                        {
+                          action_id: 12,
+                          code: 'role:view',
+                          has_data_permission: false,
+                          module_id: 6,
+                          name: '浏览角色管理页面',
+                          sort_num: 0
+                        },
+                        {
+                          action_id: 13,
+                          code: 'role:query',
+                          has_data_permission: false,
+                          module_id: 6,
+                          name: '查询角色',
+                          sort_num: 1
+                        },
+                        {
+                          action_id: 14,
+                          code: 'role:create',
+                          has_data_permission: false,
+                          module_id: 6,
+                          name: '新增角色',
+                          sort_num: 2
+                        },
+                        {
+                          action_id: 15,
+                          code: 'role:update',
+                          has_data_permission: false,
+                          module_id: 6,
+                          name: '更新角色',
+                          sort_num: 3
+                        },
+                        {
+                          action_id: 16,
+                          code: 'role:delete',
+                          has_data_permission: false,
+                          module_id: 6,
+                          name: '删除角色',
+                          sort_num: 4
+                        }
+                      ],
+                      action_priority: actionPriority[6],
+                      module_id: 6,
+                      name: '角色管理',
+                      parent_id: 5,
+                      sort_num: 0
+                    },
+                    {
+                      module_id: 7,
+                      name: '权限分配',
+                      parent_id: 5,
+                      sort_num: 1
+                    }
+                  ],
                   module_id: 5,
-                  name: '角色管理',
-                  sort_num: 0,
-                  parent_id: 1
-                },
-                {
-                  module_id: 6,
-                  name: '权限分配',
-                  sort_num: 1,
-                  parent_id: 1
+                  name: '权限管理',
+                  parent_id: 1,
+                  sort_num: 1
                 }
-              ]
-            },
-            {
-              module_id: 7,
-              name: '资源管理',
-              sort_num: 2,
-              children: [
-                {
-                  module_id: 8,
-                  name: '模块管理',
-                  sort_num: 0,
-                  parent_id: 1
-                },
-                {
-                  module_id: 9,
-                  name: '菜单管理',
-                  sort_num: 1,
-                  parent_id: 1
-                }
-              ]
+              ],
+              module_id: 1,
+              name: '系统管理',
+              sort_num: 0
             }
           ]
         }
@@ -121,4 +309,16 @@ if (mockConfig.module.sort_module) {
     console.log(config)
     return [204]
   })
+}
+
+/**
+ * 分配功能接口mock
+ */
+if (mockConfig.module.assign_actions) {
+  mock
+    .onPost(/^\/module\/[1-9]\d*\/actions$/)
+    .reply((config: AxiosRequestConfig): [number] => {
+      console.log(config)
+      return [204]
+    })
 }

@@ -6,7 +6,7 @@ import {
   FormInstance,
   FormRules
 } from 'element-plus/es'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import type {
   Module,
   ModuleFormData,
@@ -18,7 +18,8 @@ import {
   newModule,
   updateModule,
   deleteModule,
-  sortModule
+  sortModule,
+  assignAction
 } from '@/api/module'
 import { VueDraggable } from 'vue-draggable-plus'
 import PermissionPriorityTopology from './components/PermissionPriorityTopology.vue'
@@ -428,71 +429,148 @@ const deleteModuleBtn = async (moduleId: number) => {
   )
 }
 
+/**
+ * 功能表单引用
+ */
 const actionsForm = ref<FormInstance>()
 
+/**
+ * 功能表单数据
+ */
 const sortableActionForm = reactive({
-  actions: [] as Action[]
+  module_id: 0, // 功能所属模块
+  actions: [] as Action[], // 功能列表
+  actionPriority: [] as { high: number; low: number }[] // 功能优先级
 })
 
-const actionsLink = reactive([
-  { high: 1, low: 2 },
-  { high: 2, low: 3 },
-  { high: 3, low: 4 },
-  { high: 3, low: 5 },
-  { high: 5, low: 6 }
-])
-
+// 功能分配对话框
 const actionDialogVisible = ref(false)
 
-const assignAction = (module_id: number) => {
-  const original: Module | undefined = findOriginal(moduleTree.value, module_id)
-  sortableActionForm.actions =
-    original?.actions?.map(item => ({
-      action_id: item.action_id,
-      name: item.name,
-      sort_num: item.sort_num,
-      has_data_permission: item.has_data_permission
-    })) || []
+// 功能优先级
+const lowToHighs = computed(() => {
+  const map = new Map<number, number[]>()
+  sortableActionForm.actionPriority.forEach(link => {
+    if (!map.has(link.low)) {
+      map.set(link.low, [])
+    }
+    map.get(link.low)!.push(link.high)
+  })
+  return map
+})
+const highToLows = computed(() => {
+  const map = new Map<number, number[]>()
+  sortableActionForm.actionPriority.forEach(link => {
+    if (!map.has(link.high)) {
+      map.set(link.high, [])
+    }
+    map.get(link.high)!.push(link.low)
+  })
+  return map
+})
+
+/**
+ * 功能分配按钮
+ */
+const assignActionBtn = (module_id: number) => {
+  const module: Module | undefined = findOriginal(moduleTree.value, module_id)
+  const actions = (module?.actions || []).map(item => ({ ...item }))
+  const actionPriority = (module?.action_priority || []).map(item => ({
+    ...item
+  }))
+
+  // 所有数据就绪后，一次性更新响应式数据
+  sortableActionForm.module_id = module_id
+  sortableActionForm.actions = actions
+  sortableActionForm.actionPriority = actionPriority
+
   actionDialogVisible.value = true
 }
 
-const moveDownAction = (actionId: number) => {
-  const index = sortableActionForm.actions.findIndex(
-    item => item.action_id === actionId
-  )
-  if (index < sortableActionForm.actions.length - 1) {
-    sortableActionForm.actions[index] = sortableActionForm.actions.splice(
-      index + 1,
-      1,
-      sortableActionForm.actions[index]
-    )[0]
-  }
-}
-
+/**
+ * 上移功能
+ */
 const moveUpAction = (actionId: number) => {
   const index = sortableActionForm.actions.findIndex(
     item => item.action_id === actionId
   )
-  if (index > 0) {
-    sortableActionForm.actions[index] = sortableActionForm.actions.splice(
-      index - 1,
-      1,
-      sortableActionForm.actions[index]
-    )[0]
+  // 已是第一条，禁止上移
+  if (index <= 0) return
+
+  const currentItem = sortableActionForm.actions[index]
+  const prevItem = sortableActionForm.actions[index - 1]
+  const prevActionId = prevItem.action_id
+
+  // 数据权限关联校验
+  const highList = lowToHighs.value.get(actionId)
+  if (highList?.includes(prevActionId)) {
+    ElMessage.warning('存在数据权限关联，无法上移')
+    return
   }
+
+  // 交换 sort_num
+  const tempSortNum = currentItem.sort_num
+  currentItem.sort_num = prevItem.sort_num
+  prevItem.sort_num = tempSortNum
+
+  // 交换数组位置
+  sortableActionForm.actions[index] = prevItem
+  sortableActionForm.actions[index - 1] = currentItem
 }
 
-const assignCancel = () => {
-  actionDialogVisible.value = false
+/**
+ * 下移功能
+ */
+const moveDownAction = (actionId: number) => {
+  const index = sortableActionForm.actions.findIndex(
+    item => item.action_id === actionId
+  )
+  const maxIndex = sortableActionForm.actions.length - 1
+  // 已是最后一条，禁止下移
+  if (index >= maxIndex) return
+
+  const currentItem = sortableActionForm.actions[index]
+  const nextItem = sortableActionForm.actions[index + 1]
+  const nextActionId = nextItem.action_id
+
+  // 数据权限关联校验
+  const lowList = highToLows.value.get(actionId)
+  if (lowList?.includes(nextActionId)) {
+    ElMessage.warning('存在数据权限关联，无法下移')
+    return
+  }
+
+  // 交换 sort_num
+  const tempSortNum = currentItem.sort_num
+  currentItem.sort_num = nextItem.sort_num
+  nextItem.sort_num = tempSortNum
+
+  // 交换数组位置
+  sortableActionForm.actions[index] = nextItem
+  sortableActionForm.actions[index + 1] = currentItem
 }
 
-const assignSubmit = () => {
-  actionDialogVisible.value = false
+/**
+ * 新增功能
+ */
+const addAction = () => {
+  sortableActionForm.actions.push({
+    action_id: -Date.now(),
+    name: '',
+    code: '',
+    module_id: sortableActionForm.module_id,
+    sort_num: sortableActionForm.actions.length,
+    has_data_permission: false
+  })
 }
 
+/**
+ * 删除功能
+ */
 const removeAction = (action_id: number) => {
   if (
-    actionsLink.some(item => item.high === action_id || item.low === action_id)
+    sortableActionForm.actionPriority.some(
+      item => item.high === action_id || item.low === action_id
+    )
   ) {
     ElMessage.warning('存在数据权限关联，无法删除')
     return
@@ -500,6 +578,94 @@ const removeAction = (action_id: number) => {
   sortableActionForm.actions = sortableActionForm.actions?.filter(
     item => item.action_id !== action_id
   )
+}
+
+/**
+ * 切换功能的数据权限开关
+ * 依赖规则：低优先级(low)功能的数据权限 依赖 高优先级(high)功能的数据权限
+ */
+const changeActionDataPermission = (action_id: number) => {
+  const targetAction = sortableActionForm.actions.find(
+    item => item.action_id === action_id
+  )
+  if (!targetAction) return
+
+  // 递归获取所有上游高优先级功能ID（所有指向当前功能的节点）
+  const getAllHighIds = (id: number, visited = new Set<number>()): number[] => {
+    const directHighs = lowToHighs.value.get(id) || []
+    const result: number[] = []
+    directHighs
+      .filter(highId => !visited.has(highId))
+      .forEach(highId => {
+        visited.add(highId)
+        result.push(highId)
+        result.push(...getAllHighIds(highId, visited))
+      })
+    return result
+  }
+
+  // 递归获取所有下游低优先级功能ID（当前功能指向的所有节点）
+  const getAllLowIds = (id: number, visited = new Set<number>()): number[] => {
+    const directLows = highToLows.value.get(id) || []
+    const result: number[] = []
+    directLows
+      .filter(lowId => !visited.has(lowId))
+      .forEach(lowId => {
+        visited.add(lowId)
+        result.push(lowId)
+        result.push(...getAllLowIds(lowId, visited))
+      })
+    return result
+  }
+
+  // 关闭数据权限
+  if (!targetAction.has_data_permission) {
+    const allUpstreamIds = getAllHighIds(action_id)
+    const hasEnabledUpstream = sortableActionForm.actions.some(
+      item =>
+        allUpstreamIds.includes(item.action_id) && item.has_data_permission
+    )
+
+    if (hasEnabledUpstream) {
+      ElMessage.warning(
+        '存在此功能依赖的上级功能，请先关闭对应上级功能数据权限'
+      )
+      targetAction.has_data_permission = true
+    }
+    return
+  }
+
+  // 开启数据权限
+  const allDownstreamIds = getAllLowIds(action_id)
+  const hasDisabledDownstream = sortableActionForm.actions.some(
+    item =>
+      allDownstreamIds.includes(item.action_id) && !item.has_data_permission
+  )
+
+  if (hasDisabledDownstream) {
+    ElMessage.warning('存在依赖此功能的下级功能，请先开启对应下级功能数据权限')
+    targetAction.has_data_permission = false
+    return
+  }
+}
+
+/**
+ * 取消功能分配
+ */
+const assignCancel = () => {
+  actionDialogVisible.value = false
+}
+
+/**
+ * 提交功能分配
+ */
+const assignSubmit = async () => {
+  await assignAction(
+    sortableActionForm.module_id,
+    sortableActionForm.actions,
+    sortableActionForm.actionPriority
+  )
+  actionDialogVisible.value = false
 }
 </script>
 
@@ -550,7 +716,10 @@ const removeAction = (action_id: number) => {
           <el-button plain type="primary" @click="updateModuleBtn(row)"
             >更新</el-button
           >
-          <el-button plain type="warning" @click="assignAction(row.module_id)"
+          <el-button
+            plain
+            type="warning"
+            @click="assignActionBtn(row.module_id)"
             >设置功能</el-button
           >
           <el-button
@@ -627,24 +796,28 @@ const removeAction = (action_id: number) => {
     </template>
   </el-dialog>
   <!-- 功能设置对话框 -->
-  <el-dialog title="设置功能" v-model="actionDialogVisible" width="521px">
+  <el-dialog
+    title="设置功能"
+    v-model="actionDialogVisible"
+    width="650px"
+    destroy-on-close
+  >
     <p style="margin-block: 0 15px; font-weight: bolder">
       <span style="margin-left: 55px">功能名称</span>
+      <span style="margin-left: 110px">功能代码</span>
       <el-tooltip effect="light" placement="top">
         <template #content>
           为true表示在权限管理页面中<br />可以为此功能设置数据权限
         </template>
-        <span style="margin-left: 85px">数据权限</span></el-tooltip
+        <span style="margin-left: 42px">数据权限</span></el-tooltip
       ><span style="margin-left: 55px">操作</span
-      ><span style="margin-left: 75px">优先级</span>
+      ><span style="margin-left: 55px">优先级</span>
     </p>
     <div style="display: flex">
       <el-form
         ref="actionsForm"
-        style="max-width: 433px"
+        style="max-width: 653px"
         :model="sortableActionForm"
-        label-width="auto"
-        class="demo-dynamic"
       >
         <el-form-item
           v-for="(action, index) in sortableActionForm.actions"
@@ -657,10 +830,15 @@ const removeAction = (action_id: number) => {
           }"
         >
           <el-input v-model="action.name" />
+          <el-input
+            v-model="action.code"
+            style="margin-left: 20px; width: 100px"
+          />
           <el-switch
             v-model="action.has_data_permission"
             size="default"
             style="--el-switch-on-color: #13ce66; margin-left: 20px"
+            @change="changeActionDataPermission(action.action_id)"
             inline-prompt
           />
           <el-button-group direction="horizontal" style="margin-left: 25px">
@@ -686,10 +864,13 @@ const removeAction = (action_id: number) => {
             />
           </el-button-group>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addAction">新增功能</el-button>
+        </el-form-item>
       </el-form>
       <permission-priority-topology
         :actions="sortableActionForm.actions"
-        v-model="actionsLink"
+        v-model="sortableActionForm.actionPriority"
         style="margin-left: 10px"
       />
     </div>

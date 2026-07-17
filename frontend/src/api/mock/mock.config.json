@@ -32,6 +32,8 @@
     "new_module": true,
     "update_module": true,
     "delete_module": true,
-    "sort_module": true
+    "sort_module": true,
+    "assign_actions": true,
+    "get_action_priority": true
   }
 }

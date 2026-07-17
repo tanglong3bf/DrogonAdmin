@@ -1,5 +1,5 @@
 import request, { validateResponse } from '@/utils/request'
-import type { Module } from '@/types/module'
+import type { Action, Module } from '@/types/module'
 import { isModuleTree } from '@/types/guard'
 
 /**
@@ -46,4 +46,18 @@ export const sortModule = (
   module_ids: number[]
 ) => {
   return request.post('/module/sort', { parent_id, module_ids })
+}
+
+/**
+ * 为模块分配功能
+ */
+export const assignAction = (
+  module_id: number,
+  actions: Action[],
+  actionsLink: { high: number; low: number }[]
+) => {
+  return request.post(`/module/${module_id}/actions`, {
+    actions,
+    actionsLink
+  })
 }

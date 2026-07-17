@@ -165,10 +165,19 @@ export function isModule(data: unknown): data is Module {
     isStringOrUndefinedField(data, 'description') &&
     isNumberField(data, 'sort_num') &&
     isNumberOrUndefinedField(data, 'parent_id') &&
-    isArrayOrUndefinedField(data, 'children', isModule)
+    isArrayOrUndefinedField(data, 'children', isModule) &&
+    isArrayOrUndefinedField(data, 'action_priority', isActionPriority)
   )
 }
 
 export function isModuleTree(data: unknown): data is Module[] {
   return isArray(data, isModule)
+}
+
+export function isActionPriority(
+  data: unknown
+): data is { high: number; low: number } {
+  return (
+    isObject(data) && isNumberField(data, 'high') && isNumberField(data, 'low')
+  )
 }

@@ -4,6 +4,8 @@
 export interface Action {
   action_id: number
   name: string
+  code: string
+  module_id: number
   has_data_permission: boolean
   sort_num: number
 }
@@ -19,6 +21,7 @@ export interface Module {
   children?: Module[] // 子模块
   child_count?: number // 子模块数量
   actions?: Action[]
+  action_priority?: { high: number; low: number }[]
 }
 
 /**

@@ -316,13 +316,13 @@ INSERT INTO public.sys_action VALUES (4, '排序部门', 'dept:sort', null, 3, t
 INSERT INTO public.sys_action VALUES (5, '更新部门', 'dept:update', null, 4, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (6, '删除部门', 'dept:delete', null, 5, true, 3, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (7, '浏览用户管理页面', 'user:view', null, 0, false, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (8, '新增用户', 'user:create', null, 1, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (9, '查询用户', 'user:query', null, 2, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (8, '查询用户', 'user:query', null, 1, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (9, '新增用户', 'user:create', null, 2, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (10, '更新用户', 'user:update', null, 3, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (11, '删除用户', 'user:delete', null, 4, true, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (12, '浏览角色管理页面', 'role:view', null, 0, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (13, '新增角色', 'role:create', null, 1, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
-INSERT INTO public.sys_action VALUES (14, '查询角色', 'role:query', null, 2, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (13, '查询角色', 'role:query', null, 1, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
+INSERT INTO public.sys_action VALUES (14, '新增角色', 'role:create', null, 2, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (15, '更新角色', 'role:update', null, 3, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (16, '删除角色', 'role:delete', null, 4, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 
