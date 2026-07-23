@@ -4,7 +4,7 @@ import type { Department } from './department'
 import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
 import { MenuType } from './enums'
-import { Module } from './module'
+import { ActionPriority, Module } from './module'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isArray = (data: unknown, callback: any) =>
@@ -174,10 +174,10 @@ export function isModuleTree(data: unknown): data is Module[] {
   return isArray(data, isModule)
 }
 
-export function isActionPriority(
-  data: unknown
-): data is { high: number; low: number } {
+export function isActionPriority(data: unknown): data is ActionPriority {
   return (
-    isObject(data) && isNumberField(data, 'high') && isNumberField(data, 'low')
+    isObject(data) &&
+    isNumberField(data, 'high_id') &&
+    isNumberField(data, 'low_id')
   )
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Action } from '@/types/module'
+import { Action, ActionPriority } from '@/types/module'
 import { ElMessage } from 'element-plus/es'
 import { computed, ref, onUnmounted } from 'vue'
 
 const props = defineProps<{
   actions: Action[]
-  modelValue: { high: number; low: number }[]
+  modelValue: ActionPriority[]
 }>()
 const emit = defineEmits(['update:modelValue'])
 const linkList = computed({
@@ -50,11 +50,11 @@ const dots = computed(() => {
 const linkPaths = computed(() => {
   const dotList = dots.value
   return linkList.value.map(link => {
-    const fromDot = dotList.find(d => d.id === link.high)
-    const toDot = dotList.find(d => d.id === link.low)
+    const fromDot = dotList.find(d => d.id === link.high_id)
+    const toDot = dotList.find(d => d.id === link.low_id)
 
-    if (!fromDot) throw new Error(`权限连线异常：不存在起点ID ${link.high}`)
-    if (!toDot) throw new Error(`权限连线异常：不存在终点ID ${link.low}`)
+    if (!fromDot) throw new Error(`权限连线异常：不存在起点ID ${link.high_id}`)
+    if (!toDot) throw new Error(`权限连线异常：不存在终点ID ${link.low_id}`)
 
     const { x: x1, y: y1 } = fromDot
     const { x: x2, y: y2 } = toDot
@@ -62,7 +62,7 @@ const linkPaths = computed(() => {
     const pathD = `M ${x1} ${y1} C ${controlX} ${y1}, ${controlX} ${y2}, ${x2} ${y2}`
 
     return {
-      key: `${link.high}-${link.low}`,
+      key: `${link.high_id}-${link.low_id}`,
       d: pathD
     }
   })
@@ -152,11 +152,11 @@ const handleMouseUp = (e: MouseEvent) => {
     }
 
     // 优先级高低
-    const high = action1.action_id
-    const low = action2.action_id
+    const high_id = action1.action_id
+    const low_id = action2.action_id
 
     const existIndex = linkList.value.findIndex(
-      link => link.high === high && link.low === low
+      link => link.high_id === high_id && link.low_id === low_id
     )
 
     if (existIndex > -1) {
@@ -164,7 +164,7 @@ const handleMouseUp = (e: MouseEvent) => {
       linkList.value.splice(existIndex, 1)
     } else {
       // 不存在 → 添加（创建连接）
-      linkList.value.push({ high, low })
+      linkList.value.push({ high_id, low_id })
     }
   }
 

@@ -39,6 +39,12 @@ drogon::Task<> ModuleRepository::save(const Module &module,
                                                         {{"data", data}});
                 co_await trans->execSqlCoro(sql);
             }
+            if (module.actionPriorities().size() > 0)
+            {
+                co_await actionPriorityMapper(trans).deleteBy(
+                    Criteria{SysActionPriority::Cols::_module_id,
+                             module.moduleId()});
+            }
             co_return;
         }
         case ChangingStatus::UPDATED:
@@ -196,4 +202,10 @@ inline CoroMapper<SysAction> ModuleRepository::actionMapper(
     const DbClientPtr &dbClient)
 {
     return CoroMapper<SysAction>{dbClient};
+}
+
+inline CoroMapper<SysActionPriority> ModuleRepository::actionPriorityMapper(
+    const DbClientPtr &dbClient)
+{
+    return CoroMapper<SysActionPriority>{dbClient};
 }

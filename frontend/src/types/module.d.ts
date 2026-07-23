@@ -9,6 +9,15 @@ export interface Action {
   has_data_permission: boolean
   sort_num: number
 }
+
+/**
+ * 功能优先级
+ */
+export interface ActionPriority {
+  high_id: number
+  low_id: number
+}
+
 /**
  * 模块
  */
@@ -20,8 +29,8 @@ export interface Module {
   parent_id?: number // 父级ID
   children?: Module[] // 子模块
   child_count?: number // 子模块数量
-  actions?: Action[]
-  action_priority?: { high: number; low: number }[]
+  actions?: Action[] // 功能
+  action_priority?: ActionPriority[] // 功能优先级
 }
 
 /**

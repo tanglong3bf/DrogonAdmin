@@ -55,33 +55,35 @@ ModuleResponse *ModuleCqrsRepo::findById(const vector<ModuleResponse> &tree,
 vector<ModuleResponse> ModuleCqrsRepo::buildTree(const Result &dbResult) const
 {
     vector<ModuleResponse> result;
-    result.reserve(10);
-    ModuleResponse *lastModule = nullptr;
     for (const auto &row : dbResult)
     {
-        if (!lastModule ||
-            row["module_id"].as<std::int32_t>() != lastModule->moduleId())
+        ModuleResponse item{Module{SysModule{row}}};
+        if (!row["action_list"].isNull())
         {
-            ModuleResponse item{Module{SysModule{row}}};
-            if (item.parentId())
+            for (const auto &actionRow : row["action_list"].as<Json::Value>())
             {
-                auto *parent = findById(result, *item.parentId());
-                parent->addChild(item);
-                lastModule =
-                    const_cast<ModuleResponse *>(&parent->children().back());
-            }
-            else
-            {
-                result.emplace_back(item);
-                lastModule = &result.back();
+                ActionResponse action{Action{SysAction{actionRow}}};
+                item.appendAction(action);
             }
         }
-        // 两个表之间多了一个level列，所以要+1
-        auto action = ActionResponse{
-            Action{SysAction(row, SysModule::getColumnNumber() + 1)}};
-        if (action.actionId())
+        if (!row["priority_list"].isNull())
         {
-            lastModule->appendAction(action);
+            for (const auto &priorityRow :
+                 row["priority_list"].as<Json::Value>())
+            {
+                ActionPriorityResponse priority{
+                    ActionPriority{SysActionPriority{priorityRow}}};
+                item.appendPriority(priority);
+            }
+        }
+        if (item.parentId())
+        {
+            auto *parent = findById(result, *item.parentId());
+            parent->addChild(item);
+        }
+        else
+        {
+            result.emplace_back(item);
         }
     }
 

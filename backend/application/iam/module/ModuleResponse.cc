@@ -5,6 +5,7 @@
 using namespace std;
 
 Json::Value toJsonArray(const vector<ActionResponse> &data);
+Json::Value toJsonArray(const vector<ActionPriorityResponse> &data);
 
 Json::Value toJsonArray(const vector<ModuleResponse> &data)
 {
@@ -58,12 +59,21 @@ Json::Value ModuleResponse::toJson() const
     {
         json["actions"] = toJsonArray(actions_);
     }
+    if (actionPriorities_.size() > 0)
+    {
+        json["priorities"] = toJsonArray(actionPriorities_);
+    }
     return json;
 }
 
-void ModuleResponse::appendAction(ActionResponse &func)
+void ModuleResponse::appendAction(ActionResponse &action)
 {
-    actions_.emplace_back(func);
+    actions_.emplace_back(action);
+}
+
+void ModuleResponse::appendPriority(ActionPriorityResponse &priority)
+{
+    actionPriorities_.emplace_back(priority);
 }
 
 void ModuleResponse::addChild(ModuleResponse &child)

@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS "public"."sys_module";
 DROP TABLE IF EXISTS "public"."sys_action";
+DROP TABLE IF EXISTS "public"."sys_action_priority";
 
 DROP SEQUENCE IF EXISTS "public"."sys_module_module_id_seq";
 CREATE SEQUENCE "public"."sys_module_module_id_seq" 
@@ -73,6 +74,20 @@ COMMENT ON COLUMN "public"."sys_action"."updated_time" IS '最新一次更新时
 COMMENT ON COLUMN "public"."sys_action"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_action"."deleted_time" IS '删除时间';
 
+CREATE TABLE "public"."sys_action_priority" (
+  "high_id" int4 NOT NULL,
+  "low_id" int4 NOT NULL,
+  "module_id" int4 NOT NULL,
+  "created_by" int4 NOT NULL,
+  "created_time" timestamp(6) NOT NULL
+)
+;
+COMMENT ON COLUMN "public"."sys_action_priority"."high_id" IS '高优先级功能id';
+COMMENT ON COLUMN "public"."sys_action_priority"."low_id" IS '低优先级功能id';
+COMMENT ON COLUMN "public"."sys_action_priority"."module_id" IS '所属模块id';
+COMMENT ON COLUMN "public"."sys_action_priority"."created_by" IS '创建者';
+COMMENT ON COLUMN "public"."sys_action_priority"."created_time" IS '创建时间';
+
 -- 模块表数据
 INSERT INTO public.sys_module VALUES (1, '系统管理', null, 0, null, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_module VALUES (2, '组织架构', null, 0, 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
@@ -100,6 +115,20 @@ INSERT INTO public.sys_action VALUES (14, '查询角色', 'role:query', null, 2,
 INSERT INTO public.sys_action VALUES (15, '更新角色', 'role:update', null, 3, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 INSERT INTO public.sys_action VALUES (16, '删除角色', 'role:delete', null, 4, false, 6, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', null, null);
 
+--- 优先级表数据
+INSERT INTO public.sys_action_priority VALUES (2, 3, 3, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (2, 4, 3, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (2, 5, 3, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (5, 6, 3, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (7, 8, 4, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (8, 9, 4, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (8, 10, 4, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (10, 11, 4, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (12, 13, 6, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (13, 14, 6, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (13, 15, 6, 1, '2026-07-22 15:32:58.000000');
+INSERT INTO public.sys_action_priority VALUES (15, 16, 6, 1, '2026-07-22 15:32:58.000000');
+
 ALTER SEQUENCE "public"."sys_module_module_id_seq"
 OWNED BY "public"."sys_module"."module_id";
 SELECT setval('"public"."sys_module_module_id_seq"', 7, true);
@@ -108,3 +137,4 @@ OWNED BY "public"."sys_action"."action_id";
 SELECT setval('"public"."sys_action_action_id_seq"', 16, true);
 ALTER TABLE "public"."sys_module" ADD CONSTRAINT "sys_module_pkey" PRIMARY KEY ("module_id");
 ALTER TABLE "public"."sys_action" ADD CONSTRAINT "sys_action_pkey" PRIMARY KEY ("action_id");
+ALTER TABLE "public"."sys_action_priority" ADD CONSTRAINT "sys_action_priority_pkey" PRIMARY KEY ("high_id", "low_id");

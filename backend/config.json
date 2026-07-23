@@ -463,13 +463,14 @@
             "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
             "group": "GROUP BY ur.role_id"
           },
+	  // 获取模块树、功能、功能优先级
           "get_module_tree": {
-            "main": "SELECT m.*, f.* FROM(@recursive()) m LEFT JOIN sys_action f ON m.module_id = f.module_id @order()",
-            "recursive": "WITH RECURSIVE module_ancestor AS ( @current() UNION @sub() ) SELECT * FROM module_ancestor",
-            "current": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
-            "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s @inner_join()",
-            "inner_join": "INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id, f.sort_num, f.action_id"
+            "main": "WITH RECURSIVE module_ancestor AS (@anchor() UNION @recursive()) @select_tree()",
+            "anchor": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
+            "recursive": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
+            "select_tree": "SELECT m.*, @sub_action_list(), @sub_priority_list() FROM module_ancestor m ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id",
+            "sub_action_list": "(SELECT json_agg(a ORDER BY a.sort_num, a.action_id) FROM sys_action a WHERE a.module_id = m.module_id AND a.deleted_by IS NULL) AS action_list",
+            "sub_priority_list": "(SELECT json_agg(ap ORDER BY ap.high_id, ap.low_id) FROM sys_action_priority ap WHERE ap.module_id = m.module_id) AS priority_list"
           },
           // 批量更新功能，包括软删除
           "multi_update_action": {

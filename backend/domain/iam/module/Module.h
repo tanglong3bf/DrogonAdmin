@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Action.h"
+#include "ActionPriority.h"
 #include "common/util/ParamGetter.hpp"
 #include "domain/models/SysModule.h"
 #include "common/framework/domain/AuditableEntity.h"
@@ -64,6 +65,7 @@ class Module : public AuditableEntity, public ChangeableEntity
     GETTER(sortNum);
     GETTER(parentId);
     GETTER(actions);
+    GETTER(actionPriorities);
 
     void setParentId(const std::optional<std::int32_t> parentId)
     {
@@ -91,10 +93,11 @@ class Module : public AuditableEntity, public ChangeableEntity
     void restoreActions(const std::vector<SysAction> &sysActions);
 
   private:
-    std::optional<int32_t> moduleId_;         ///< 模块id
-    std::string name_;                        ///< 模块名称
-    std::optional<std::string> description_;  ///< 模块描述
-    std::int32_t sortNum_;                    ///< 排序
-    std::optional<int32_t> parentId_;         ///< 父模块
-    std::vector<Action> actions_;             ///< 拥有的功能
+    std::optional<int32_t> moduleId_;               ///< 模块id
+    std::string name_;                              ///< 模块名称
+    std::optional<std::string> description_;        ///< 模块描述
+    std::int32_t sortNum_;                          ///< 排序
+    std::optional<int32_t> parentId_;               ///< 父模块
+    std::vector<Action> actions_;                   ///< 拥有的功能
+    std::vector<ActionPriority> actionPriorities_;  ///< 功能优先级
 };

@@ -17,6 +17,8 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
     using SysModuleMapper = drogon::orm::CoroMapper<SysModule>;
     using SysAction = drogon_model::drogon_admin_db::SysAction;
     using SysActionMapper = drogon::orm::CoroMapper<SysAction>;
+    using SysActionPriority = drogon_model::drogon_admin_db::SysActionPriority;
+    using SysActionPriorityMapper = drogon::orm::CoroMapper<SysActionPriority>;
 
   public:
     /**
@@ -70,6 +72,8 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
     static SysModuleMapper moduleMapper(
         const DbClientPtr &dbClient = drogon::app().getDbClient());
     static SysActionMapper actionMapper(
+        const DbClientPtr &dbClient = drogon::app().getDbClient());
+    static SysActionPriorityMapper actionPriorityMapper(
         const DbClientPtr &dbClient = drogon::app().getDbClient());
 };
 

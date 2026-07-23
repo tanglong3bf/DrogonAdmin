@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ActionResponse.h"
+#include "ActionPriorityResponse.h"
 #include "domain/iam/module/Module.h"
 #include <optional>
 #include <string>
@@ -30,8 +31,12 @@ class ModuleResponse
     GETTER(sortNum)
     GETTER(parentId)
     GETTER(children)
+    GETTER(actions)
+    GETTER(actionPriorities)
 
-    void appendAction(ActionResponse &func);
+    void appendAction(ActionResponse &action);
+
+    void appendPriority(ActionPriorityResponse &priority);
 
     /**
      * @brief 新增一个子节点
@@ -44,12 +49,13 @@ class ModuleResponse
     bool isChildIdExist(const std::int32_t id) noexcept;
 
   private:
-    const std::int32_t moduleId_;                   ///< 模块id
-    const std::string name_;                        ///< 模块名称
-    const std::optional<std::string> description_;  ///< 模块描述
-    const std::int32_t sortNum_;                    ///< 模块排序
-    const std::optional<std::int32_t> parentId_;    ///< 父模块id
-    ModuleResponse *parent_;                        ///< 父模块
-    std::vector<ModuleResponse> children_;          ///< 子模块列表
-    std::vector<ActionResponse> actions_;           ///< 功能列表
+    const std::int32_t moduleId_;                           ///< 模块id
+    const std::string name_;                                ///< 模块名称
+    const std::optional<std::string> description_;          ///< 模块描述
+    const std::int32_t sortNum_;                            ///< 模块排序
+    const std::optional<std::int32_t> parentId_;            ///< 父模块id
+    ModuleResponse *parent_;                                ///< 父模块
+    std::vector<ModuleResponse> children_;                  ///< 子模块列表
+    std::vector<ActionResponse> actions_;                   ///< 功能列表
+    std::vector<ActionPriorityResponse> actionPriorities_;  ///< 功能优先级
 };

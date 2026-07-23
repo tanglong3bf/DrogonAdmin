@@ -1,5 +1,5 @@
 import request, { validateResponse } from '@/utils/request'
-import type { Action, Module } from '@/types/module'
+import type { Action, ActionPriority, Module } from '@/types/module'
 import { isModuleTree } from '@/types/guard'
 
 /**
@@ -54,7 +54,7 @@ export const sortModule = (
 export const assignAction = (
   module_id: number,
   actions: Action[],
-  actionsLink: { high: number; low: number }[]
+  actionsLink: ActionPriority[]
 ) => {
   return request.post(`/module/${module_id}/actions`, {
     actions,

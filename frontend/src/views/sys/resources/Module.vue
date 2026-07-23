@@ -11,7 +11,8 @@ import type {
   Module,
   ModuleFormData,
   ModuleSortItem,
-  Action
+  Action,
+  ActionPriority
 } from '@/types/module'
 import {
   getModuleTree,
@@ -440,7 +441,7 @@ const actionsForm = ref<FormInstance>()
 const sortableActionForm = reactive({
   module_id: 0, // 功能所属模块
   actions: [] as Action[], // 功能列表
-  actionPriority: [] as { high: number; low: number }[] // 功能优先级
+  actionPriority: [] as ActionPriority[] // 功能优先级
 })
 
 // 功能分配对话框
@@ -450,20 +451,20 @@ const actionDialogVisible = ref(false)
 const lowToHighs = computed(() => {
   const map = new Map<number, number[]>()
   sortableActionForm.actionPriority.forEach(link => {
-    if (!map.has(link.low)) {
-      map.set(link.low, [])
+    if (!map.has(link.low_id)) {
+      map.set(link.low_id, [])
     }
-    map.get(link.low)!.push(link.high)
+    map.get(link.low_id)!.push(link.high_id)
   })
   return map
 })
 const highToLows = computed(() => {
   const map = new Map<number, number[]>()
   sortableActionForm.actionPriority.forEach(link => {
-    if (!map.has(link.high)) {
-      map.set(link.high, [])
+    if (!map.has(link.high_id)) {
+      map.set(link.high_id, [])
     }
-    map.get(link.high)!.push(link.low)
+    map.get(link.high_id)!.push(link.low_id)
   })
   return map
 })
@@ -569,7 +570,7 @@ const addAction = () => {
 const removeAction = (action_id: number) => {
   if (
     sortableActionForm.actionPriority.some(
-      item => item.high === action_id || item.low === action_id
+      item => item.high_id === action_id || item.low_id === action_id
     )
   ) {
     ElMessage.warning('存在数据权限关联，无法删除')
