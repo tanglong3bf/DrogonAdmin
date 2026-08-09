@@ -16,7 +16,8 @@ Task<> ModuleHandler::deleteModule(Module &module,
 
     const vector<std::int32_t> actionIds =
         module.actions() |
-        views::transform([](const Action &f) { return *f.actionId(); }) |
+        views::transform(
+            [](const Action &a) -> std::int32_t { return a.actionId(); }) |
         ranges_utils::to<vector>();
 
     if (actionIds.size() > 0)

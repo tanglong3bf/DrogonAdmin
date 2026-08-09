@@ -15,7 +15,7 @@ Json::Value toJsonArray(const vector<ActionResponse> &data)
 }
 
 ActionResponse::ActionResponse(const Action &action)
-    : actionId_{*action.actionId()},
+    : actionId_{static_cast<int32_t>(action.actionId())},
       name_{action.name()},
       code_{action.code()},
       description_{action.description()},

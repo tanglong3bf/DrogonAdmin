@@ -3,12 +3,14 @@
 using namespace std;
 using namespace trantor;
 
-Action::Action(string_view name,
+Action::Action(const int64_t actionId,
+               const string_view name,
                const string_view code,
                const int32_t sortNum,
                const bool hasDataPermission,
                const int32_t moduleId)
-    : name_{name},
+    : actionId_{actionId},
+      name_{name},
       code_{code},
       sortNum_{sortNum},
       hasDataPermission_{hasDataPermission},
@@ -16,19 +18,22 @@ Action::Action(string_view name,
 {
 }
 
-Action::Action(string_view name,
+Action::Action(const int64_t actionId,
+               const string_view name,
                const string_view code,
                const int32_t sortNum,
                const bool hasDataPermission,
                const int32_t moduleId,
                const int32_t createdBy)
-    : name_{name},
+    : actionId_{actionId},
+      name_{name},
       code_{code},
       sortNum_{sortNum},
       hasDataPermission_{hasDataPermission},
       moduleId_{moduleId},
       AuditableEntity{AUDITABLE_INIT}
 {
+    markNew();
 }
 
 Action::Action(const SysAction &model)
@@ -45,7 +50,7 @@ Action::Action(const SysAction &model)
 Action::operator SysAction() const
 {
     SysAction model;
-    SET_OPT(actionId_, ActionId);
+    SET_VAL(actionId_, ActionId);
     SET_VAL(name_, Name);
     SET_VAL(code_, Code);
     SET_OPT(description_, Description);
@@ -59,4 +64,38 @@ Action::operator SysAction() const
     SET_OPT(deletedBy(), DeletedBy);
     SET_OPT(deletedTime(), DeletedTime);
     return model;
+}
+
+void Action::updateInfo(const string_view name,
+                        const string_view code,
+                        const int32_t sortNum,
+                        const bool hasDataPermission,
+                        const int32_t updatedBy)
+{
+    bool isUpdated = false;
+    if (name_ != name)
+    {
+        name_ = name;
+        isUpdated = true;
+    }
+    if (code_ != code)
+    {
+        code_ = code;
+        isUpdated = true;
+    }
+    if (sortNum_ != sortNum)
+    {
+        sortNum_ = sortNum;
+        isUpdated = true;
+    }
+    if (hasDataPermission_ != hasDataPermission)
+    {
+        hasDataPermission_ = hasDataPermission;
+        isUpdated = true;
+    }
+    if (isUpdated)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
 }

@@ -54,10 +54,10 @@ export const sortModule = (
 export const assignAction = (
   module_id: number,
   actions: Action[],
-  actionsLink: ActionPriority[]
+  priorities: ActionPriority[]
 ) => {
   return request.post(`/module/${module_id}/actions`, {
     actions,
-    actionsLink
+    priorities
   })
 }

@@ -1,12 +1,13 @@
 #pragma once
 
-#include "ModuleResponse.h"
+#include "dto/ModuleResponse.h"
+#include "dto/ModuleCreateRequest.h"
+#include "dto/ModuleUpdateRequest.h"
+#include "dto/ModuleSortRequest.h"
+#include "dto/ActionUpdateRequest.h"
 #include "ModuleCqrsRepo.h"
-#include "ModuleCreateRequest.h"
-#include "ModuleUpdateRequest.h"
 #include "ModuleAssembler.h"
 #include "ModuleUpdater.h"
-#include "ModuleSortRequest.h"
 #include "domain/iam/module/ModuleHandler.h"
 #include "domain/iam/module/ModuleRepository.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -47,6 +48,13 @@ class ModuleService : public DrAdminObject<ModuleService>
      */
     drogon::Task<> sortModule(const ModuleSortRequest &request,
                               const std::int32_t updatedBy) const;
+
+    /**
+     * @brief 更新模块
+     */
+    drogon::Task<> updateActions(const std::int32_t moduleId,
+                                 const ActionUpdateRequest &request,
+                                 const std::int32_t updatedBy) const;
 
   private:
     ModuleCqrsRepoPtr moduleCqrsRepo_{

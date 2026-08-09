@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ModuleCreateRequest.h"
+#include "dto/ModuleCreateRequest.h"
 #include "domain/iam/module/Module.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "domain/iam/module/ModuleRepository.h"

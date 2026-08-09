@@ -7,16 +7,17 @@
 class ActionPriority : public ChangeableEntity
 {
     using SysActionPriority = drogon_model::drogon_admin_db::SysActionPriority;
+    friend class ModuleRepository;
 
   public:
-    ActionPriority(const std::int32_t highId,
-                   const std::int32_t lowId,
-                   const std::int32_t moduleId);
+    ActionPriority(std::int64_t highId,
+                   std::int64_t lowId,
+                   std::int32_t moduleId);
 
-    ActionPriority(const std::int32_t highId,
-                   const std::int32_t lowId,
-                   const std::int32_t moduleId,
-                   int32_t createdBy);
+    ActionPriority(std::int64_t highId,
+                   std::int64_t lowId,
+                   std::int32_t moduleId,
+                   std::int32_t createdBy);
 
     /// @group 和model类互转
     /// @{
@@ -32,8 +33,8 @@ class ActionPriority : public ChangeableEntity
     GETTER(createdTime);
 
   private:
-    std::int32_t highId_;        ///< 高优先级功能id
-    std::int32_t lowId_;         ///< 低优先级功能id
+    std::int64_t highId_;        ///< 高优先级功能id
+    std::int64_t lowId_;         ///< 低优先级功能id
     std::int32_t moduleId_;      ///< 所属模块id
     std::int32_t createdBy_;     ///< 创建者id
     trantor::Date createdTime_;  ///< 创建时间

@@ -6,7 +6,15 @@
       "configuration": {
         "request": "launch",
         "program": "./build/DrogonAdminBackend",
-        "stopAtEntry": true
+        "stopAtEntry": true,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "enable mi pretty‑printing",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": false
+          }
+        ]
       }
     }
   }

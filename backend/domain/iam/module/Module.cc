@@ -3,6 +3,7 @@
 #include "common/exception/BusinessException.h"
 #include "common/util/rangesUtils.hpp"
 #include <ranges>
+#include <unordered_map>
 
 using namespace std;
 using namespace trantor;
@@ -113,9 +114,135 @@ void Module::replaceActions(const std::vector<Action> &newActions,
     throw BusinessException("函数未实现");
 }
 
+void Module::updateActions(
+    const unordered_map<int64_t, const Action *> &newActionsMapping,
+    const int32_t updatedBy)
+{
+    bool isAnyUpdated = false;
+    for (auto &a : actions_)
+    {
+        if (newActionsMapping.find(a.actionId()) == newActionsMapping.end())
+        {
+            a.markDeleted();
+            a.markDeletedBy(updatedBy);
+        }
+        else
+        {
+            bool isUpdated = false;
+            auto newAction = newActionsMapping.at(a.actionId());
+
+            if (a.name_ != newAction->name())
+            {
+                a.name_ = newAction->name();
+                isUpdated = true;
+            }
+            if (a.code_ != newAction->code())
+            {
+                a.code_ = newAction->code();
+                isUpdated = true;
+            }
+            if (a.hasDataPermission_ != newAction->hasDataPermission())
+            {
+                a.hasDataPermission_ = newAction->hasDataPermission();
+                isUpdated = true;
+            }
+            if (a.sortNum_ != newAction->sortNum())
+            {
+                a.sortNum_ = newAction->sortNum();
+                isUpdated = true;
+            }
+
+            if (isUpdated)
+            {
+                a.markUpdated();
+                a.markUpdatedBy(updatedBy);
+                isAnyUpdated = true;
+            }
+        }
+    }
+
+    auto newActions = newActionsMapping | views::filter([](const auto &a) {
+                          return a.second->actionId() > INT32_MAX;
+                      }) |
+                      views::transform([](const auto &a) { return a.second; }) |
+                      ranges_utils::to<vector>();
+    for (const Action *a : newActions)
+    {
+        Action temp{a->actionId(),
+                    a->name(),
+                    a->code(),
+                    a->sortNum(),
+                    a->hasDataPermission(),
+                    a->moduleId(),
+                    updatedBy};
+        actions_.push_back(temp);
+    }
+
+    if (newActions.size() > 0)
+    {
+        isAnyUpdated = true;
+    }
+
+    if (isAnyUpdated)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+}
+
+void Module::updatePriorities(const std::vector<ActionPriority> &priorityList,
+                              const int32_t updatedBy)
+{
+    bool isUpdated = false;
+    for (auto &priority : priorities_)
+    {
+        std::pair<int64_t, int64_t> ids{priority.highId(), priority.lowId()};
+        const auto iter =
+            ranges::find_if(priorityList, [&ids](const ActionPriority &p) {
+                return p.highId() == ids.first && p.lowId() == ids.second;
+            });
+        if (iter == priorityList.end())
+        {
+            priority.markDeleted();
+            isUpdated = true;
+        }
+    }
+
+    auto newPriorities =
+        priorityList | views::filter([this](const auto &p) {
+            return p.highId() > INT32_MAX || p.lowId() > INT32_MAX ||
+                   ranges::find_if(priorities_, [&p](const auto &priority) {
+                       return priority.highId() == p.highId() &&
+                              priority.lowId() == p.lowId();
+                   }) == priorities_.end();
+        }) |
+        ranges_utils::to<vector>();
+    for (const ActionPriority p : newPriorities)
+    {
+        ActionPriority temp{p.highId(), p.lowId(), p.moduleId(), updatedBy};
+        priorities_.push_back(temp);
+    }
+
+    if (isUpdated || newPriorities.size() > 0)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+}
+
 void Module::restoreActions(const std::vector<SysAction> &sysActions)
 {
     actions_ = sysActions |
                views::transform([](const SysAction &f) { return Action{f}; }) |
                ranges_utils::to<vector>();
+}
+
+void Module::restorePriorities(
+    const std::vector<SysActionPriority> &sysActionPriorities)
+{
+    priorities_ = sysActionPriorities |
+                  views::transform([](const SysActionPriority &f) {
+                      return ActionPriority{f};
+                  }) |
+                  ranges_utils::to<vector>();
 }

@@ -412,6 +412,29 @@ class ParamGetter
         return value;
     }
 
+    // bool类型参数
+    template <typename D>
+    std::enable_if_t<std::is_same_v<D, bool>, std::optional<D>> getParam(
+        const Json::Value &json,
+        const std::string &key,
+        const std::pair<int32_t, int32_t> & /*ignore*/)
+    {
+        // 类型检查
+        if (!json[key].isBool())
+        {
+            if constexpr (is_necessary)
+            {
+                throw BusinessException{key + "必须是一个布尔值"};
+            }
+            else
+            {
+                LOG_WARN << key + "类型错误，已忽略";
+                return std::nullopt;
+            }
+        }
+        return json[key].asBool();
+    }
+
     /**
      * 整数类型参数
      * value_range：考虑到整数类型参数一般只会是关联数据id，限制关联数据数量等
@@ -425,7 +448,7 @@ class ParamGetter
              const std::pair<int32_t, int32_t> &value_range)
     {
         // 类型检查
-        if (!json[key].isInt())
+        if (!json[key].isInt64())
         {
             if constexpr (is_necessary)
             {
@@ -438,7 +461,7 @@ class ParamGetter
             }
         }
 
-        const int jsonValue = json[key].asInt();
+        const int64_t jsonValue = json[key].asInt64();
 
         // 符号检查
         if constexpr (std::is_unsigned_v<D>)

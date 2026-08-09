@@ -1,9 +1,10 @@
 #pragma once
 
+#include "application/iam/module/dto/ModuleCreateRequest.h"
+#include "application/iam/module/dto/ModuleUpdateRequest.h"
+#include "application/iam/module/dto/ModuleSortRequest.h"
+#include "application/iam/module/dto/ActionUpdateRequest.h"
 #include "application/iam/module/ModuleService.h"
-#include "application/iam/module/ModuleCreateRequest.h"
-#include "application/iam/module/ModuleUpdateRequest.h"
-#include "application/iam/module/ModuleSortRequest.h"
 #include <drogon/HttpController.h>
 
 class ModuleController : public drogon::HttpController<ModuleController>
@@ -28,6 +29,10 @@ class ModuleController : public drogon::HttpController<ModuleController>
                          drogon::Options);
     ADD_METHOD_VIA_REGEX(ModuleController::sortModule,
                          "/module/sort",
+                         drogon::Post,
+                         drogon::Options);
+    ADD_METHOD_VIA_REGEX(ModuleController::updateActions,
+                         "/module/([1-9]\\d*)/actions",
                          drogon::Post,
                          drogon::Options);
     METHOD_LIST_END
@@ -66,6 +71,14 @@ class ModuleController : public drogon::HttpController<ModuleController>
     drogon::Task<drogon::HttpResponsePtr> sortModule(
         const drogon::HttpRequestPtr req,
         const ModuleSortRequest request) const;
+
+    /**
+     * @brief 更新功能及优先级
+     */
+    drogon::Task<drogon::HttpResponsePtr> updateActions(
+        const drogon::HttpRequestPtr req,
+        const std::int32_t moduleId,
+        const ActionUpdateRequest request) const;
 
   private:
     ModuleServicePtr moduleService_{

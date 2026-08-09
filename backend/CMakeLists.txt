@@ -35,6 +35,7 @@ aux_source_directory(application/iam/auth AUTH_SERVICE_SRC)
 aux_source_directory(application/iam/role ROLE_SERVICE_SRC)
 aux_source_directory(application/iam/role/dto ROLE_DTO_SRC)
 aux_source_directory(application/iam/module MODULE_SERVICE_SRC)
+aux_source_directory(application/iam/module/dto MODULE_DTO_SRC)
 aux_source_directory(application/org/dept DEPT_SERVICE_SRC)
 aux_source_directory(application/org/user USER_SERVICE_SRC)
 aux_source_directory(application/org/user/dto USER_DTO_SRC)
@@ -64,6 +65,7 @@ target_sources(
           ${ROLE_SERVICE_SRC}
           ${ROLE_DTO_SRC}
           ${MODULE_SERVICE_SRC}
+          ${MODULE_DTO_SRC}
           ${DEPT_SERVICE_SRC}
           ${USER_SERVICE_SRC}
           ${USER_DTO_SRC}

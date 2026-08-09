@@ -45,3 +45,13 @@ Task<HttpResponsePtr> ModuleController::sortModule(
     co_await moduleService_->sortModule(request, updatedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
+
+Task<HttpResponsePtr> ModuleController::updateActions(
+    const HttpRequestPtr req,
+    const int32_t moduleId,
+    const ActionUpdateRequest request) const
+{
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
+    co_await moduleService_->updateActions(moduleId, request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
+}

@@ -441,7 +441,7 @@ const actionsForm = ref<FormInstance>()
 const sortableActionForm = reactive({
   module_id: 0, // 功能所属模块
   actions: [] as Action[], // 功能列表
-  actionPriority: [] as ActionPriority[] // 功能优先级
+  priorities: [] as ActionPriority[] // 功能优先级
 })
 
 // 功能分配对话框
@@ -450,7 +450,7 @@ const actionDialogVisible = ref(false)
 // 功能优先级
 const lowToHighs = computed(() => {
   const map = new Map<number, number[]>()
-  sortableActionForm.actionPriority.forEach(link => {
+  sortableActionForm.priorities.forEach(link => {
     if (!map.has(link.low_id)) {
       map.set(link.low_id, [])
     }
@@ -460,7 +460,7 @@ const lowToHighs = computed(() => {
 })
 const highToLows = computed(() => {
   const map = new Map<number, number[]>()
-  sortableActionForm.actionPriority.forEach(link => {
+  sortableActionForm.priorities.forEach(link => {
     if (!map.has(link.high_id)) {
       map.set(link.high_id, [])
     }
@@ -475,14 +475,14 @@ const highToLows = computed(() => {
 const assignActionBtn = (module_id: number) => {
   const module: Module | undefined = findOriginal(moduleTree.value, module_id)
   const actions = (module?.actions || []).map(item => ({ ...item }))
-  const actionPriority = (module?.action_priority || []).map(item => ({
+  const priorities = (module?.priorities || []).map(item => ({
     ...item
   }))
 
   // 所有数据就绪后，一次性更新响应式数据
   sortableActionForm.module_id = module_id
   sortableActionForm.actions = actions
-  sortableActionForm.actionPriority = actionPriority
+  sortableActionForm.priorities = priorities
 
   actionDialogVisible.value = true
 }
@@ -555,7 +555,7 @@ const moveDownAction = (actionId: number) => {
  */
 const addAction = () => {
   sortableActionForm.actions.push({
-    action_id: -Date.now(),
+    action_id: Date.now(),
     name: '',
     code: '',
     module_id: sortableActionForm.module_id,
@@ -569,7 +569,7 @@ const addAction = () => {
  */
 const removeAction = (action_id: number) => {
   if (
-    sortableActionForm.actionPriority.some(
+    sortableActionForm.priorities.some(
       item => item.high_id === action_id || item.low_id === action_id
     )
   ) {
@@ -664,8 +664,9 @@ const assignSubmit = async () => {
   await assignAction(
     sortableActionForm.module_id,
     sortableActionForm.actions,
-    sortableActionForm.actionPriority
+    sortableActionForm.priorities
   )
+  await getModuleData()
   actionDialogVisible.value = false
 }
 </script>
@@ -871,7 +872,7 @@ const assignSubmit = async () => {
       </el-form>
       <permission-priority-topology
         :actions="sortableActionForm.actions"
-        v-model="sortableActionForm.actionPriority"
+        v-model="sortableActionForm.priorities"
         style="margin-left: 10px"
       />
     </div>

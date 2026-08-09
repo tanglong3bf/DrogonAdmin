@@ -1,6 +1,6 @@
 #include "application/iam/module/ModuleCqrsRepo.h"
 
-#include "application/iam/module/ActionResponse.h"
+#include "application/iam/module/dto/ActionResponse.h"
 #include "domain/models/SysAction.h"
 #include <drogon/HttpAppFramework.h>
 

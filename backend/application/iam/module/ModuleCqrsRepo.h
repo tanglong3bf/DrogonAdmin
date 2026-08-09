@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ModuleResponse.h"
+#include "dto/ModuleResponse.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
 #include <memory>

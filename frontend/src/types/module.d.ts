@@ -30,7 +30,7 @@ export interface Module {
   children?: Module[] // 子模块
   child_count?: number // 子模块数量
   actions?: Action[] // 功能
-  action_priority?: ActionPriority[] // 功能优先级
+  priorities?: ActionPriority[] // 功能优先级
 }
 
 /**

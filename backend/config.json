@@ -463,7 +463,7 @@
             "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
             "group": "GROUP BY ur.role_id"
           },
-	  // 获取模块树、功能、功能优先级
+          // 获取模块树、功能、功能优先级
           "get_module_tree": {
             "main": "WITH RECURSIVE module_ancestor AS (@anchor() UNION @recursive()) @select_tree()",
             "anchor": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
@@ -471,34 +471,6 @@
             "select_tree": "SELECT m.*, @sub_action_list(), @sub_priority_list() FROM module_ancestor m ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id",
             "sub_action_list": "(SELECT json_agg(a ORDER BY a.sort_num, a.action_id) FROM sys_action a WHERE a.module_id = m.module_id AND a.deleted_by IS NULL) AS action_list",
             "sub_priority_list": "(SELECT json_agg(ap ORDER BY ap.high_id, ap.low_id) FROM sys_action_priority ap WHERE ap.module_id = m.module_id) AS priority_list"
-          },
-          // 批量更新功能，包括软删除
-          "multi_update_action": {
-            "main": {
-              "sql": "UPDATE sys_action f SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE f.action_id = s.action_id",
-              "params": {
-                "fields_list": [
-                  "action_id",
-                  "name",
-                  "code",
-                  "description",
-                  "sort_num",
-                  "module_id",
-                  "created_by",
-                  "created_time",
-                  "updated_by",
-                  "updated_time",
-                  "deleted_by",
-                  "deleted_time"
-                ]
-              }
-            },
-            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
-            "values": "(@for(item in data, separator='), (') ${item.action_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
-            "string_value": "@if(value && value != null) '${value}' @else NULL::String @endif",
-            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
-            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
-            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           },
           // 指定父模块id，获取最大的sort_num
           "get_max_sub_module_sort_num": {
@@ -531,6 +503,78 @@
             "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
             "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          // 批量插入功能
+          "multi_insert_action": {
+            "main": {
+              "sql": "INSERT INTO sys_action (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data) RETURNING action_id",
+              "params": {
+                "fields": [
+                  "name",
+                  "code",
+                  "description",
+                  "sort_num",
+                  "has_data_permission",
+                  "module_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time"
+                ]
+              }
+            },
+            "values": "(@for(item in data, separator='), (') '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.has_data_permission}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp @endfor)",
+            "string_value": "@if(value) '${value}' @else NULL @endif"
+          },
+          // 批量更新功能，包括软删除
+          "multi_update_action": {
+            "main": {
+              "sql": "UPDATE sys_action a SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE a.action_id = s.action_id",
+              "params": {
+                "fields_list": [
+                  "action_id",
+                  "name",
+                  "code",
+                  "description",
+                  "sort_num",
+                  "has_data_permission",
+                  "module_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
+            "values": "(@for(item in data, separator='), (') ${item.action_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.has_data_permission}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          // 批量插入功能优先级
+          "multi_insert_priority": {
+            "main": {
+              "sql": "INSERT INTO sys_action_priority (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
+              "params": {
+                "fields": [
+                  "high_id",
+                  "low_id",
+                  "module_id",
+                  "created_by",
+                  "created_time"
+                ]
+              }
+            },
+            "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp @endfor)"
+          },
+          // 批量删除功能优先级
+          "multi_delete_priority": {
+            "main": "DELETE FROM sys_action_priority WHERE (high_id, low_id) IN ( VALUES @values(data) )",
+            "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id} @endfor)"
           }
         }
       }

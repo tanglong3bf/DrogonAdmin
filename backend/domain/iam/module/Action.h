@@ -11,25 +11,28 @@ class Action : public AuditableEntity, public ChangeableEntity
     friend class Module;
     friend class ModuleRepository;
     friend class ModuleCqrsRepo;
+    friend class ModuleUpdater;
 
     /**
      * @brief 准备必备参数的构造
      */
-    Action(std::string_view name,
-           const std::string_view code,
-           const std::int32_t sortNum,
-           const bool hasDataPermission,
-           const std::int32_t moduleId);
+    Action(std::int64_t actionId,
+           std::string_view name,
+           std::string_view code,
+           std::int32_t sortNum,
+           bool hasDataPermission,
+           std::int32_t moduleId);
 
     /**
      * @brief 准备必备参数以及创建者id的构造
      */
-    Action(std::string_view name,
-           const std::string_view code,
-           const std::int32_t sortNum,
-           const bool hasDataPermission,
-           const std::int32_t moduleId,
-           const std::int32_t createdBy);
+    Action(std::int64_t actionId,
+           std::string_view name,
+           std::string_view code,
+           std::int32_t sortNum,
+           bool hasDataPermission,
+           std::int32_t moduleId,
+           std::int32_t createdBy);
 
     /// @group 和model类互转
     /// @{
@@ -46,8 +49,17 @@ class Action : public AuditableEntity, public ChangeableEntity
     GETTER(hasDataPermission);
     GETTER(moduleId);
 
+    /**
+     * @brief 更新Action信息
+     */
+    void updateInfo(std::string_view name,
+                    std::string_view code,
+                    std::int32_t sortNum,
+                    bool hasDataPermission,
+                    std::int32_t updatedBy);
+
   private:
-    std::optional<std::int32_t> actionId_;
+    std::int64_t actionId_;
     std::string name_;
     std::string code_;
     std::optional<std::string> description_;

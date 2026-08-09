@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include <cstdint>
+#include <vector>
 
 /**
  * @brief 模块
@@ -18,6 +19,8 @@ class Module : public AuditableEntity, public ChangeableEntity
 {
     using SysModule = drogon_model::drogon_admin_db::SysModule;
     using SysAction = drogon_model::drogon_admin_db::SysAction;
+    using SysActionPriority = drogon_model::drogon_admin_db::SysActionPriority;
+
     friend class ModuleRepository;
 
   public:
@@ -65,7 +68,7 @@ class Module : public AuditableEntity, public ChangeableEntity
     GETTER(sortNum);
     GETTER(parentId);
     GETTER(actions);
-    GETTER(actionPriorities);
+    GETTER(priorities);
 
     void setParentId(const std::optional<std::int32_t> parentId)
     {
@@ -88,16 +91,37 @@ class Module : public AuditableEntity, public ChangeableEntity
                         const int32_t updatedBy);
 
     /**
-     * @brief 仅在ModuleRepository中用于读取数据库数据
+     * @brief 更新功能列表（差量更新）
+     * @param actions 新的功能列表
+     * @param updatedBy 更新操作人
      */
-    void restoreActions(const std::vector<SysAction> &sysActions);
+    void updateActions(
+        const std::unordered_map<int64_t, const Action *> &newActionsMapping,
+        int32_t updatedBy);
 
-  private:
-    std::optional<int32_t> moduleId_;               ///< 模块id
-    std::string name_;                              ///< 模块名称
-    std::optional<std::string> description_;        ///< 模块描述
-    std::int32_t sortNum_;                          ///< 排序
-    std::optional<int32_t> parentId_;               ///< 父模块
-    std::vector<Action> actions_;                   ///< 拥有的功能
-    std::vector<ActionPriority> actionPriorities_;  ///< 功能优先级
+        /**
+         * @brief 更新优先级列表（差量更新）
+         * @param priorities 新的优先级列表
+         * @param pendingPriorities 待解析的优先级（包含时间戳ID）
+         * @param updatedBy 更新操作人
+         */
+        void updatePriorities(const std::vector<ActionPriority> &priorities,
+                              const int32_t updatedBy);
+
+        /**
+         * @brief 仅在ModuleRepository中用于读取数据库数据
+         */
+        void restoreActions(const std::vector<SysAction> &sysActions);
+
+        void restorePriorities(
+            const std::vector<SysActionPriority> &sysActionPriorities);
+
+      private:
+        std::optional<int32_t> moduleId_;         ///< 模块id
+        std::string name_;                        ///< 模块名称
+        std::optional<std::string> description_;  ///< 模块描述
+        std::int32_t sortNum_;                    ///< 排序
+        std::optional<int32_t> parentId_;         ///< 父模块
+        std::vector<Action> actions_;             ///< 拥有的功能
+        std::vector<ActionPriority> priorities_;  ///< 功能优先级
 };

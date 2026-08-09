@@ -2,23 +2,24 @@
 
 using namespace trantor;
 
-ActionPriority::ActionPriority(const std::int32_t highId,
-                               const std::int32_t lowId,
+ActionPriority::ActionPriority(const std::int64_t highId,
+                               const std::int64_t lowId,
                                const std::int32_t moduleId)
     : highId_{highId}, lowId_{lowId}, moduleId_{moduleId}
 {
 }
 
-ActionPriority::ActionPriority(const std::int32_t highId,
-                               const std::int32_t lowId,
+ActionPriority::ActionPriority(const std::int64_t highId,
+                               const std::int64_t lowId,
                                const std::int32_t moduleId,
-                               int32_t createdBy)
+                               const int32_t createdBy)
     : highId_{highId},
       lowId_{lowId},
       moduleId_{moduleId},
       createdBy_{createdBy},
       createdTime_{Date::now()}
 {
+    markNew();
 }
 
 ActionPriority::ActionPriority(const SysActionPriority &sysActionPriority)

@@ -51,3 +51,17 @@ Task<> ModuleService::sortModule(const ModuleSortRequest &request,
 
     co_await moduleRepository_->multiSave(sortResult);
 }
+
+Task<> ModuleService::updateActions(const std::int32_t moduleId,
+                                    const ActionUpdateRequest &request,
+                                    const std::int32_t updatedBy) const
+{
+    auto module = co_await moduleRepository_->getById(moduleId, true);
+    if (!module)
+    {
+        throw BusinessException{"指定的模块id不存在"};
+    }
+
+    co_await moduleUpdater_->updateActions(*module, request, updatedBy);
+    co_await moduleRepository_->save(*module);
+}
