@@ -1,8 +1,8 @@
 #pragma once
 
-#include "application/authorization/role/RoleService.h"
-#include "application/authorization/role/dto/RoleCreateRequest.h"
-#include "application/authorization/role/dto/RoleUpdateRequest.h"
+#include "application/iam/role/RoleService.h"
+#include "application/iam/role/dto/RoleCreateRequest.h"
+#include "application/iam/role/dto/RoleUpdateRequest.h"
 #include <drogon/HttpController.h>
 
 class RoleController : public drogon::HttpController<RoleController>

@@ -20,7 +20,7 @@
       //port: Server port, 5432 by default
       "port": 5432,
       //dbname: Database name
-      "dbname": "da_test_db",
+      "dbname": "drogon_admin_db",
       //user: 'postgres' by default
       "user": "admin",
       //passwd: '' by default
@@ -462,6 +462,119 @@
             "where": "WHERE u.deleted_by IS NULL @if(role_ids.length) AND ur.role_id IN @id_list(role_ids) @endif",
             "id_list": "(@for(id in role_ids, separator=',') ${id} @endfor)",
             "group": "GROUP BY ur.role_id"
+          },
+          // 获取模块树、功能、功能优先级
+          "get_module_tree": {
+            "main": "WITH RECURSIVE module_ancestor AS (@anchor() UNION @recursive()) @select_tree()",
+            "anchor": "SELECT *, 0 AS \"level\" FROM sys_module WHERE parent_id IS NULL AND deleted_by IS NULL",
+            "recursive": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_module s INNER JOIN module_ancestor d ON d.module_id = s.parent_id AND s.deleted_by IS NULL",
+            "select_tree": "SELECT m.*, @sub_action_list(), @sub_priority_list() FROM module_ancestor m ORDER BY m.\"level\", m.parent_id, m.sort_num, m.module_id",
+            "sub_action_list": "(SELECT json_agg(a ORDER BY a.sort_num, a.action_id) FROM sys_action a WHERE a.module_id = m.module_id AND a.deleted_by IS NULL) AS action_list",
+            "sub_priority_list": "(SELECT json_agg(ap ORDER BY ap.high_id, ap.low_id) FROM sys_action_priority ap WHERE ap.module_id = m.module_id) AS priority_list"
+          },
+          // 指定父模块id，获取最大的sort_num
+          "get_max_sub_module_sort_num": {
+            "main": "SELECT MAX(sort_num) FROM sys_module @condition(parent_id)",
+            "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
+          },
+          // 批量更新模块数据、包括批量删除
+          "multi_update_module": {
+            "main": {
+              "sql": "UPDATE sys_module m SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE m.module_id = s.module_id",
+              "params": {
+                "fields_list": [
+                  "module_id",
+                  "name",
+                  "description",
+                  "sort_num",
+                  "parent_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.module_id}, '${item.name}', @string_value(value = item.description), ${item.sort_num}, @int_value(value = item.parent_id), ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "string_value": "@if(value && value != null) '${value}' @else NULL @endif",
+            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          // 批量插入功能
+          "multi_insert_action": {
+            "main": {
+              "sql": "INSERT INTO sys_action (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data) RETURNING action_id",
+              "params": {
+                "fields": [
+                  "name",
+                  "code",
+                  "description",
+                  "sort_num",
+                  "has_data_permission",
+                  "module_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time"
+                ]
+              }
+            },
+            "values": "(@for(item in data, separator='), (') '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.has_data_permission}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp @endfor)",
+            "string_value": "@if(value) '${value}' @else NULL @endif"
+          },
+          // 批量更新功能，包括软删除
+          "multi_update_action": {
+            "main": {
+              "sql": "UPDATE sys_action a SET @sets(fields_list) FROM ( VALUES @values(data, fields_list) ) AS s @fields(fields_list) WHERE a.action_id = s.action_id",
+              "params": {
+                "fields_list": [
+                  "action_id",
+                  "name",
+                  "code",
+                  "description",
+                  "sort_num",
+                  "has_data_permission",
+                  "module_id",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
+            "values": "(@for(item in data, separator='), (') ${item.action_id}, '${item.name}', '${item.code}', @string_value(value = item.description), ${item.sort_num}, ${item.has_data_permission}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
+          },
+          // 批量插入功能优先级
+          "multi_insert_priority": {
+            "main": {
+              "sql": "INSERT INTO sys_action_priority (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
+              "params": {
+                "fields": [
+                  "high_id",
+                  "low_id",
+                  "module_id",
+                  "created_by",
+                  "created_time"
+                ]
+              }
+            },
+            "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id}, ${item.module_id}, ${item.created_by}, '${item.created_time}'::timestamp @endfor)"
+          },
+          // 批量删除功能优先级
+          "multi_delete_priority": {
+            "main": "DELETE FROM sys_action_priority WHERE (high_id, low_id) IN ( VALUES @values(data) )",
+            "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id} @endfor)"
           }
         }
       }
@@ -493,18 +606,18 @@
             "children": [
               {
                 "menu_id": 5,
-                "path": "/sys/organization/dept",
+                "path": "/sys/org/dept",
                 "icon": "mingcute:department-fill",
                 "name": "部门管理",
-                "component": "/sys/organization/Dept",
+                "component": "/sys/org/Dept",
                 "type": 1 // page
               },
               {
                 "menu_id": 6,
-                "path": "/sys/organization/user",
+                "path": "/sys/org/user",
                 "icon": "ri:user-fill",
                 "name": "用户管理",
-                "component": "/sys/organization/User",
+                "component": "/sys/org/User",
                 "type": 1 // page
               }
             ]
@@ -512,23 +625,23 @@
           {
             "menu_id": 3,
             "icon": "ion:settings-sharp",
-            "name": "模块菜单",
-            "type": 0, // menu
+            "name": "权限管理",
+            "type": 0, //menu
             "children": [
               {
                 "menu_id": 7,
-                "path": "/sys/module_menu/menu",
-                "icon": "tdesign:module-filled",
-                "name": "模块管理",
-                "component": "/sys/module_menu/Module",
+                "path": "/sys/authorization/role",
+                "icon": "fa7-solid:user-cog",
+                "name": "角色管理",
+                "component": "/sys/authorization/Role",
                 "type": 1 // page
               },
               {
                 "menu_id": 8,
-                "path": "/sys/module_menu/module",
-                "icon": "fluent-mdl2:context-menu",
-                "name": "菜单管理",
-                "component": "/sys/module_menu/Menu",
+                "path": "/sys/authorization/permission",
+                "icon": "ix:user-key",
+                "name": "权限分配",
+                "component": "/sys/authorization/Permission",
                 "type": 1 // page
               }
             ]
@@ -536,23 +649,23 @@
           {
             "menu_id": 4,
             "icon": "ion:settings-sharp",
-            "name": "角色权限",
-            "type": 0, //menu
+            "name": "资源管理",
+            "type": 0, // menu
             "children": [
               {
                 "menu_id": 9,
-                "path": "/sys/role_auth/role",
-                "icon": "fa7-solid:user-cog",
-                "name": "角色管理",
-                "component": "/sys/authorization/Role",
+                "path": "/sys/resources/module",
+                "icon": "tdesign:module-filled",
+                "name": "模块管理",
+                "component": "/sys/resources/Module",
                 "type": 1 // page
               },
               {
                 "menu_id": 10,
-                "path": "/sys/role_auth/auth",
-                "icon": "ix:user-key",
-                "name": "权限管理",
-                "component": "/sys/authorization/Auth",
+                "path": "/sys/resources/menu",
+                "icon": "fluent-mdl2:context-menu",
+                "name": "菜单管理",
+                "component": "/sys/resources/Menu",
                 "type": 1 // page
               }
             ]

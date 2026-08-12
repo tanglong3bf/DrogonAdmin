@@ -1,6 +1,6 @@
 #include "UserCenterController.h"
+
 #include <drogon/MultiPart.h>
-#include "domain/organization/user/AvatarStorage.h"
 
 using namespace drogon;
 

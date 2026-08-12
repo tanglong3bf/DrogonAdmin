@@ -1,7 +1,5 @@
-#include "domain/authorization/RoleRepository.h"
+#include "domain/iam/role/RoleRepository.h"
 
-#include "domain/models/SysRole.h"
-#include "domain/models/SysRoleDept.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "common/util/plugins/RelationQuery/src/RelationQuery.hpp"
 #include "common/util/rangesUtils.hpp"
@@ -282,6 +280,17 @@ drogon::Task<std::vector<Role>> RoleRepository::getByIds(
     }) | ranges_utils::to<std::vector>();
 }
 
+Task<size_t> RoleRepository::countPermissionByActionIds(
+    const vector<int32_t> &actionIds) const
+{
+    Criteria criteria{SysPermission::Cols::_deleted_by,
+                      CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysPermission::Cols::_action_id,
+                                    CompareOperator::In,
+                                    actionIds};
+    co_return co_await permissionMapper().count(criteria);
+}
+
 vector<Role> RoleRepository::buildRoleList(
     const vector<SysRole> &sysRoleList) const
 {
@@ -332,4 +341,10 @@ inline CoroMapper<SysRoleDept> RoleRepository::roleDeptMapper(
     const DbClientPtr &dbClient)
 {
     return CoroMapper<SysRoleDept>{dbClient};
+}
+
+inline CoroMapper<SysPermission> RoleRepository::permissionMapper(
+    const DbClientPtr &dbClient)
+{
+    return CoroMapper<SysPermission>{dbClient};
 }

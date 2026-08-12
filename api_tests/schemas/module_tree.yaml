@@ -1,0 +1,128 @@
+# /module/tree 接口响应体结构
+type: object
+required: [data]
+properties:
+  data:
+    type: array
+    title: 模块树顶层（根节点列表）
+    # 顶层
+    items:
+      $ref: '#/components/schemas/RootModule'
+
+components:
+  schemas:
+    # 根节点：没有 parent_id
+    RootModule:
+      type: object
+      required:
+        - module_id
+        - name
+        - sort_num
+      # 禁止出现 parent_id
+      forbidden:
+        - parent_id
+      properties:
+        module_id:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+        description:
+          type: string
+        sort_num:
+          type: integer
+          minimum: 0
+        children:
+          type: array
+          minItems: 1
+          items:
+            # 子节点：非根节点
+            $ref: '#/components/schemas/ChildModule'
+        actions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Action'
+        priorities:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ActionPriority'
+
+    # 非根节点：必须有 parent_id
+    ChildModule:
+      type: object
+      required:
+        - module_id
+        - name
+        - parent_id
+        - sort_num
+      properties:
+        module_id:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+        description:
+          type: string
+        parent_id:
+          type: integer
+          minimum: 1
+        sort_num:
+          type: integer
+          minimum: 0
+        children:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ChildModule'
+        actions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Action'
+        priorities:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ActionPriority'
+
+    # 功能
+    Action:
+      type: object
+      required:
+        - action_id
+        - name
+        - code
+        - sort_num
+        - module_id
+      properties:
+        action_id:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+        sort_num:
+          type: integer
+          minimum: 0
+        module_id:
+          type: integer
+          minimum: 1
+
+    # 功能优先级
+    ActionPriority:
+      type: object
+      required:
+        - high_id
+        - low_id
+      properties:
+        high_id:
+          type: integer
+          minimum: 1
+        low_id:
+          type: integer
+          minimum: 1

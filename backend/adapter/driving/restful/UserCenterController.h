@@ -1,8 +1,8 @@
 #pragma once
 
-#include "application/organization/user/UserCenterService.h"
-#include "application/organization/user/dto/ChangePasswordRequest.h"
-#include "application/organization/user/dto/UserInfoUpdateRequest.h"
+#include "application/org/user/UserCenterService.h"
+#include "application/org/user/dto/ChangePasswordRequest.h"
+#include "application/org/user/dto/UserInfoUpdateRequest.h"
 #include <drogon/HttpController.h>
 
 class UserCenterController : public drogon::HttpController<UserCenterController>

@@ -1,0 +1,8 @@
+INSERT INTO sys_action ( name , code , description , sort_num , module_id , created_by , created_time , updated_by , updated_time ) VALUES ( '临时测试功能', 'detp:temp',  NULL::String , 6, 3, 1, '2026-08-08 15:44:01.073946'::timestamp, 1, '2026-08-08 15:44:01.073946'::timestamp )
+
+UPDATE sys_action f SET  name = s.name , code = s.code , description = s.description , sort_num = s.sort_num , module_id = s.module_id , created_by = s.created_by , created_time = s.created_time , updated_by = s.updated_by , updated_time = s.updated_time , deleted_by = s.deleted_by , deleted_time = s.deleted_time  FROM ( VALUES ( '排序部门', 'dept:sort',  NULL::String , 3, 3, 1, '2026-07-05 14:46:05'::timestamp, 1, '2026-08-08 15:44:01.073942'::timestamp,  NULL::Integer ,  NULL::timestamp  ) ) AS s ( name , code , description , sort_num , module_id , created_by , created_time , updated_by , updated_time , deleted_by , deleted_time ) WHERE f.action_id = s.action_id
+
+INSERT INTO sys_action_priority ( high_id , low_id , module_id , created_by , created_time ) VALUES ( 1, 2, 3, 1, '2026-08-08 15:44:01.073956'::timestamp ), ( 5, -705267447, 3, 1, '2026-08-08 15:44:01.073957'::timestamp )
+
+UPDATE sys_action_priority f SET  high_id = s.high_id , low_id = s.low_id , module_id = s.module_id , created_by = s.created_by , created_time = s.created_time  FROM ( VALUES ( 2, 4, 3, 1, '2026-07-22 15:32:58'::timestamp ) ) AS s ( high_id , low_id , module_id , created_by , created_time ) WHERE f.high_id = s.high_id AND f.low_id = s.low_id
+   

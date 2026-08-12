@@ -54,18 +54,18 @@ if (mockConfig.auth.login) {
                       children: [
                         {
                           menu_id: 5,
-                          path: '/sys/organization/dept',
+                          path: '/sys/org/dept',
                           icon: 'mingcute:department-fill',
                           name: '部门管理',
-                          component: '/sys/organization/Dept',
+                          component: '/sys/org/Dept',
                           type: 1
                         },
                         {
                           menu_id: 6,
-                          path: '/sys/organization/user',
+                          path: '/sys/org/user',
                           icon: 'ri:user-fill',
                           name: '用户管理',
-                          component: '/sys/organization/User',
+                          component: '/sys/org/User',
                           type: 1
                         }
                       ]
@@ -73,35 +73,11 @@ if (mockConfig.auth.login) {
                     {
                       menu_id: 3,
                       icon: 'ion:settings-sharp',
-                      name: '模块菜单',
+                      name: '权限管理',
                       type: 0,
                       children: [
                         {
                           menu_id: 7,
-                          path: '/sys/module_menu/menu',
-                          icon: 'tdesign:module-filled',
-                          name: '模块管理',
-                          component: '/sys/module_menu/Module',
-                          type: 1
-                        },
-                        {
-                          menu_id: 8,
-                          path: '/sys/module_menu/module',
-                          icon: 'fluent-mdl2:context-menu',
-                          name: '菜单管理',
-                          component: '/sys/module_menu/Menu',
-                          type: 1
-                        }
-                      ]
-                    },
-                    {
-                      menu_id: 4,
-                      icon: 'ion:settings-sharp',
-                      name: '角色权限',
-                      type: 0,
-                      children: [
-                        {
-                          menu_id: 9,
                           path: '/sys/authorization/role',
                           icon: 'fa7-solid:user-cog',
                           name: '角色管理',
@@ -109,11 +85,35 @@ if (mockConfig.auth.login) {
                           type: 1
                         },
                         {
-                          menu_id: 10,
-                          path: '/sys/authorization/auth',
+                          menu_id: 8,
+                          path: '/sys/authorization/permission',
                           icon: 'ix:user-key',
-                          name: '权限管理',
-                          component: '/sys/authorization/Auth',
+                          name: '权限分配',
+                          component: '/sys/authorization/Permission',
+                          type: 1
+                        }
+                      ]
+                    },
+                    {
+                      menu_id: 4,
+                      icon: 'ion:settings-sharp',
+                      name: '资源管理',
+                      type: 0,
+                      children: [
+                        {
+                          menu_id: 9,
+                          path: '/sys/resources/module',
+                          icon: 'tdesign:module-filled',
+                          name: '模块管理',
+                          component: '/sys/resources/Module',
+                          type: 1
+                        },
+                        {
+                          menu_id: 10,
+                          path: '/sys/resources/menu',
+                          icon: 'fluent-mdl2:context-menu',
+                          name: '菜单管理',
+                          component: '/sys/resources/Menu',
                           type: 1
                         }
                       ]

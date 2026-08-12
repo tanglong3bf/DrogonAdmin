@@ -1,13 +1,11 @@
 #include "UserController.h"
 
-#include "application/organization/user/dto/UserQueryRequest.h"
 #include "common/util/ApiResponse.hpp"
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::utils;
 
-// Add definition of your processing function here
 Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                                            const string username,
                                            const string nickname,

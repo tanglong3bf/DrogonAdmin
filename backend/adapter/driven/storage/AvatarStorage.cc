@@ -1,4 +1,4 @@
-#include "domain/organization/user/AvatarStorage.h"
+#include "domain/org/user/AvatarStorage.h"
 
 #include <drogon/drogon.h>
 #include <fstream>

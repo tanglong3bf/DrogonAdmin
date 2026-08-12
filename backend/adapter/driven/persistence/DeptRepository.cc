@@ -1,6 +1,5 @@
-#include "domain/organization/dept/DeptRepository.h"
+#include "domain/org/dept/DeptRepository.h"
 
-#include "domain/models/SysDept.h"
 #include "SqlGenerator/src/SqlGenerator.h"
 #include "common/util/rangesUtils.hpp"
 #include <drogon/orm/CoroMapper.h>

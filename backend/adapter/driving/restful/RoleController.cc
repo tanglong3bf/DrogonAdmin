@@ -1,8 +1,8 @@
 #include "RoleController.h"
 
-#include <drogon/HttpTypes.h>
-#include <drogon/utils/Utilities.h>
 #include "common/util/ApiResponse.hpp"
+#include <drogon/utils/Utilities.h>
+#include <drogon/HttpTypes.h>
 
 using namespace std;
 using namespace drogon;

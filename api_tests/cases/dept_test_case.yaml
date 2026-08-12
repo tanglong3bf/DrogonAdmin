@@ -11,7 +11,7 @@ dept_cases:
       assert_jsonpath:
         $.data: []
     validate_schema: dept_tree.yaml
-  - name: 查询部门树-1000层深部门树
+  - name: 查询部门树-100层深部门树
     sql_file: deep_dept_tree.sql
     url: http://localhost:8000/dept/tree
     method: GET

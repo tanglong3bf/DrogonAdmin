@@ -1,8 +1,5 @@
-#include "application/authorization/role/RoleCqrsRepo.h"
+#include "application/iam/role/RoleCqrsRepo.h"
 
-#include "domain/authorization/RoleDept.h"
-#include "domain/authorization/Role.h"
-#include "domain/models/SysRole.h"
 #include "common/util/AttrUtils.hpp"
 #include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>

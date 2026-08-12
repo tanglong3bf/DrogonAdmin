@@ -6,10 +6,10 @@
         return field##_;               \
     }
 
-#define GETTER_STR_VIEW(field)                     \
+#define GETTER_STR_VIEW(field)                    \
     const std::string_view field() const noexcept \
-    {                                              \
-        return field##_;                           \
+    {                                             \
+        return field##_;                          \
     }
 
 #define ENTITY_SET(field, ...)           \
