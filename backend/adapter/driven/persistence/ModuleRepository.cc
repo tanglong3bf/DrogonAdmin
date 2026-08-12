@@ -10,8 +10,8 @@ using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 using namespace drogon_admin;
 
-drogon::Task<> ModuleRepository::save(const Module &module,
-                                      const DbClientPtr &dbClient) const
+Task<> ModuleRepository::save(const Module &module,
+                              const DbClientPtr &dbClient) const
 {
     switch (module.changingStatus())
     {
@@ -296,8 +296,8 @@ Task<vector<Module>> ModuleRepository::getByParentId(
         ranges_utils::to<vector>();
 }
 
-drogon::Task<> ModuleRepository::multiSave(const std::vector<Module> &modules,
-                                           const DbClientPtr &dbClient) const
+Task<> ModuleRepository::multiSave(const vector<Module> &modules,
+                                   const DbClientPtr &dbClient) const
 {
     // 暂只考虑批量更新
     vector<SysModule> toUpdate;
@@ -335,6 +335,21 @@ drogon::Task<> ModuleRepository::multiSave(const std::vector<Module> &modules,
                                             ParamList{{"data_list", dataList}});
 
     co_await dbClient->execSqlCoro(sql);
+}
+
+Task<vector<Action>> ModuleRepository::getActionByIds(
+    const vector<std::int32_t> &actionIds) const
+{
+    assert(actionIds.size() > 0);
+
+    Criteria criteria{SysAction::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria =
+        criteria &&
+        Criteria{SysAction::Cols::_action_id, CompareOperator::In, actionIds};
+
+    co_return co_await actionMapper().findBy(criteria) |
+        views::transform([](const auto &data) { return Action{data}; }) |
+        ranges_utils::to<vector>();
 }
 
 inline SqlGenerator *ModuleRepository::sqlGenerator()

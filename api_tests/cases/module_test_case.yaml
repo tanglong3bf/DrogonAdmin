@@ -354,4 +354,153 @@ module_cases:
         $.code: lt 0
         $.error: 缺少必备参数：module_ids
   # }}}
+  # 更新功能及其优先级 {{{
+  - name: 更新功能-不存在的模块id
+    sql_file: action_to_update.sql
+    url: http://localhost:8000/module/233/actions
+    method: POST
+    json:
+      actions: []
+      priorities: []
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的模块id不存在
+  - name: 更新功能-新增/更新/删除功能及新增/删除优先级
+    url: http://localhost:8000/module/1/actions
+    method: POST
+    json:
+      # id 为4的功能被删除
+      actions:
+        - action_id: 1
+          name: 功能-1
+          code: action-1
+          has_data_permission: false
+          sort_num: 0
+        - action_id: 2
+          name: 功能-2
+          code: action-2
+          has_data_permission: true
+          sort_num: 1
+        - action_id: 3
+          name: 功能-3
+          code: action-3
+          has_data_permission: true
+          sort_num: 2
+        - action_id: 5
+          name: 功能-5【更新】
+          code: action-5(updated)
+          has_data_permission: true
+          sort_num: 3
+          # 新增
+        - action_id: 1786001127689
+          name: 功能-6
+          code: action-6
+          has_data_permission: true
+          sort_num: 4
+      priorities:
+        - high_id: 1
+          low_id: 2
+        - high_id: 2
+          low_id: 3
+        - high_id: 2
+          low_id: 5
+        - high_id: 5
+          low_id: 1786001127689
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新功能-检查更新结果-1
+    url: http://localhost:8000/module/tree
+    method: GET
+    json: {}
+    params: ''
+    expect:
+      status_code: 200
+      assert_jsonpath:
+        len:$.data[0].actions: 5
+        $.data[0].actions[3].name: 功能-5【更新】
+        $.data[0].actions[3].code: action-5(updated)
+        len:$.data[0].priorities: 4
+        $.data[0].priorities[3].low_id: gt 0
+    validate_schema: module_tree.yaml
+  - name: 更新功能-priorities使用不存在的action_id
+    url: http://localhost:8000/module/2/actions
+    method: POST
+    json:
+      priorities:
+        - high_id: 114
+          low_id: 514
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: actions为空时，priorities也应为空
+  - name: 更新功能-priorities的优先级不满足actions中的排序条件
+    url: http://localhost:8000/module/3/actions
+    method: POST
+    json:
+      actions:
+        - action_id: 6
+          name: 功能-3-1
+          code: action-3-1
+          has_data_permission: false
+          sort_num: 0
+        - action_id: 7
+          name: 功能-3-2
+          code: action-3-2
+          has_data_permission: false
+          sort_num: 1
+      priorities:
+        - high_id: 7
+          low_id: 6
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 权限优先级应该满足排序的条件
+  - name: 更新功能-清空模块-1的功能
+    url: http://localhost:8000/module/1/actions
+    method: POST
+    json: {}
+    params: ''
+    expect:
+      status_code: 204
+  - name: 更新功能-功能id不属于指定的模块
+    url: http://localhost:8000/module/1/actions
+    method: POST
+    json:
+      actions:
+        - action_id: 6
+          name: 功能-1
+          code: action-1
+          has_data_permission: false
+          sort_num: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的功能id不属于指定的模块
+  - name: 更新功能-功能id不存在
+    url: http://localhost:8000/module/1/actions
+    method: POST
+    json:
+      actions:
+        - action_id: 233
+          name: 功能-1
+          code: action-1
+          has_data_permission: false
+          sort_num: 0
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 指定的功能id不存在
+  # }}}
 # vim: set foldmethod=marker foldlevel=0:

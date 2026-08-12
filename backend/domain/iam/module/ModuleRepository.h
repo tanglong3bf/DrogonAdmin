@@ -3,8 +3,8 @@
 #include "Module.h"
 #include "common/framework/DrAdminObject.hpp"
 #include "SqlGenerator/src/SqlGenerator.h"
-#include <drogon/utils/coroutine.h>
 #include <drogon/HttpAppFramework.h>
+#include <drogon/utils/coroutine.h>
 
 /**
  * @brief 模块数据仓库
@@ -66,6 +66,12 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
     drogon::Task<> multiSave(
         const std::vector<Module> &modules,
         const DbClientPtr & = drogon::app().getDbClient()) const;
+
+    /**
+     * @brief 根据id批量获取功能
+     */
+    drogon::Task<std::vector<Action>> getActionByIds(
+        const std::vector<std::int32_t> &actionIds) const;
 
   private:
     static SqlGenerator *sqlGenerator();

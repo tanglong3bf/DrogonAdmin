@@ -25,11 +25,9 @@ ActionRequest fromRequest(const HttpRequest &req)
 
 ActionRequest::ActionRequest(const Json::Value &json)
 {
-    LOG_DEBUG << json.toStyledString();
     actionId_ = getParam<std::int64_t, true>(json, "action_id");
     name_ = getParam<std::string, true>(json, "name", {1, -1});
     code_ = getParam<std::string, true>(json, "code", {1, -1});
-    moduleId_ = getParam<std::int32_t, true>(json, "module_id", {1, -1});
     hasDataPermission_ = getParam<bool, true>(json, "has_data_permission");
     sortNum_ = getParam<std::int32_t, true>(json, "sort_num", {0, -1});
 }

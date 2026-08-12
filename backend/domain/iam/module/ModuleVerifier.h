@@ -24,6 +24,13 @@ class ModuleVerifier : public DrAdminObject<ModuleVerifier>
         const std::string &name,
         const std::optional<int32_t> parentId) const;
 
+    /**
+     * @brief 校验功能属于模块
+     */
+    drogon::Task<> verifyActionsBelongsToModule(
+        std::int32_t moduleId,
+        const std::vector<std::int32_t> &actionIds) const;
+
   private:
     ModuleRepositoryPtr moduleRepository_{
         drogon::DrClassMap::getSingleInstance<ModuleRepository>()};

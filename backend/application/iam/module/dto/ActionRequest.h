@@ -12,7 +12,6 @@ class ActionRequest
     GETTER(actionId)
     GETTER(name)
     GETTER(code)
-    GETTER(moduleId)
     GETTER(hasDataPermission)
     GETTER(sortNum)
 
@@ -20,7 +19,6 @@ class ActionRequest
     std::int64_t actionId_;
     std::string name_;
     std::string code_;
-    std::int32_t moduleId_;
     bool hasDataPermission_;
     std::int32_t sortNum_;
 };
