@@ -258,9 +258,10 @@ const handleUpdateDept = async (
     return false
   }
 
-  await updateDept(original.dept_id!, dept.name)
+  await updateDept(original.dept_id!, dept.name, original.version)
   ElMessage.success('更新成功')
   original.name = dept.name // 仍需修改原对象（业务逻辑要求）
+  original.version += 1
   dialogVisible.value = false
   return true
 }
@@ -329,7 +330,7 @@ const getSortSubDeptData = (
     const data = deptData.map(item => ({
       dept_id: item.dept_id,
       name: item.name,
-      sort_num: item.sort_num
+      version: item.version
     }))
     return { data, visible: true }
   }
@@ -340,7 +341,7 @@ const getSortSubDeptData = (
     ? targetDept.children.map(item => ({
         dept_id: item.dept_id,
         name: item.name,
-        sort_num: item.sort_num
+        version: item.version
       }))
     : []
 
@@ -368,10 +369,11 @@ const sortCancel = () => {
  * 提交排序
  */
 const sortSubmit = async () => {
-  const deptIds = sortableData.value.map(item => {
-    return item.dept_id
-  })
-  await sortDept(currentParentId.value, deptIds)
+  const depts = sortableData.value.map(item => ({
+    dept_id: item.dept_id,
+    version: item.version
+  }))
+  await sortDept(currentParentId.value, depts)
 
   ElMessage.success('排序成功')
   await getDeptData()
@@ -404,7 +406,7 @@ const deleteDeptBtn = async (deptId: number) => {
   }
   ElMessageBox.confirm(`请确认是否要删除 ${deptToDelete.name} 部门`).then(
     async () => {
-      await deleteDept(deptToDelete.dept_id)
+      await deleteDept(deptToDelete.dept_id, deptToDelete.version)
       ElMessage.success('删除成功')
       await getDeptData()
       queryParams.name = ''

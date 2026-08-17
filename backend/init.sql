@@ -56,6 +56,7 @@ CREATE TABLE "public"."sys_dept" (
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -67,6 +68,7 @@ CREATE TABLE "public"."sys_dept" (
 COMMENT ON COLUMN "public"."sys_dept"."name" IS '部门名称';
 COMMENT ON COLUMN "public"."sys_dept"."sort_num" IS '部门排序';
 COMMENT ON COLUMN "public"."sys_dept"."parent_id" IS '父部门id';
+COMMENT ON COLUMN "public"."sys_dept"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_dept"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_dept"."updated_by" IS '最新一次更新者';
@@ -291,14 +293,14 @@ COMMENT ON COLUMN "public"."sys_menu"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_menu"."deleted_time" IS '删除时间';
 
 -- 部门表数据
-INSERT INTO "public"."sys_dept" VALUES (1, '钱途无量有限公司', 0, NULL, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (2, '人事部', 0, 1, 1, '2026-01-10 21:48:02', 1, '2026-01-10 21:48:02', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (3, '财务部', 1, 1, 1, '2026-01-10 21:48:27', 1, '2026-01-10 21:48:27', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (4, '技术部', 2, 1, 1, '2026-01-10 21:48:48', 1, '2026-01-10 21:48:48', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (5, 'xx项目开发组', 0, 4, 1, '2026-01-10 21:49:11', 1, '2026-01-10 21:49:11', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (6, 'yy项目开发组', 1, 4, 1, '2026-01-10 21:49:34', 1, '2026-01-10 21:49:34', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (7, '分公司', 1, NULL, 1, '2026-01-10 21:49:55', 1, '2026-01-10 21:49:55', NULL, NULL);
-INSERT INTO "public"."sys_dept" VALUES (8, '财务部', 0, 7, 1, '2026-01-10 21:50:15', 1, '2026-01-10 21:50:15', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (1, '钱途无量有限公司', 0, NULL, 0, 1, '2026-01-10 21:47:30', 1, '2026-01-10 21:47:30', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (2, '人事部', 0, 1, 0, 1, '2026-01-10 21:48:02', 1, '2026-01-10 21:48:02', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (3, '财务部', 1, 1, 0, 1, '2026-01-10 21:48:27', 1, '2026-01-10 21:48:27', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (4, '技术部', 2, 1, 0, 1, '2026-01-10 21:48:48', 1, '2026-01-10 21:48:48', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (5, 'xx项目开发组', 0, 4, 0, 1, '2026-01-10 21:49:11', 1, '2026-01-10 21:49:11', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (6, 'yy项目开发组', 1, 4, 0, 1, '2026-01-10 21:49:34', 1, '2026-01-10 21:49:34', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (7, '分公司', 1, NULL, 0, 1, '2026-01-10 21:49:55', 1, '2026-01-10 21:49:55', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (8, '财务部', 0, 7, 0, 1, '2026-01-10 21:50:15', 1, '2026-01-10 21:50:15', NULL, NULL);
 
 -- 角色表数据
 INSERT INTO "public"."sys_role" VALUES (1, '系统管理员', 'admin', NULL, 1, 3, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);

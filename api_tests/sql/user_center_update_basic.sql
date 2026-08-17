@@ -12,6 +12,7 @@ CREATE TABLE "public"."sys_dept" (
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -43,7 +44,7 @@ CREATE TABLE "public"."sys_user" (
 );
 
 -- 部门数据
-INSERT INTO "public"."sys_dept" VALUES (1, '技术部', 0, NULL, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_dept" VALUES (1, '技术部', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 -- 用户数据
 INSERT INTO "public"."sys_user" VALUES (1, 'admin123', '$2a$10$hdjImi9IKKR/mqlJ29x5t.P7yGE1b1GRMGrt5kBtXj.a.NTN5iDiK', '超级管理员', '#', 0, 1, NULL, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 
 static std::string trim(const std::string &s)
 {
@@ -125,4 +126,71 @@ static std::size_t utf8Length(const std::string &s)
         }
     }
     return count;
+}
+
+/**
+ * @brief 判断字符串是否是整数
+ *
+ * @param[in] str 要检查的字符串
+ * @return true 字符串为合法整数；false 不是合法整数
+ *
+ * @details
+ * 等价正则（整串完全匹配）：
+ * @verbatim
+ ^[+-]?(?:[1-9]\d*|0)$
+ @endverbatim
+ *
+ * @note 状态机状态说明：
+ * @li 0: 初始状态，未读取任何输入
+ * @li 1: 读到了正负号：+或者-
+ * @li 2: 读到了非零数字，后续可以读取更多的数字
+ * @li 3: 读到前导0，不允许后续再有任何字符
+ */
+static bool isInteger(const std::string_view &str)
+{
+    uint8_t status = 0;
+
+    for (char c : str)
+    {
+        switch (status)
+        {
+            case 0:
+                // [+-]
+                if (c == '+' || c == '-')
+                {
+                    status = 1;
+                }
+                else
+                    [[fallthrough]];
+            case 1:
+                // [+-]?[1-9]
+                if (c >= '1' && c <= '9')
+                {
+                    status = 2;
+                }
+                // [+-]?0
+                else if (c == '0')
+                {
+                    status = 3;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            case 2:
+                if (c < '0' || c > '9')
+                {
+                    return false;
+                }
+                // [+-]?[1-9]\d*
+                break;
+            case 3:
+                // 上一次读到了前导0，无视这一次的输入
+                return false;
+        }
+    }
+    // 2: [+-]?[1-9]\d*
+    // 3: [+-]?0
+    return status == 2 || status == 3;
 }

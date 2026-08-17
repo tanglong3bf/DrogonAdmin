@@ -337,13 +337,14 @@
           // 批量更新部门数据、包括批量删除
           "multi_update_dept": {
             "main": {
-              "sql": "UPDATE sys_dept d SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE d.dept_id = s.dept_id",
+              "sql": "UPDATE sys_dept d SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE d.dept_id = s.dept_id AND d.version = s.version",
               "params": {
                 "fields_list": [
                   "dept_id",
                   "parent_id",
                   "name",
                   "sort_num",
+                  "version",
                   "created_by",
                   "created_time",
                   "updated_by",
@@ -353,8 +354,8 @@
                 ]
               }
             },
-            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
-            "values": "(@for(item in data_list, separator='), (') ${item.dept_id}, @int_value(value = item.parent_id), '${item.name}', ${item.sort_num}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "sets": "@for(field in fields_list, separator=',') @if(field == 'version') ${field}=d.version+1 @else ${field}=s.${field} @endif @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.dept_id}, @int_value(value = item.parent_id), '${item.name}', ${item.sort_num}, ${item.version}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
             "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
             "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"

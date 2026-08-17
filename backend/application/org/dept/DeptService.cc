@@ -2,13 +2,16 @@
 
 #include "DeptSortRequest.h"
 #include "common/exception/BusinessException.h"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/orm/Exception.h>
 #include <drogon/utils/coroutine.h>
+#include <ranges>
 
 using namespace std;
 using namespace drogon;
 using namespace drogon::orm;
+using namespace drogon_admin;
 
 Task<vector<DeptResponse>> DeptService::getDeptTree() const
 {
@@ -33,11 +36,13 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
     }
     co_await deptHandler_->updateDept(*dept,
                                       static_cast<string>(request.name()),
+                                      request.version(),
                                       updatedBy);
     co_await deptRepository_->save(*dept);
 }
 
 Task<> DeptService::deleteDept(const std::int32_t deptId,
+                               const std::int32_t version,
                                const std::int32_t deletedBy) const
 {
     auto dept = co_await deptRepository_->getById(deptId);
@@ -47,7 +52,7 @@ Task<> DeptService::deleteDept(const std::int32_t deptId,
         co_return;
     }
 
-    co_await deptHandler_->deleteDept(*dept, deletedBy);
+    co_await deptHandler_->deleteDept(*dept, version, deletedBy);
 
     const auto trans = co_await app().getDbClient()->newTransactionCoro();
     try
@@ -65,11 +70,39 @@ Task<> DeptService::deleteDept(const std::int32_t deptId,
 }
 
 Task<> DeptService::sortDept(const DeptSortRequest &request,
-                             const std::int32_t updatedBy) const
+                             const int32_t updatedBy) const
 {
-    auto sortResult = co_await deptHandler_->sortDept(request.parentId(),
-                                                      request.deptIds(),
-                                                      updatedBy);
+    vector<Dept> sortResult =
+        co_await deptHandler_->sortDept(request.parentId(),
+                                        request.deptIds(),
+                                        updatedBy);
 
-    co_await deptRepository_->multiSave(sortResult);
+    if (sortResult.size() == 0)
+    {
+        co_return;
+    }
+
+    const vector<int32_t> versions =
+        // 排序后结果
+        sortResult |
+        // 取id
+        views::transform([](const auto &dept) { return *dept.deptId(); }) |
+        // 从请求中找到version
+        views::transform([&request](const auto &deptId) {
+            return ranges::find_if(request.depts(), [deptId](const auto &item) {
+                return deptId == item.deptId;
+            });
+        }) |
+        views::transform([](const auto &it) { return it->version; }) |
+        ranges_utils::to<vector>();
+
+    for (size_t i = 0; i < sortResult.size(); i++)
+    {
+        if (versions[i] != sortResult[i].version())
+        {
+            throw BusinessException("更新期间数据发生变化，更新失败");
+        }
+    }
+
+    co_await deptRepository_->multiSave(sortResult, versions);
 }

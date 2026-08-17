@@ -5,12 +5,15 @@ using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
 
 Dept::Dept(const string &name, const int32_t sortNum)
-    : name_{name}, sortNum_{sortNum}
+    : name_{name}, sortNum_{sortNum}, version_{0}
 {
 }
 
 Dept::Dept(const string &name, const int32_t sortNum, const int32_t createdBy)
-    : name_{name}, sortNum_{sortNum}, AuditableEntity{AUDITABLE_INIT}
+    : name_{name},
+      sortNum_{sortNum},
+      version_{0},
+      AuditableEntity{AUDITABLE_INIT}
 {
 }
 
@@ -19,6 +22,7 @@ Dept::Dept(const SysDept &model)
       INIT(name_, Name),
       INIT(sortNum_, SortNum),
       OPT_INIT(parentId_, ParentId),
+      INIT(version_, Version),
       AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
@@ -30,6 +34,7 @@ Dept::operator SysDept() const
     SET_VAL(name_, Name);
     SET_VAL(sortNum_, SortNum);
     SET_OPT(parentId_, ParentId);
+    SET_VAL(version_, Version);
     SET_OPT(createdBy(), CreatedBy);
     SET_OPT(createdTime(), CreatedTime);
     SET_OPT(updatedBy(), UpdatedBy);

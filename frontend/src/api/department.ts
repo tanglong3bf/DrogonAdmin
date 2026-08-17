@@ -1,5 +1,5 @@
 import request, { validateResponse } from '@/utils/request'
-import type { Department } from '@/types/department'
+import type { Department, DeptSortFormDataItem } from '@/types/department'
 import { isDeptTree } from '@/types/guard'
 
 /**
@@ -19,20 +19,23 @@ export const newDept = (name: string, parent_id?: number) => {
 /**
  * 更新指定部门名称
  */
-export const updateDept = (dept_id: number, name: string) => {
-  return request.patch(`/dept/${dept_id}`, { name })
+export const updateDept = (dept_id: number, name: string, version: number) => {
+  return request.patch(`/dept/${dept_id}`, { name, version })
 }
 
 /**
  * 删除指定部门
  */
-export const deleteDept = (dept_id: number) => {
-  return request.delete(`/dept/${dept_id}`)
+export const deleteDept = (dept_id: number, version: number) => {
+  return request.delete(`/dept/${dept_id}`, { params: { version } })
 }
 
 /**
  * 排序部门
  */
-export const sortDept = (parent_id: number | undefined, dept_ids: number[]) => {
-  return request.post('/dept/sort', { parent_id, dept_ids })
+export const sortDept = (
+  parent_id: number | undefined,
+  depts: DeptSortFormDataItem[]
+) => {
+  return request.post('/dept/sort', { parent_id, depts })
 }

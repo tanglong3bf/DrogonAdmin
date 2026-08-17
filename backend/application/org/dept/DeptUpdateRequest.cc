@@ -24,4 +24,5 @@ DeptUpdateRequest fromRequest(const HttpRequest &req)
 DeptUpdateRequest::DeptUpdateRequest(const Json::Value &json)
 {
     name_ = getParam<string, true>(json, "name", {1, -1});
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }
