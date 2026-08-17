@@ -1,6 +1,6 @@
 {
   "auth": {
-    "login": false
+    "login": true
   },
   "user": {
     "get_user_list": true,
@@ -28,12 +28,12 @@
     "get_role_option": true
   },
   "module": {
-    "get_module_tree": false,
-    "new_module": false,
-    "update_module": false,
-    "delete_module": false,
-    "sort_module": false,
-    "assign_actions": false,
-    "get_action_priority": false
+    "get_module_tree": true,
+    "new_module": true,
+    "update_module": true,
+    "delete_module": true,
+    "sort_module": true,
+    "assign_actions": true,
+    "get_action_priority": true
   }
 }
