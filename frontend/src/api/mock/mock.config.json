@@ -1,6 +1,6 @@
 {
   "auth": {
-    "login": false
+    "login": true
   },
   "user": {
     "get_user_list": true,
@@ -14,11 +14,11 @@
     "upload_avatar": true
   },
   "dept": {
-    "get_dept_tree": false,
-    "new_dept": false,
-    "update_dept": false,
-    "delete_dept": false,
-    "sort_dept": false
+    "get_dept_tree": true,
+    "new_dept": true,
+    "update_dept": true,
+    "delete_dept": true,
+    "sort_dept": true
   },
   "role": {
     "get_role_list": true,

@@ -36,6 +36,7 @@ CREATE TABLE "public"."sys_role" (
   "quota_type" int2 NOT NULL,
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -89,7 +90,7 @@ INSERT INTO "public"."sys_dept" VALUES (1, '技术部', 0, NULL, 0, 1, '2026-04-
 INSERT INTO "public"."sys_role_dept" VALUES (1, 1, 1, '2026-04-01 00:00:00');
 
 -- 角色数据
-INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '技术部白名单', 0, NULL, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '技术部白名单', 0, NULL, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 -- 用户角色关联数据
 INSERT INTO "public"."sys_user_role" VALUES (4, 1, 1, '2026-04-01 00:00:00');

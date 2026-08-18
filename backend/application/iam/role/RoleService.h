@@ -54,8 +54,9 @@ class RoleService : public DrAdminObject<RoleService>
     /**
      * @brief 删除角色
      */
-    drogon::Task<> deleteRole(const std::int32_t roleId,
-                              const std::int32_t deletedBy) const;
+    drogon::Task<> deleteRole(std::int32_t roleId,
+                              std::int32_t version,
+                              std::int32_t deletedBy) const;
 
     /**
      * @brief 获取指定部门可以分配的角色

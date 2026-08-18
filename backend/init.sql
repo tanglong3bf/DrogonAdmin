@@ -85,6 +85,7 @@ CREATE TABLE "public"."sys_role" (
   "quota_type" int2 NOT NULL,
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -100,6 +101,7 @@ COMMENT ON COLUMN "public"."sys_role"."description" IS '角色描述';
 COMMENT ON COLUMN "public"."sys_role"."quota_type" IS '用户数量限制类型 0-不限制 1-总数量限制 2-每个部门用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."relation_type" IS '和部门的关联关系 0-所有部门可用 1-指定部门可用 2-指定部门不可用';
+COMMENT ON COLUMN "public"."sys_dept"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_role"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role"."updated_by" IS '更新者';
@@ -303,8 +305,8 @@ INSERT INTO "public"."sys_dept" VALUES (7, '分公司', 1, NULL, 0, 1, '2026-01-
 INSERT INTO "public"."sys_dept" VALUES (8, '财务部', 0, 7, 0, 1, '2026-01-10 21:50:15', 1, '2026-01-10 21:50:15', NULL, NULL);
 
 -- 角色表数据
-INSERT INTO "public"."sys_role" VALUES (1, '系统管理员', 'admin', NULL, 1, 3, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (2, '测试角色', 'test', 'test_test_test', 2, 1, 0, 1, '2026-03-29 00:00:00', 1, '2026-03-29 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (1, '系统管理员', 'admin', NULL, 1, 3, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (2, '测试角色', 'test', 'test_test_test', 2, 1, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-03-29 00:00:00', NULL, NULL);
 
 -- 角色部门表数据
 INSERT INTO "public"."sys_role_dept" VALUES (1, 7, 1, '2026-04-02 21:53:40.210895');

@@ -36,6 +36,7 @@ CREATE TABLE "public"."sys_role" (
   "quota_type" int2 NOT NULL,
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -99,16 +100,16 @@ INSERT INTO "public"."sys_role_dept" VALUES (2, 3, 1, '2026-04-01 00:00:00');
 INSERT INTO "public"."sys_role_dept" VALUES (9, 1, 1, '2026-04-01 00:00:00');
 
 -- 角色数据
-INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '技术部白名单', 0, NULL, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (2, '角色-2', 'role-2', '人事部黑名单', 0, NULL, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (3, '角色-3', 'role-3', '每个部门限制用户数量为1', 2, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (4, '角色-4', 'role-4', '软删除的角色', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
-INSERT INTO "public"."sys_role" VALUES (5, '角色-5', 'role-5', '正常的角色', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (6, '角色-6', 'role-6', '总数量限制为1', 1, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (7, '角色-7', 'role-7', '人事部白名单', 0, NULL, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (8, '角色-8', 'role-8', '市场部白名单', 2, 1, 1, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (9, '角色-9', 'role-9', '技术部黑名单', 0, NULL, 2, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (10, '角色-10', 'role-10', '正常角色', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (1, '角色-1', 'role-1', '技术部白名单', 0, NULL, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (2, '角色-2', 'role-2', '人事部黑名单', 0, NULL, 2, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (3, '角色-3', 'role-3', '每个部门限制用户数量为1', 2, 1, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (4, '角色-4', 'role-4', '软删除的角色', 0, NULL, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00');
+INSERT INTO "public"."sys_role" VALUES (5, '角色-5', 'role-5', '正常的角色', 0, NULL, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (6, '角色-6', 'role-6', '总数量限制为1', 1, 1, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (7, '角色-7', 'role-7', '人事部白名单', 0, NULL, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (8, '角色-8', 'role-8', '市场部白名单', 2, 1, 1, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (9, '角色-9', 'role-9', '技术部黑名单', 0, NULL, 2, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (10, '角色-10', 'role-10', '正常角色', 0, NULL, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
 -- 用户角色关联数据
 INSERT INTO "public"."sys_user_role" VALUES (8, 1, 1, '2026-04-01 00:00:00');

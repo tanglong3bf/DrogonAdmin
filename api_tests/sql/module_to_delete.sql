@@ -41,6 +41,7 @@ CREATE TABLE "public"."sys_role" (
   "quota_type" int2 NOT NULL,
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -56,6 +57,7 @@ COMMENT ON COLUMN "public"."sys_role"."description" IS '角色描述';
 COMMENT ON COLUMN "public"."sys_role"."quota_type" IS '用户数量限制类型 0-不限制 1-总数量限制 2-每个部门用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."relation_type" IS '和部门的关联关系 0-所有部门可用 1-指定部门可用 2-指定部门不可用';
+COMMENT ON COLUMN "public"."sys_role"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_role"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role"."updated_by" IS '更新者';
@@ -176,7 +178,7 @@ COMMENT ON COLUMN "public"."sys_menu"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_menu"."deleted_time" IS '删除时间';
 
 -- 角色表数据
-INSERT INTO public.sys_role VALUES (1, '超级管理员', 'admin', '分配了user:*权限', 0, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_role VALUES (1, '超级管理员', 'admin', '分配了user:*权限', 0, NULL, 0, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 权限表数据
 INSERT INTO public.sys_permission VALUES (1, 3, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);

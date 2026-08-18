@@ -392,6 +392,11 @@
             "noBindDept": "@if(type=='0'||type=='2') AND r.role_id NOT IN (@subQuery(dept_id)) @endif",
             "subQuery": "SELECT DISTINCT role_id FROM sys_role_dept @if(dept_id) WHERE dept_id = ${dept_id} @endif"
           },
+          "update_role": {
+            "main": "UPDATE sys_role SET name = @string_value(value = data.name), code = @string_value(value = data.code), description = @string_value(value = data.description), quota_type = ${data.quota_type}, user_quota = @int_value(value = data.user_quota),  relation_type = ${data.relation_type}, version = version + 1, updated_by = ${data.updated_by}, updated_time = '${data.updated_time}'::timestamp WHERE role_id = ${data.role_id} AND version = ${data.version}",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif"
+          },
           "multi_insert_role_dept": {
             "main": {
               "sql": "INSERT INTO sys_role_dept (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
@@ -419,7 +424,7 @@
             "values": "(@for(item in data, separator='), (') ${item.user_id}, ${item.role_id} @endfor)"
           },
           "get_assignable_roles": {
-            "main": "SELECT DISTINCT r.role_id, r.name FROM public.sys_role r @where()",
+            "main": "SELECT DISTINCT r.role_id, r.name, r.version FROM public.sys_role r @where()",
             "where": "WHERE r.deleted_by IS NULL AND (r.relation_type = 0 OR (@sub_query(type = '1')) OR (@sub_query(type = '2')))",
             "sub_query": {
               "sql": "r.relation_type = ${type} AND @if(type == '2') NOT @endif EXISTS ( SELECT 1 FROM public.sys_role_dept rd WHERE rd.role_id = r.role_id AND rd.dept_id = ${emm})",

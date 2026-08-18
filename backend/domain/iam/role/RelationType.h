@@ -13,4 +13,6 @@ enum class RelationType : std::int16_t
     Blacklist = 2   ///< 黑名单
 };
 
-std::string toString(const RelationType &deptScopeType);
+std::string toString(const RelationType &relationType);
+
+// vim: set filetype = cpp:

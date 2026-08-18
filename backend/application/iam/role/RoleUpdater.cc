@@ -11,6 +11,10 @@ Task<> RoleUpdater::updateRole(Role &role,
                                const RoleUpdateRequest &request,
                                const int32_t updatedBy) const
 {
+    if (role.version() != request.version())
+    {
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
     const Role oldData = role;
 
     // 验证

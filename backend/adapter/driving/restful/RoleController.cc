@@ -1,12 +1,12 @@
 #include "RoleController.h"
 
 #include "common/util/ApiResponse.hpp"
+#include "common/util/ParamUtils.hpp"
 #include <drogon/utils/Utilities.h>
 #include <drogon/HttpTypes.h>
 
 using namespace std;
 using namespace drogon;
-using namespace drogon::utils;
 
 Task<HttpResponsePtr> RoleController::list(const HttpRequestPtr req,
                                            const string name,
@@ -46,7 +46,15 @@ Task<HttpResponsePtr> RoleController::deleteRole(
     const std::int32_t roleId) const
 {
     const auto deletedBy = req->getAttributes()->get<int32_t>("userId");
-    co_await roleService_->deleteRole(roleId, deletedBy);
+
+    const auto versionStr = req->getParameter("version");
+    if (!isInteger(versionStr))
+    {
+        throw BusinessException("版本号必须为整数");
+    }
+    const int32_t version = stoi(versionStr);
+
+    co_await roleService_->deleteRole(roleId, version, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
 

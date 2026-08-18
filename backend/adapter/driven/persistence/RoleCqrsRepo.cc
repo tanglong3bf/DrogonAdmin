@@ -121,7 +121,9 @@ vector<AssignableRoleResponse> RoleCqrsRepo::buildAssignableList(
     for (const auto &row : dbResult)
     {
         AssignableRoleResponse assignableRoleResponse{
-            row["role_id"].as<std::int32_t>(), row["name"].as<string>()};
+            row["role_id"].as<std::int32_t>(),
+            row["name"].as<string>(),
+            row["version"].as<std::int32_t>()};
         result.push_back(assignableRoleResponse);
     }
     return result;

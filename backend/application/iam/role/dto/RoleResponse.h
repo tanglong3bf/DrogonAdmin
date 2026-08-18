@@ -29,5 +29,6 @@ struct RoleResponse
     const QuotaType quotaType_;                     ///< 限制类型
     const std::optional<std::int32_t> userQuota_;   ///< 限制数量
     const RelationType relationType_;               ///< 关联类型
+    const std::int32_t version_;                    ///< 乐观锁版本号
     std::vector<RoleDeptResponse> depts_;           ///< 关联部门
 };

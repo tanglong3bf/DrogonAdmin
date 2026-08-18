@@ -31,6 +31,7 @@ if (mockConfig.role.get_role_list) {
                   role_id: 1,
                   user_quota: 3,
                   relation_type: 1,
+                  version: 0,
                   depts: [
                     { role_id: 1, dept_id: 1 },
                     { role_id: 1, dept_id: 7 }
@@ -43,7 +44,8 @@ if (mockConfig.role.get_role_list) {
                   quota_type: 2,
                   role_id: 2,
                   user_quota: 3,
-                  relation_type: 0
+                  relation_type: 0,
+                  version: 0
                 },
                 {
                   code: 'test_role222',
@@ -53,6 +55,7 @@ if (mockConfig.role.get_role_list) {
                   role_id: 3,
                   user_quota: 3,
                   relation_type: 2,
+                  version: 0,
                   depts: [
                     { role_id: 3, dept_id: 4 },
                     { role_id: 3, dept_id: 5 },
@@ -103,11 +106,13 @@ if (mockConfig.role.get_role_option) {
           data: [
             {
               role_id: 1,
-              name: '系统管理员'
+              name: '系统管理员',
+              version: 0
             },
             {
               role_id: 2,
-              name: '测试角色'
+              name: '测试角色',
+              version: 0
             }
           ]
         }

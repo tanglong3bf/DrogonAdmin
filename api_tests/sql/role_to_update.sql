@@ -58,6 +58,7 @@ CREATE TABLE "public"."sys_role" (
   "quota_type" int2 NOT NULL,
   "user_quota" int4,
   "relation_type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(0) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -73,6 +74,7 @@ COMMENT ON COLUMN "public"."sys_role"."description" IS '角色描述';
 COMMENT ON COLUMN "public"."sys_role"."quota_type" IS '用户数量限制类型 0-不限制 1-总数量限制 2-每个部门用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."user_quota" IS '用户数量限制';
 COMMENT ON COLUMN "public"."sys_role"."relation_type" IS '和部门的关联关系 0-所有部门可用 1-指定部门可用 2-指定部门不可用';
+COMMENT ON COLUMN "public"."sys_role"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_role"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_role"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_role"."updated_by" IS '更新者';
@@ -80,57 +82,58 @@ COMMENT ON COLUMN "public"."sys_role"."updated_time" IS '更新时间';
 COMMENT ON COLUMN "public"."sys_role"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_role"."deleted_time" IS '删除时间';
 
-INSERT INTO "public"."sys_role" VALUES (1, '管理员-1', 'admin-1', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (2, '管理员-2', 'admin-2', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (3, '管理员-3', 'admin-3', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (4, '管理员-4', 'admin-4', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (5, '管理员-5', 'admin-5', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (6, '管理员-6', 'admin-6', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (7, '管理员-7', 'admin-7', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (8, '管理员-8', 'admin-8', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (9, '管理员-9', 'admin-9', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (10, '管理员-10', 'admin-10', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (11, '管理员-11', 'admin-11', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (12, '管理员-12', 'admin-12', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (13, '管理员-13', 'admin-13', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (14, '管理员-14', 'admin-14', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (15, '管理员-15', 'admin-15', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (16, '管理员-16', 'admin-16', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (17, '管理员-17', 'admin-17', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (18, '管理员-18', 'admin-18', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (19, '管理员-19', 'admin-19', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (20, '管理员-20', 'admin-20', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (21, '管理员-21', 'admin-21', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (22, '管理员-22', 'admin-22', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (23, '管理员-23', 'admin-23', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (24, '管理员-24', 'admin-24', NULL, 1, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (25, '管理员-25', 'admin-25', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (26, '管理员-26', 'admin-26', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (27, '管理员-27', 'admin-27', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (28, '管理员-28', 'admin-28', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (29, '管理员-29', 'admin-29', NULL, 2, 3, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (30, '管理员-30', 'admin-30', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (31, '管理员-31', 'admin-31', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (32, '管理员-32', 'admin-32', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (33, '管理员-33', 'admin-33', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (34, '管理员-34', 'admin-34', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (35, '管理员-35', 'admin-35', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (36, '管理员-36', 'admin-36', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (37, '管理员-37', 'admin-37', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (38, '管理员-38', 'admin-38', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (39, '管理员-39', 'admin-39', NULL, 0, NULL, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (40, '管理员-40', 'admin-40', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (41, '管理员-41', 'admin-41', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (42, '管理员-42', 'admin-42', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (43, '管理员-43', 'admin-43', NULL, 0, NULL, 1, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (44, '管理员-44', 'admin-44', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (45, '管理员-45', 'admin-45', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (46, '管理员-46', 'admin-46', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
-INSERT INTO "public"."sys_role" VALUES (47, '管理员-47', 'admin-47', NULL, 0, NULL, 2, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (1, '管理员-1', 'admin-1', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (2, '管理员-2', 'admin-2', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (3, '管理员-3', 'admin-3', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (4, '管理员-4', 'admin-4', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (5, '管理员-5', 'admin-5', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (6, '管理员-6', 'admin-6', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (7, '管理员-7', 'admin-7', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (8, '管理员-8', 'admin-8', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (9, '管理员-9', 'admin-9', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (10, '管理员-10', 'admin-10', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (11, '管理员-11', 'admin-11', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (12, '管理员-12', 'admin-12', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (13, '管理员-13', 'admin-13', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (14, '管理员-14', 'admin-14', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (15, '管理员-15', 'admin-15', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (16, '管理员-16', 'admin-16', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (17, '管理员-17', 'admin-17', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (18, '管理员-18', 'admin-18', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (19, '管理员-19', 'admin-19', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (20, '管理员-20', 'admin-20', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (21, '管理员-21', 'admin-21', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (22, '管理员-22', 'admin-22', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (23, '管理员-23', 'admin-23', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (24, '管理员-24', 'admin-24', NULL, 1, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (25, '管理员-25', 'admin-25', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (26, '管理员-26', 'admin-26', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (27, '管理员-27', 'admin-27', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (28, '管理员-28', 'admin-28', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (29, '管理员-29', 'admin-29', NULL, 2, 3, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (30, '管理员-30', 'admin-30', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (31, '管理员-31', 'admin-31', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (32, '管理员-32', 'admin-32', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (33, '管理员-33', 'admin-33', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (34, '管理员-34', 'admin-34', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (35, '管理员-35', 'admin-35', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (36, '管理员-36', 'admin-36', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (37, '管理员-37', 'admin-37', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (38, '管理员-38', 'admin-38', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (39, '管理员-39', 'admin-39', NULL, 0, NULL, 0, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (40, '管理员-40', 'admin-40', NULL, 0, NULL, 1, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (41, '管理员-41', 'admin-41', NULL, 0, NULL, 1, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (42, '管理员-42', 'admin-42', NULL, 0, NULL, 1, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (43, '管理员-43', 'admin-43', NULL, 0, NULL, 1, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (44, '管理员-44', 'admin-44', NULL, 0, NULL, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (45, '管理员-45', 'admin-45', NULL, 0, NULL, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (46, '管理员-46', 'admin-46', NULL, 0, NULL, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (47, '管理员-47', 'admin-47', NULL, 0, NULL, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
+INSERT INTO "public"."sys_role" VALUES (48, '管理员-48', 'admin-48', NULL, 0, NULL, 2, 0, 1, '2026-03-29 00:00:00', 1, '2026-04-02 21:53:40', NULL, NULL);
 
 ALTER SEQUENCE "public"."sys_role_role_id_seq"
 OWNED BY "public"."sys_role"."role_id";
-SELECT setval('"public"."sys_role_role_id_seq"', 47, true);
+SELECT setval('"public"."sys_role_role_id_seq"', 48, true);
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
 
 DROP TABLE IF EXISTS "public"."sys_role_dept";

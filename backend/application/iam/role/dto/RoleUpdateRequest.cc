@@ -39,5 +39,6 @@ RoleUpdateRequest::RoleUpdateRequest(const Json::Value &json)
     {
         relationType_ = static_cast<RelationType>(*relationTypeInt);
     }
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
     deptIds_ = getParam<vector<std::int32_t>>(json, "dept_ids");
 }

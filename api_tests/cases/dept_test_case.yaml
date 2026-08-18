@@ -342,10 +342,10 @@ dept_cases:
   # 删除部门 {{{
   - name: 删除部门-正常删除
     sql_file: dept_with_user_and_role.sql
-    url: http://localhost:8000/dept/2?version=0
+    url: http://localhost:8000/dept/2
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除部门-检查删除结果
@@ -358,24 +358,24 @@ dept_cases:
       assert_jsonpath:
         len:$.data[0].children: 2
   - name: 删除部门-重复删除
-    url: http://localhost:8000/dept/2?version=1
+    url: http://localhost:8000/dept/2
     method: DELETE
     json: {}
-    params: ''
+    params: version=1
     expect:
       status_code: 204
   - name: 删除部门-不存在的部门id
-    url: http://localhost:8000/dept/233?version=0
+    url: http://localhost:8000/dept/233
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除部门-包含子部门不能删除
-    url: http://localhost:8000/dept/8?version=0
+    url: http://localhost:8000/dept/8
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 400
       assert_jsonpath:
@@ -391,10 +391,10 @@ dept_cases:
       assert_jsonpath:
         len:$.data: 3
   - name: 删除部门-正常删除2
-    url: http://localhost:8000/dept/9?version=0
+    url: http://localhost:8000/dept/9
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除部门-检查删除结果3
@@ -407,10 +407,10 @@ dept_cases:
       assert_jsonpath:
         len:$.data[1].children: 0
   - name: 删除部门-再次删除
-    url: http://localhost:8000/dept/8?version=0
+    url: http://localhost:8000/dept/8
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除部门-检查删除结果4
@@ -423,30 +423,30 @@ dept_cases:
       assert_jsonpath:
         len:$.data: 2
   - name: 删除部门-有用户的部门不能删除
-    url: http://localhost:8000/dept/6?version=0
+    url: http://localhost:8000/dept/6
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 400
       assert_jsonpath:
         $.code: lt 0
         $.error: 指定部门包含用户
   - name: 删除部门-有角色白名单的部门不能删除
-    url: http://localhost:8000/dept/5?version=0
+    url: http://localhost:8000/dept/5
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 400
       assert_jsonpath:
         $.code: lt 0
         $.error: 指定部门包含在角色的白名单中，无法删除
   - name: 删除部门-有角色黑名单的部门可以删除
-    url: http://localhost:8000/dept/7?version=0
+    url: http://localhost:8000/dept/7
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除部门-检查删除结果5
@@ -462,10 +462,10 @@ dept_cases:
         $.data[0].children[1].children[0].dept_id: 5
         $.data[0].children[1].children[1].dept_id: 6
   - name: 删除部门-指定错误的版本号无法删除
-    url: http://localhost:8000/dept/10?version=0
+    url: http://localhost:8000/dept/10
     method: DELETE
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 400
       assert_jsonpath:

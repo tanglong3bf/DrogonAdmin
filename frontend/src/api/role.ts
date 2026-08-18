@@ -43,8 +43,8 @@ export const updateRole = (role_id: number, role: RoleFormData) => {
 /**
  * 删除角色
  */
-export const deleteRole = (role_id: number) => {
-  return request.delete(`/role/${role_id}`)
+export const deleteRole = (role_id: number, version: number) => {
+  return request.delete(`/role/${role_id}`, { params: { version } })
 }
 
 /**
