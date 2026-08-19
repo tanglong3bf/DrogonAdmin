@@ -30,6 +30,7 @@ export interface UserInfo {
   phone_number?: string
   email?: string
   status: 'normal' | 'disabled'
+  version: number
 }
 
 /**

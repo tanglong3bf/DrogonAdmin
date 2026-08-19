@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>
 
 /**
@@ -20,16 +21,8 @@ class LoginRequest
      */
     LoginRequest(const Json::Value &json);
 
-  public:
-    std::string_view username() const
-    {
-        return username_;
-    }
-
-    std::string_view password() const
-    {
-        return password_;
-    }
+    GETTER_STR_VIEW(username);
+    GETTER_STR_VIEW(password);
 
   private:
     std::string username_;  ///< 用户名

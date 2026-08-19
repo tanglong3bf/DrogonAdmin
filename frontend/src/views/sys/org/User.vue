@@ -272,6 +272,7 @@ const submit = (form?: FormInstance) => {
           : undefined,
         email: emailChanged ? (user.email ? user.email : null) : undefined,
         status: statusChanged ? user.status : undefined,
+        version: user.version!,
         role_ids: user.role_ids
       }
 
@@ -305,6 +306,7 @@ const updateUserBtn = (row: User) => {
   user.phone_number = row.phone_number
   user.email = row.email
   user.status = row.status
+  user.version = row.version
   user.role_ids = row.user_roles?.map(item => item.role_id)
   dialogVisible.value = true
 }
@@ -320,7 +322,10 @@ const deleteUserBtn = async (userId: number) => {
         type: 'warning'
       }
     )
-    await deleteUser(userId)
+    const version = userList.value.find(
+      item => item.user_id === userId
+    )?.version!
+    await deleteUser(userId, version)
     ElMessage.success('删除成功')
     queryParams.page = 1
     resetQuery()

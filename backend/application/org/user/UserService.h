@@ -30,20 +30,21 @@ class UserService : public DrAdminObject<UserService>
      * @brief 新增用户
      */
     drogon::Task<> createUser(const UserCreateRequest &request,
-                              const std::int32_t createdBy) const;
+                              std::int32_t createdBy) const;
 
     /**
      * @brief 更新用户
      */
-    drogon::Task<> updateUser(const std::int32_t userId,
+    drogon::Task<> updateUser(std::int32_t userId,
                               const UserUpdateRequest &request,
-                              const std::int32_t updatedBy) const;
+                              std::int32_t updatedBy) const;
 
     /**
      * @brief 删除用户
      */
-    drogon::Task<> deleteUser(const std::int32_t userId,
-                              const std::int32_t deletedBy) const;
+    drogon::Task<> deleteUser(std::int32_t userId,
+                              std::int32_t version,
+                              std::int32_t deletedBy) const;
 
   private:
     UserCqrsRepoPtr userCqrsRepo_{

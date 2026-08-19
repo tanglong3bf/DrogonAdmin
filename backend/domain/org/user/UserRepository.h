@@ -51,6 +51,11 @@ class UserRepository : public DrAdminObject<UserRepository>
     drogon::Task<> save(User &user) const;
 
     /**
+     * @brief 更新密码
+     */
+    drogon::Task<> updatePassword(User &user) const;
+
+    /**
      * @brief 根据ID获取用户
      */
     drogon::Task<std::optional<User>> getById(const std::int32_t userId,

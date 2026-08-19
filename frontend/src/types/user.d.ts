@@ -19,6 +19,7 @@ export interface User {
   phone_number?: string
   email?: string
   status: Status
+  version: number
   user_roles: UserRole[]
 }
 
@@ -34,6 +35,7 @@ export interface UserFormData {
   phone_number?: string | null
   email?: string | null
   status?: Status
+  version?: number
   role_ids?: number[]
 }
 
@@ -48,6 +50,7 @@ export interface UserInfoUpdateRequest {
   sex?: Sex
   phone_number?: string | null
   email?: string | null
+  version: number
 }
 
 /**
@@ -56,6 +59,7 @@ export interface UserInfoUpdateRequest {
 export interface UserPasswordUpdateRequest {
   old_password: string
   new_password: string
+  version: number
 }
 
 export interface UploadAvatarResponse {

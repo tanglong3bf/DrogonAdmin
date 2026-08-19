@@ -30,4 +30,5 @@ ChangePasswordRequest::ChangePasswordRequest(const Json::Value &json)
     {
         throw BusinessException("新旧密码不能相同");
     }
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }

@@ -68,11 +68,11 @@ class User : public AuditableEntity, public ChangeableEntity
         const drogon_admin::util::NullableValue<Email> &email,
         std::int32_t updatedBy = -1);
 
-    bool updateStatus(Status status, int32_t updatedBy);
+    bool updateStatus(Status status, std::int32_t updatedBy);
 
     bool assignToDept(std::int32_t deptId, std::int32_t updatedBy);
 
-    void remove(const std::int32_t deletedBy);
+    void remove(std::int32_t deletedBy);
 
     GETTER(userId)
     GETTER_STR_VIEW(username)
@@ -84,6 +84,7 @@ class User : public AuditableEntity, public ChangeableEntity
     GETTER(phoneNumber)
     GETTER(email)
     GETTER(status)
+    GETTER(version)
     GETTER(userRoles)
 
     /**
@@ -92,15 +93,14 @@ class User : public AuditableEntity, public ChangeableEntity
      * @param createdBy 操作人ID，用于填充新建角色审计字段
      */
     void appendRoles(const std::vector<int32_t> &newRoleIds,
-                     const int32_t createdBy);
+                     std::int32_t createdBy);
 
     /**
      * @brief 差量对齐更新角色：保留交集、删除不在新列表的旧角色、新增缺少角色
      * @param newRoleIds 最终需要持有的角色ID集合
      * @param updatedBy 本次更新操作人
      */
-    void replaceRoles(const std::vector<int32_t> &roleIds,
-                      const int32_t updatedBy);
+    void replaceRoles(const std::vector<int32_t> &roleIds, std::int32_t updatedBy);
 
     // 仓储重建聚合时调用
     void restoreRoles(const std::vector<SysUserRole> &sysUserRoles);
@@ -116,5 +116,6 @@ class User : public AuditableEntity, public ChangeableEntity
     std::optional<PhoneNumber> phoneNumber_;
     std::optional<Email> email_;
     Status status_;
+    std::int32_t version_;
     std::vector<UserRole> userRoles_;
 };

@@ -7,6 +7,9 @@ import type {
 } from 'async-validator/dist-types/interface.d.ts'
 import { UserPasswordUpdateRequest } from '@/types/user'
 import { changePassword } from '@/api/user_center'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 /**
  * 更新密码表单数据
@@ -15,6 +18,7 @@ interface PasswordModifyForm {
   old_password: string
   old_password2: string
   new_password: string
+  version: number
 }
 
 /**
@@ -28,7 +32,8 @@ const formRef = ref<FormInstance>()
 const formData = reactive<PasswordModifyForm>({
   old_password: '',
   old_password2: '',
-  new_password: ''
+  new_password: '',
+  version: authStore.userInfo!.version
 })
 
 /**
@@ -122,7 +127,8 @@ const changePasswordBtn = async (formEl?: FormInstance) => {
   if (isValid) {
     const request: UserPasswordUpdateRequest = {
       old_password: formData.old_password,
-      new_password: formData.new_password
+      new_password: formData.new_password,
+      version: formData.version
     }
 
     await changePassword(request)

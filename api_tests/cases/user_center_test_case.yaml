@@ -6,6 +6,7 @@ user_center_cases:
     method: PATCH
     json:
       nickname: abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -17,6 +18,7 @@ user_center_cases:
     method: PATCH
     json:
       sex: -1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -27,7 +29,8 @@ user_center_cases:
     url: http://localhost:8000/user_center/basic_info
     method: PATCH
     json:
-      sex: -1
+      sex: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -39,6 +42,7 @@ user_center_cases:
     method: PATCH
     json:
       phone_number: '1381234567'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -50,6 +54,7 @@ user_center_cases:
     method: PATCH
     json:
       phone_number: '138123456789'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -61,6 +66,7 @@ user_center_cases:
     method: PATCH
     json:
       phone_number: '1381234567a'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -72,6 +78,7 @@ user_center_cases:
     method: PATCH
     json:
       email: abcqq.com
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -83,6 +90,7 @@ user_center_cases:
     method: PATCH
     json:
       email: abc@qq
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -104,6 +112,7 @@ user_center_cases:
     method: PATCH
     json:
       nickname: 修改后的昵称
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -112,6 +121,7 @@ user_center_cases:
     method: PATCH
     json:
       sex: 1
+      version: 1
     params: ''
     expect:
       status_code: 204
@@ -120,6 +130,7 @@ user_center_cases:
     method: PATCH
     json:
       phone_number: '13811223344'
+      version: 2
     params: ''
     expect:
       status_code: 204
@@ -128,6 +139,7 @@ user_center_cases:
     method: PATCH
     json:
       email: hello@world.com
+      version: 3
     params: ''
     expect:
       status_code: 204
@@ -143,6 +155,7 @@ user_center_cases:
         $.data.list[0].sex: 1
         $.data.list[0].phone_number: '13811223344'
         $.data.list[0].email: hello@world.com
+        $.data.list[0].version: 4
     validate_schema: user_paginated.yaml
   # }}}
   # 修改密码 {{{
@@ -153,6 +166,7 @@ user_center_cases:
     json:
       username: admin123
       password: '123456'
+      version: 0
     params: ''
     expect:
       status_code: 200
@@ -166,6 +180,7 @@ user_center_cases:
     method: PATCH
     json:
       new_password: '654321'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -177,6 +192,7 @@ user_center_cases:
     method: PATCH
     json:
       old_password: '123456'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -189,6 +205,7 @@ user_center_cases:
     json:
       old_password: '123456'
       new_password: '123456'
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -201,6 +218,7 @@ user_center_cases:
     json:
       old_password: '123456'
       new_password: '654321'
+      version: 4
     params: ''
     expect:
       status_code: 204

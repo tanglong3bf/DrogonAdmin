@@ -50,10 +50,10 @@ Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
         case ChangingStatus::NEW:
             co_await mapper.insert(sysDept);
             break;
-        case ChangingStatus::DELETED:  // 软删除也是更新
+        case ChangingStatus::DELETED:
         {
             string sql = format(
-                "UPDATE sys_dept SET deleted_by = '{}', deleted_time = "
+                "UPDATE sys_dept SET deleted_by = {}, deleted_time = "
                 "'{}'::timestamp, version = version + 1 WHERE dept_id = {} AND "
                 "version = {}",
                 sysDept.getValueOfDeletedBy(),

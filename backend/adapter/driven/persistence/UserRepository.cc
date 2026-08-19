@@ -1,5 +1,6 @@
 #include "domain/org/user/UserRepository.h"
 
+#include "common/exception/BusinessException.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include "RelationQuery/src/RelationQuery.hpp"
 #include <drogon/orm/Exception.h>
@@ -12,7 +13,7 @@ using namespace drogon::orm;
 using namespace drogon_model::drogon_admin_db;
 using namespace tl::sql;
 
-Task<size_t> UserRepository::countByDept(const std::int32_t deptId) const
+Task<size_t> UserRepository::countByDept(const int32_t deptId) const
 {
     Criteria criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysUser::Cols::_dept_id, deptId};
@@ -20,15 +21,14 @@ Task<size_t> UserRepository::countByDept(const std::int32_t deptId) const
     co_return co_await userMapper().count(criteria);
 }
 
-Task<size_t> UserRepository::countByRole(const std::int32_t roleId) const
+Task<size_t> UserRepository::countByRole(const int32_t roleId) const
 {
     Criteria criteria{SysUserRole::Cols::_role_id, roleId};
 
     co_return co_await userRoleMapper().count(criteria);
 }
 
-drogon::Task<std::size_t> UserRepository::countByUsername(
-    const std::string &username) const
+Task<size_t> UserRepository::countByUsername(const string &username) const
 {
     Criteria criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysUser::Cols::_username, username};
@@ -36,8 +36,7 @@ drogon::Task<std::size_t> UserRepository::countByUsername(
     co_return co_await userMapper().count(criteria);
 }
 
-drogon::Task<std::size_t> UserRepository::countByNickname(
-    const std::string &nickname) const
+Task<size_t> UserRepository::countByNickname(const string &nickname) const
 {
     Criteria criteria{SysUser::Cols::_deleted_by, CompareOperator::IsNull};
     criteria = criteria && Criteria{SysUser::Cols::_nickname, nickname};
@@ -45,7 +44,7 @@ drogon::Task<std::size_t> UserRepository::countByNickname(
     co_return co_await userMapper().count(criteria);
 }
 
-drogon::Task<> UserRepository::save(User &user) const
+Task<> UserRepository::save(User &user) const
 {
     switch (user.changingStatus())
     {
@@ -74,8 +73,18 @@ drogon::Task<> UserRepository::save(User &user) const
         {
             const auto trans = co_await dbClient()->newTransactionCoro();
             const auto model = static_cast<SysUser>(user);
-            co_await userMapper(trans).update(model);
 
+            Json::Value data = model.toJson();
+            string sql =
+                sqlGenerator()->getSql("update_user", {{"data", data}});
+            const auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"更新期间数据发生变化，更新失败"};
+            }
+
+            // 关联数据
             Json::Value toInsert{Json::arrayValue};
             Json::Value toDelete{Json::arrayValue};
 
@@ -95,7 +104,7 @@ drogon::Task<> UserRepository::save(User &user) const
                         // 未做更改，无需操作数据库
                         break;
                     case ChangingStatus::UPDATED:
-                        throw std::runtime_error("不支持更新用户角色");
+                        throw BusinessException{"不支持更新用户角色"};
                         break;
                 }
             }
@@ -120,7 +129,21 @@ drogon::Task<> UserRepository::save(User &user) const
             const auto trans = co_await dbClient()->newTransactionCoro();
             const auto model = static_cast<SysUser>(user);
             // 本体删除(软删除)
-            co_await userMapper(trans).update(model);
+            string sql = format(
+                "UPDATE sys_user SET deleted_by = {}, deleted_time = "
+                "'{}'::timestamp, version = version + 1 WHERE user_id = {} AND "
+                "version = {}",
+                model.getValueOfDeletedBy(),
+                model.getValueOfDeletedTime().toDbStringLocal(),
+                model.getValueOfUserId(),
+                model.getValueOfVersion());
+            auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException("删除期间数据发生变化，删除失败");
+            }
+
             // 关联数据删除
             co_await userRoleMapper(trans).deleteBy(
                 Criteria{SysUserRole::Cols::_user_id, *user.userId()});
@@ -133,7 +156,29 @@ drogon::Task<> UserRepository::save(User &user) const
     }
 }
 
-Task<optional<User>> UserRepository::getById(const std::int32_t userId,
+Task<> UserRepository::updatePassword(User &user) const
+{
+    const auto trans = co_await dbClient()->newTransactionCoro();
+
+    string sql = format(
+        "UPDATE sys_user SET password = '{}', version = version + 1, "
+        "updated_by = {}, updated_time = '{}' WHERE user_id = {} AND version = "
+        "{}",
+        user.password(),
+        *user.updatedBy(),
+        user.updatedTime()->toDbStringLocal(),
+        *user.userId(),
+        user.version());
+
+    const auto result = co_await trans->execSqlCoro(sql);
+    if (result.affectedRows() != 1)
+    {
+        trans->rollback();
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
+}
+
+Task<optional<User>> UserRepository::getById(const int32_t userId,
                                              bool withRelation) const
 {
     static const auto relationQuery = app().getPlugin<RelationQuery>();
@@ -174,8 +219,8 @@ Task<optional<User>> UserRepository::getById(const std::int32_t userId,
 }
 
 Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
-    const std::int32_t deptId,
-    const vector<std::int32_t> &roleIds) const
+    const int32_t deptId,
+    const vector<int32_t> &roleIds) const
 {
     LOG_TRACE << "统计部门下角色的用户数量，deptId=" << deptId
               << ", roleIds=" << roleIds.size() << "个角色";
@@ -199,8 +244,8 @@ Task<unordered_map<int32_t, size_t>> UserRepository::countByDeptAndRoles(
     co_return result;
 }
 
-drogon::Task<std::map<std::int32_t, std::size_t>> UserRepository::
-    countByRoleList(const std::vector<std::int32_t> &roleIds) const
+Task<map<int32_t, size_t>> UserRepository::countByRoleList(
+    const vector<int32_t> &roleIds) const
 {
     LOG_TRACE << "统计角色的用户数量，roleIds=" << roleIds.size() << "个角色";
     ParamList param;
@@ -221,8 +266,8 @@ drogon::Task<std::map<std::int32_t, std::size_t>> UserRepository::
     co_return result;
 }
 
-Task<unordered_map<std::int32_t, size_t>> UserRepository::
-    countUsersWithRolePerDepartment(const std::int32_t roleId) const
+Task<unordered_map<int32_t, size_t>> UserRepository::
+    countUsersWithRolePerDepartment(const int32_t roleId) const
 {
     const auto sql =
         sqlGenerator()->getSql("count_users_with_role_per_department",
@@ -236,8 +281,8 @@ Task<unordered_map<std::int32_t, size_t>> UserRepository::
     co_return result;
 }
 
-Task<vector<std::int32_t>> UserRepository::getDeptIdsByRoleId(
-    const std::int32_t roleId) const
+Task<vector<int32_t>> UserRepository::getDeptIdsByRoleId(
+    const int32_t roleId) const
 {
     const auto sql = sqlGenerator()->getSql("get_dept_ids_by_role_id",
                                             {{"role_id", roleId}});
@@ -251,8 +296,8 @@ Task<vector<std::int32_t>> UserRepository::getDeptIdsByRoleId(
 }
 
 Task<size_t> UserRepository::countByRoleNotInDepts(
-    const std::int32_t roleId,
-    const vector<std::int32_t> &deptIds) const
+    const int32_t roleId,
+    const vector<int32_t> &deptIds) const
 {
     ParamList param;
     param["role_id"] = roleId;
@@ -269,8 +314,8 @@ Task<size_t> UserRepository::countByRoleNotInDepts(
 }
 
 Task<size_t> UserRepository::countByRoleInDepts(
-    const std::int32_t roleId,
-    const vector<std::int32_t> &deptIds) const
+    const int32_t roleId,
+    const vector<int32_t> &deptIds) const
 {
     ParamList param;
     param["role_id"] = roleId;
@@ -309,7 +354,7 @@ Task<map<int32_t, size_t>> UserRepository::countUsersPerRoleInDepartment(
     co_return result;
 }
 
-Task<optional<User>> UserRepository::getByUsername(std::string_view username,
+Task<optional<User>> UserRepository::getByUsername(string_view username,
                                                    bool withRelation) const
 {
     static const auto relationQuery = app().getPlugin<RelationQuery>();

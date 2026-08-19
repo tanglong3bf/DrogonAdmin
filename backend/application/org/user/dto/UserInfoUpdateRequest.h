@@ -8,6 +8,9 @@
 #include <jsoncpp/json/value.h>
 #include <optional>
 
+/**
+ * @brief (个人中心)更新用户请求
+ */
 struct UserInfoUpdateRequest
 {
     UserInfoUpdateRequest() = default;
@@ -17,10 +20,12 @@ struct UserInfoUpdateRequest
     GETTER(sex)
     GETTER(phoneNumber)
     GETTER(email)
+    GETTER(version)
 
   private:
     std::optional<std::string> nickname_;                         ///< 昵称
     std::optional<Sex> sex_;                                      ///< 性别
     drogon_admin::util::NullableValue<PhoneNumber> phoneNumber_;  ///< 电话号码
     drogon_admin::util::NullableValue<Email> email_;              ///< 邮箱
+    std::int32_t version_;  ///< 乐观锁版本号
 };

@@ -41,6 +41,6 @@ UserUpdateRequest::UserUpdateRequest(const Json::Value &json)
     {
         status_ = static_cast<Status>(*statusInt);
     }
-
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
     roleIds_ = getParam<std::vector<int32_t>>(json, "role_ids", {0, -1});
 }

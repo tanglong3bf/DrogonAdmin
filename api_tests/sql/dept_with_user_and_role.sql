@@ -70,6 +70,7 @@ CREATE TABLE "public"."sys_user" (
   "phone_number" char(11) COLLATE "pg_catalog"."default",
   "email" varchar(50) COLLATE "pg_catalog"."default",
   "status" int2 NOT NULL DEFAULT 0,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -87,6 +88,7 @@ COMMENT ON COLUMN "public"."sys_user"."dept_id" IS '所属部门id';
 COMMENT ON COLUMN "public"."sys_user"."phone_number" IS '电话号码';
 COMMENT ON COLUMN "public"."sys_user"."email" IS '邮箱';
 COMMENT ON COLUMN "public"."sys_user"."status" IS '状态 0-正常 1-禁用';
+COMMENT ON COLUMN "public"."sys_user"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_user"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_user"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_user"."updated_by" IS '最后一次更新者';
@@ -94,7 +96,7 @@ COMMENT ON COLUMN "public"."sys_user"."updated_time" IS '最后一次更新时�
 COMMENT ON COLUMN "public"."sys_user"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
 
-INSERT INTO "public"."sys_user" VALUES (1, 'gugugaga', '$2a$10$yniicB8J5B9lvCWuHYP23eXxztTI5pIjpM1rD2m2S.YvFw6zqiXiS', '咕咕嘎嘎', '#', 1, 6, NULL, NULL, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
+INSERT INTO "public"."sys_user" VALUES (1, 'gugugaga', '$2a$10$yniicB8J5B9lvCWuHYP23eXxztTI5pIjpM1rD2m2S.YvFw6zqiXiS', '咕咕嘎嘎', '#', 1, 6, NULL, NULL, 0, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 
 CREATE TABLE "public"."sys_role_dept" (
   "role_id" int4 NOT NULL,

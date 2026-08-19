@@ -63,4 +63,5 @@ UserInfoUpdateRequest::UserInfoUpdateRequest(const Json::Value &json)
             return "邮箱格式错误";
         });
     email_ = emailStr.to<Email>();
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }

@@ -30,6 +30,6 @@ export const updateUser = (user_id: number, user: UserFormData) => {
 /**
  * 删除用户
  */
-export const deleteUser = (user_id: number) => {
-  return request.delete(`/user/${user_id}`)
+export const deleteUser = (user_id: number, version: number) => {
+  return request.delete(`/user/${user_id}`, { params: { version } })
 }

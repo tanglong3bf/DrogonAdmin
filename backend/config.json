@@ -410,6 +410,11 @@
             "main": "DELETE FROM \"sys_role_dept\" WHERE (role_id, dept_id) IN ( VALUES @values(data) )",
             "values": "(@for(item in data, separator='), (') ${item.role_id}, ${item.dept_id} @endfor)"
           },
+          "update_user": {
+            "main": "UPDATE sys_user SET nickname='${data.nickname}', avatar='${data.avatar}', sex=${data.sex}, dept_id=@int_value(value=data.dept_id), phone_number=@string_value(value=data.phone_number), email=@string_value(value=data.email), status=${data.status}, version = version + 1, updated_by = ${data.updated_by}, updated_time = '${data.updated_time}'::timestamp WHERE user_id = ${data.user_id} AND version = ${data.version}",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif"
+          },
           "multi_insert_user_role": {
             "main": {
               "sql": "INSERT INTO sys_user_role (@for(field in fields, separator=',') ${field} @endfor) VALUES @values(data)",
