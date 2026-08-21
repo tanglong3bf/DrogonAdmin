@@ -356,8 +356,8 @@
             },
             "sets": "@for(field in fields_list, separator=',') @if(field == 'version') ${field}=d.version+1 @else ${field}=s.${field} @endif @endfor",
             "values": "(@for(item in data_list, separator='), (') ${item.dept_id}, @int_value(value = item.parent_id), '${item.name}', ${item.sort_num}, ${item.version}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
-            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
-            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           },
           "count_belong_dept": {
@@ -488,6 +488,11 @@
             "main": "SELECT MAX(sort_num) FROM sys_module @condition(parent_id)",
             "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           },
+          "update_module": {
+            "main": "UPDATE sys_module SET @sets(data) WHERE module_id = ${data.module_id} AND version = ${data.version}",
+            "sets": "name = '${data.name}', description = @string_value(value=data.description), sort_num = ${data.sort_num}, parent_id = ${data.parent_id}, version = version + 1, updated_by = ${data.updated_by}, updated_time = '${data.updated_time}'::timestamp",
+            "string_value": "@if(value) '${value}' @else NULL @endif"
+          },
           // 批量更新模块数据、包括批量删除
           "multi_update_module": {
             "main": {
@@ -499,6 +504,7 @@
                   "description",
                   "sort_num",
                   "parent_id",
+                  "version",
                   "created_by",
                   "created_time",
                   "updated_by",
@@ -508,11 +514,11 @@
                 ]
               }
             },
-            "sets": "@for(field in fields_list, separator=',') ${field} = s.${field} @endfor",
-            "values": "(@for(item in data_list, separator='), (') ${item.module_id}, '${item.name}', @string_value(value = item.description), ${item.sort_num}, @int_value(value = item.parent_id), ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
-            "string_value": "@if(value && value != null) '${value}' @else NULL @endif",
-            "int_value": "@if(value && value != null) ${value} @else NULL::Integer @endif",
-            "timestamp_value": "@if(value && value != null) '${value}'::timestamp @else NULL::timestamp @endif",
+            "sets": "@for(field in fields_list, separator=',') @if(field == 'version') ${field}=m.version+1 @else ${field}=s.${field} @endif @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.module_id}, '${item.name}', @string_value(value = item.description), ${item.sort_num}, @int_value(value = item.parent_id), ${item.version}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
             "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           },
           // 批量插入功能

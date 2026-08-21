@@ -1,13 +1,15 @@
 #include "ActionUpdateRequest.h"
 
-#include "common/util/rangesUtils.hpp"
 #include "common/exception/BusinessException.h"
+#include "common/util/ParamGetter.hpp"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpRequest.h>
 #include <utility>
 #include <ranges>
 
 using namespace std;
 using namespace drogon_admin;
+using namespace drogon_admin::util;
 
 namespace drogon
 {
@@ -73,4 +75,6 @@ ActionUpdateRequest::ActionUpdateRequest(const Json::Value &json)
             }
         }
     }
+
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }

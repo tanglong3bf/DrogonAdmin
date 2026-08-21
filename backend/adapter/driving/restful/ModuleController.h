@@ -7,6 +7,9 @@
 #include "application/iam/module/ModuleService.h"
 #include <drogon/HttpController.h>
 
+/**
+ * @brief 模块控制器
+ */
 class ModuleController : public drogon::HttpController<ModuleController>
 {
   public:
@@ -27,10 +30,10 @@ class ModuleController : public drogon::HttpController<ModuleController>
                          "/module/([1-9]\\d*)",
                          drogon::Delete,
                          drogon::Options);
-    ADD_METHOD_VIA_REGEX(ModuleController::sortModule,
-                         "/module/sort",
-                         drogon::Post,
-                         drogon::Options);
+    ADD_METHOD_TO(ModuleController::sortModule,
+                  "/module/sort",
+                  drogon::Post,
+                  drogon::Options);
     ADD_METHOD_VIA_REGEX(ModuleController::updateActions,
                          "/module/([1-9]\\d*)/actions",
                          drogon::Post,
@@ -55,7 +58,7 @@ class ModuleController : public drogon::HttpController<ModuleController>
      */
     drogon::Task<drogon::HttpResponsePtr> updateModule(
         const drogon::HttpRequestPtr req,
-        const std::int32_t moduleId,
+        std::int32_t moduleId,
         const ModuleUpdateRequest request) const;
 
     /**
@@ -63,7 +66,7 @@ class ModuleController : public drogon::HttpController<ModuleController>
      */
     drogon::Task<drogon::HttpResponsePtr> deleteModule(
         const drogon::HttpRequestPtr req,
-        const std::int32_t moduleId) const;
+        std::int32_t moduleId) const;
 
     /**
      * @brief 排序模块
@@ -77,7 +80,7 @@ class ModuleController : public drogon::HttpController<ModuleController>
      */
     drogon::Task<drogon::HttpResponsePtr> updateActions(
         const drogon::HttpRequestPtr req,
-        const std::int32_t moduleId,
+        std::int32_t moduleId,
         const ActionUpdateRequest request) const;
 
   private:

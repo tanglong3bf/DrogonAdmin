@@ -154,7 +154,8 @@ const module = reactive<ModuleFormData>({
   module_id: undefined,
   name: '',
   description: '',
-  parent_id: undefined
+  parent_id: undefined,
+  version: undefined
 })
 
 /**
@@ -195,6 +196,7 @@ const newModuleBtn = () => {
   module.name = ''
   module.description = undefined
   module.parent_id = undefined
+  module.version = 0
 
   dialogType.value = DialogType.ADD
   dialogVisible.value = true
@@ -271,6 +273,7 @@ const handleUpdateModule = async (
 
   await updateModule(
     module.module_id!,
+    module.version!,
     module.name,
     module.description === '' ? null : module.description
   )
@@ -346,7 +349,7 @@ const getSortSubModuleData = (
     const data = moduleData.map(item => ({
       module_id: item.module_id,
       name: item.name,
-      sort_num: item.sort_num
+      version: item.version
     }))
     return { data, visible: true }
   }
@@ -357,7 +360,7 @@ const getSortSubModuleData = (
     ? targetModule.children.map(item => ({
         module_id: item.module_id,
         name: item.name,
-        sort_num: item.sort_num
+        version: item.version
       }))
     : []
 
@@ -385,10 +388,11 @@ const sortCancel = () => {
  * 提交排序
  */
 const sortSubmit = async () => {
-  const moduleIds = sortableData.value.map(item => {
-    return item.module_id
-  })
-  await sortModule(currentParentId.value, moduleIds)
+  const modules = sortableData.value.map(item => ({
+    module_id: item.module_id,
+    version: item.version
+  }))
+  await sortModule(currentParentId.value, modules)
 
   ElMessage.success('排序成功')
   await getModuleData()
@@ -404,6 +408,7 @@ const updateModuleBtn = (row: Module) => {
   module.name = row.name
   module.description = row.description
   module.parent_id = row.parent_id
+  module.version = row.version
   dialogVisible.value = true
 }
 
@@ -422,7 +427,7 @@ const deleteModuleBtn = async (moduleId: number) => {
   }
   ElMessageBox.confirm(`请确认是否要删除 ${moduleToDelete.name} 模块`).then(
     async () => {
-      await deleteModule(moduleToDelete.module_id)
+      await deleteModule(moduleToDelete.module_id, moduleToDelete.version)
       ElMessage.success('删除成功')
       await getModuleData()
       queryParams.name = ''
@@ -440,6 +445,7 @@ const actionsForm = ref<FormInstance>()
  */
 const sortableActionForm = reactive({
   module_id: 0, // 功能所属模块
+  version: -1 as number, // 模块乐观锁版本号
   actions: [] as Action[], // 功能列表
   priorities: [] as ActionPriority[] // 功能优先级
 })
@@ -473,14 +479,15 @@ const highToLows = computed(() => {
  * 功能分配按钮
  */
 const assignActionBtn = (module_id: number) => {
-  const module: Module | undefined = findOriginal(moduleTree.value, module_id)
-  const actions = (module?.actions || []).map(item => ({ ...item }))
-  const priorities = (module?.priorities || []).map(item => ({
+  const module: Module = findOriginal(moduleTree.value, module_id)!
+  const actions = (module.actions || []).map(item => ({ ...item }))
+  const priorities = (module.priorities || []).map(item => ({
     ...item
   }))
 
   // 所有数据就绪后，一次性更新响应式数据
   sortableActionForm.module_id = module_id
+  sortableActionForm.version = module.version
   sortableActionForm.actions = actions
   sortableActionForm.priorities = priorities
 
@@ -663,6 +670,7 @@ const assignCancel = () => {
 const assignSubmit = async () => {
   await assignAction(
     sortableActionForm.module_id,
+    sortableActionForm.version,
     sortableActionForm.actions,
     sortableActionForm.priorities
   )

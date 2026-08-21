@@ -93,6 +93,7 @@ CREATE TABLE "public"."sys_module" (
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -106,6 +107,7 @@ COMMENT ON COLUMN "public"."sys_module"."name" IS '模块名称';
 COMMENT ON COLUMN "public"."sys_module"."description" IS '模块描述';
 COMMENT ON COLUMN "public"."sys_module"."sort_num" IS '模块排序';
 COMMENT ON COLUMN "public"."sys_module"."parent_id" IS '父模块id';
+COMMENT ON COLUMN "public"."sys_module"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_module"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_module"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_module"."updated_by" IS '最新一次更新者';
@@ -185,12 +187,12 @@ INSERT INTO public.sys_permission VALUES (1, 3, 0, 1, '2026-07-05 14:46:05.00000
 INSERT INTO public.sys_permission VALUES (1, 4, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 模块表数据
-INSERT INTO public.sys_module VALUES (1, '模块-1', '已经被软删除的模块', 0, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000');
-INSERT INTO public.sys_module VALUES (2, '模块-2', '有子模块的模块', 1, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (3, '模块-3', '占位子模块', 0, 2, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (4, '模块-4', '有功能的模块', 2, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (5, '模块-5', '功能被分配了权限', 3, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (6, '模块-6', '功能被菜单使用', 3, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (1, '模块-1', '已经被软删除的模块', 0, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000');
+INSERT INTO public.sys_module VALUES (2, '模块-2', '有子模块的模块', 1, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (3, '模块-3', '占位子模块', 0, 2, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (4, '模块-4', '有功能的模块', 2, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (5, '模块-5', '功能被分配了权限', 3, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (6, '模块-6', '功能被菜单使用', 3, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 -- 功能表数据
 INSERT INTO public.sys_action VALUES (1, '浏览部门管理页面', 'dept:view', NULL, 0, false, 4, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);

@@ -27,14 +27,12 @@ class Module : public AuditableEntity, public ChangeableEntity
     /**
      * @brief 准备必备参数的构造
      */
-    Module(std::string_view name, const std::int32_t sortNum);
+    Module(std::string_view name, std::int32_t sortNum);
 
     /**
      * @brief 准备必备参数以及创建者id的构造
      */
-    Module(std::string_view name,
-           const std::int32_t sortNum,
-           const std::int32_t createdBy);
+    Module(std::string_view name, std::int32_t sortNum, std::int32_t createdBy);
 
     /// @group 和model类互转
     /// @{
@@ -45,7 +43,7 @@ class Module : public AuditableEntity, public ChangeableEntity
     /**
      * @brief 标记删除
      */
-    void remove(const int32_t deletedBy);
+    void remove(int32_t deletedBy);
 
     /**
      * @brief 更新基础信息
@@ -53,7 +51,7 @@ class Module : public AuditableEntity, public ChangeableEntity
     void updateBasicInfo(
         const std::optional<std::string> &name,
         const drogon_admin::util::NullableValue<std::string> &description,
-        const std::int32_t updatedBy);
+        std::int32_t updatedBy);
 
     void updateSortNum(const std::int32_t sortNum, const std::int32_t updatedBy)
     {
@@ -62,13 +60,14 @@ class Module : public AuditableEntity, public ChangeableEntity
         markUpdated();
     }
 
-    GETTER(moduleId);
-    GETTER_STR_VIEW(name);
-    GETTER(description);
-    GETTER(sortNum);
-    GETTER(parentId);
-    GETTER(actions);
-    GETTER(priorities);
+    GETTER(moduleId)
+    GETTER_STR_VIEW(name)
+    GETTER(description)
+    GETTER(sortNum)
+    GETTER(parentId)
+    GETTER(version)
+    GETTER(actions)
+    GETTER(priorities)
 
     void setParentId(const std::optional<std::int32_t> parentId)
     {
@@ -80,7 +79,7 @@ class Module : public AuditableEntity, public ChangeableEntity
      * @param actions 待新增功能列表
      * @param createdBy 操作人ID，用于填充新建功能审计字段
      */
-    void appendActions(std::vector<Action> &actions, const int32_t createdBy);
+    void appendActions(std::vector<Action> &actions, int32_t createdBy);
 
     /**
      * @brief 差量对齐更新功能：保留交集、删除不在新列表的旧功能、新增缺少功能
@@ -88,7 +87,7 @@ class Module : public AuditableEntity, public ChangeableEntity
      * @param updatedBy 本次更新操作人
      */
     void replaceActions(const std::vector<Action> &newActions,
-                        const int32_t updatedBy);
+                        int32_t updatedBy);
 
     /**
      * @brief 更新功能列表（差量更新）
@@ -99,29 +98,33 @@ class Module : public AuditableEntity, public ChangeableEntity
         const std::unordered_map<int64_t, const Action *> &newActionsMapping,
         int32_t updatedBy);
 
-        /**
-         * @brief 更新优先级列表（差量更新）
-         * @param priorities 新的优先级列表
-         * @param pendingPriorities 待解析的优先级（包含时间戳ID）
-         * @param updatedBy 更新操作人
-         */
-        void updatePriorities(const std::vector<ActionPriority> &priorities,
-                              const int32_t updatedBy);
+    /**
+     * @brief 更新优先级列表（差量更新）
+     * @param priorities 新的优先级列表
+     * @param pendingPriorities 待解析的优先级（包含时间戳ID）
+     * @param updatedBy 更新操作人
+     */
+    void updatePriorities(const std::vector<ActionPriority> &priorities,
+                          int32_t updatedBy);
 
-        /**
-         * @brief 仅在ModuleRepository中用于读取数据库数据
-         */
-        void restoreActions(const std::vector<SysAction> &sysActions);
+    /**
+     * @brief 仅在ModuleRepository中用于读取数据库数据
+     */
+    void restoreActions(const std::vector<SysAction> &sysActions);
 
-        void restorePriorities(
-            const std::vector<SysActionPriority> &sysActionPriorities);
+    /**
+     * @brief 仅在ModuleRepository中用于读取数据库数据
+     */
+    void restorePriorities(
+        const std::vector<SysActionPriority> &sysActionPriorities);
 
-      private:
-        std::optional<int32_t> moduleId_;         ///< 模块id
-        std::string name_;                        ///< 模块名称
-        std::optional<std::string> description_;  ///< 模块描述
-        std::int32_t sortNum_;                    ///< 排序
-        std::optional<int32_t> parentId_;         ///< 父模块
-        std::vector<Action> actions_;             ///< 拥有的功能
-        std::vector<ActionPriority> priorities_;  ///< 功能优先级
+  private:
+    std::optional<int32_t> moduleId_;         ///< 模块id
+    std::string name_;                        ///< 模块名称
+    std::optional<std::string> description_;  ///< 模块描述
+    std::int32_t sortNum_;                    ///< 排序
+    std::optional<int32_t> parentId_;         ///< 父模块
+    std::int32_t version_;                    ///< 乐观锁版本号
+    std::vector<Action> actions_;             ///< 拥有的功能
+    std::vector<ActionPriority> priorities_;  ///< 功能优先级
 };

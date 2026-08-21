@@ -8,9 +8,14 @@ using namespace drogon;
 using namespace drogon_admin;
 
 Task<> ModuleHandler::deleteModule(Module &module,
+                                   const int32_t version,
                                    const int32_t deletedBy) const
 {
     // 校验
+    if (module.version() != version)
+    {
+        throw BusinessException("删除期间数据发生变化，删除失败");
+    }
     // 检查没有子模块
     co_await moduleVerifier_->verifyNoSubmodule(*module.moduleId());
 
@@ -33,9 +38,9 @@ Task<> ModuleHandler::deleteModule(Module &module,
 }
 
 Task<vector<Module>> ModuleHandler::sortModule(
-    const optional<std::int32_t> &parentId,
+    const optional<std::int32_t> parentId,
     const vector<int32_t> &moduleIds,
-    const int32_t updatedBy) const
+    int32_t updatedBy) const
 {
     const auto allModules = co_await moduleRepository_->getByParentId(parentId);
     if (parentId)

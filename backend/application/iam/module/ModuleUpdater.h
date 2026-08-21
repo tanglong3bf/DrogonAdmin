@@ -7,15 +7,18 @@
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/utils/coroutine.h>
 
+/**
+ * @brief 模块更新器
+ */
 class ModuleUpdater : public DrAdminObject<ModuleUpdater>
 {
   public:
     /**
-     * @brief 更新模块
+     * @brief 更新模块基本信息，包括名称、描述字段
      */
     drogon::Task<> updateModule(Module &module,
                                 const ModuleUpdateRequest &request,
-                                const std::int32_t updatedBy);
+                                std::int32_t updatedBy);
 
     /**
      * @brief 更新功能

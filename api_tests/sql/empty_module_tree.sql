@@ -23,6 +23,7 @@ CREATE TABLE "public"."sys_module" (
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -36,6 +37,7 @@ COMMENT ON COLUMN "public"."sys_module"."name" IS '模块名称';
 COMMENT ON COLUMN "public"."sys_module"."description" IS '模块描述';
 COMMENT ON COLUMN "public"."sys_module"."sort_num" IS '模块排序';
 COMMENT ON COLUMN "public"."sys_module"."parent_id" IS '父模块id';
+COMMENT ON COLUMN "public"."sys_module"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_module"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_module"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_module"."updated_by" IS '最新一次更新者';

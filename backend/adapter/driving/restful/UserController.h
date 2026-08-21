@@ -17,14 +17,14 @@ class UserController : public drogon::HttpController<UserController>
                   "/user",
                   drogon::Post,
                   drogon::Options);
-    ADD_METHOD_TO(UserController::updateUser,
-                  "/user/{id}",
-                  drogon::Patch,
-                  drogon::Options);
-    ADD_METHOD_TO(UserController::deleteUser,
-                  "/user/{id}",
-                  drogon::Delete,
-                  drogon::Options);
+    ADD_METHOD_VIA_REGEX(UserController::updateUser,
+                         "/user/([1-9]\\d*)",
+                         drogon::Patch,
+                         drogon::Options);
+    ADD_METHOD_VIA_REGEX(UserController::deleteUser,
+                         "/user/([1-9]\\d*)",
+                         drogon::Delete,
+                         drogon::Options);
     METHOD_LIST_END
 
     /**

@@ -14,6 +14,7 @@ CREATE TABLE "public"."sys_module" (
   "description" varchar(255) COLLATE "pg_catalog"."default",
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -27,6 +28,7 @@ COMMENT ON COLUMN "public"."sys_module"."name" IS '模块名称';
 COMMENT ON COLUMN "public"."sys_module"."description" IS '模块描述';
 COMMENT ON COLUMN "public"."sys_module"."sort_num" IS '模块排序';
 COMMENT ON COLUMN "public"."sys_module"."parent_id" IS '父模块id';
+COMMENT ON COLUMN "public"."sys_module"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_module"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_module"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_module"."updated_by" IS '最新一次更新者';
@@ -35,11 +37,11 @@ COMMENT ON COLUMN "public"."sys_module"."deleted_by" IS '删除者';
 COMMENT ON COLUMN "public"."sys_module"."deleted_time" IS '删除时间';
 
 -- 模块表数据
-INSERT INTO public.sys_module VALUES (1, '模块-1', NULL, 0, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (2, '模块-1-1', NULL, 0, 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (3, '模块-1-2', NULL, 1, 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (4, '模块-1-3', NULL, 2, 1, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
-INSERT INTO public.sys_module VALUES (5, '模块-2', NULL, 1, NULL, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (1, '模块-1', NULL, 0, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (2, '模块-1-1', NULL, 0, 1, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (3, '模块-1-2', NULL, 1, 1, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (4, '模块-1-3', NULL, 2, 1, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
+INSERT INTO public.sys_module VALUES (5, '模块-2', NULL, 1, NULL, 0, 1, '2026-07-05 14:46:05.000000', 1, '2026-07-05 14:46:05.000000', NULL, NULL);
 
 ALTER SEQUENCE "public"."sys_module_module_id_seq"
 OWNED BY "public"."sys_module"."module_id";

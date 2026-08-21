@@ -65,6 +65,7 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
      */
     drogon::Task<> multiSave(
         const std::vector<Module> &modules,
+        const std::vector<std::int32_t> &versions,
         const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**

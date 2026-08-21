@@ -10,14 +10,17 @@ using namespace trantor;
 using namespace drogon_admin;
 
 Module::Module(std::string_view name, const std::int32_t sortNum)
-    : name_(name), sortNum_(sortNum)
+    : name_{name}, sortNum_{sortNum}, version_{0}
 {
 }
 
 Module::Module(std::string_view name,
                const std::int32_t sortNum,
                const std::int32_t createdBy)
-    : name_(name), sortNum_(sortNum), AuditableEntity(AUDITABLE_INIT)
+    : name_{name},
+      sortNum_{sortNum},
+      version_{0},
+      AuditableEntity(AUDITABLE_INIT)
 {
     markNew();
 }
@@ -28,6 +31,7 @@ Module::Module(const SysModule &model)
       OPT_INIT(description_, Description),
       INIT(sortNum_, SortNum),
       OPT_INIT(parentId_, ParentId),
+      INIT(version_, Version),
       AuditableEntity(AUDITABLE_INIT_BY_MODEL)
 {
 }
@@ -47,6 +51,7 @@ Module::operator SysModule() const
     }
     SET_VAL(sortNum_, SortNum);
     SET_OPT(parentId_, ParentId);
+    SET_VAL(version_, Version);
     SET_OPT(createdBy(), CreatedBy);
     SET_OPT(createdTime(), CreatedTime);
     SET_OPT(updatedBy(), UpdatedBy);

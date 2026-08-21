@@ -22,10 +22,23 @@ Task<> ModuleRepository::save(const Module &module,
         case ChangingStatus::DELETED:
         {
             auto trans = co_await dbClient->newTransactionCoro();
-            auto mapper = moduleMapper(trans);
-
             const auto sysModule = static_cast<SysModule>(module);
-            co_await mapper.update(sysModule);
+
+            const string sql = format(
+                "UPDATE sys_module SET deleted_by = {}, deleted_time = "
+                "'{}'::timestamp, version = version + 1 WHERE module_id = {} "
+                "AND "
+                "version = {}",
+                sysModule.getValueOfDeletedBy(),
+                sysModule.getValueOfDeletedTime().toDbStringLocal(),
+                sysModule.getValueOfModuleId(),
+                sysModule.getValueOfVersion());
+            const auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"删除期间数据发生变化，删除失败"};
+            }
 
             if (module.actions().size() > 0)
             {
@@ -53,7 +66,15 @@ Task<> ModuleRepository::save(const Module &module,
             auto mapper = moduleMapper(trans);
 
             const auto sysModule = static_cast<SysModule>(module);
-            co_await mapper.update(sysModule);
+            Json::Value data = sysModule.toJson();
+            const string sql =
+                sqlGenerator()->getSql("update_module", {{"data", data}});
+            const auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"更新期间数据发生变化，更新失败"};
+            }
 
             // 采用分别存储的方式，是因为无法保证新增的actionId是有顺序的
             vector<int64_t> newActionIds;
@@ -297,8 +318,10 @@ Task<vector<Module>> ModuleRepository::getByParentId(
 }
 
 Task<> ModuleRepository::multiSave(const vector<Module> &modules,
+                                   const vector<int32_t> &versions,
                                    const DbClientPtr &dbClient) const
 {
+    assert(modules.size() == versions.size());
     // 暂只考虑批量更新
     vector<SysModule> toUpdate;
     toUpdate.reserve(modules.size());
@@ -314,27 +337,30 @@ Task<> ModuleRepository::multiSave(const vector<Module> &modules,
         LOG_WARN << "multiSave被调用，但没有需要更新的数据，请检查代码逻辑";
         co_return;
     }
-    Json::Value dataList;
 
+    Json::Value dataList;
     for (const auto &module : toUpdate)
     {
-        Json::Value item;
-        item = module.toJson();
-        // SqlGenerator 太垃圾了
-        for (const auto &key : item.getMemberNames())
-        {
-            if (item[key].isNull())
-            {
-                item.removeMember(key);
-            }
-        }
-        dataList.append(item);
+        dataList.append(module.toJson());
+    }
+    Json::Value versionList;
+    for (const auto &version : versions)
+    {
+        versionList.append(version);
     }
 
-    const auto sql = sqlGenerator()->getSql("multi_update_module",
-                                            ParamList{{"data_list", dataList}});
+    const auto sql =
+        sqlGenerator()->getSql("multi_update_module",
+                               ParamList{{"data_list", dataList},
+                                         {"version_list", versionList}});
 
-    co_await dbClient->execSqlCoro(sql);
+    auto trans = co_await dbClient->newTransactionCoro();
+    const auto result = co_await trans->execSqlCoro(sql);
+    if (result.affectedRows() < modules.size())
+    {
+        trans->rollback();
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
 }
 
 Task<vector<Action>> ModuleRepository::getActionByIds(

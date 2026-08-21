@@ -26,5 +26,5 @@ struct DeptSortRequest
 
   private:
     std::optional<std::int32_t> parentId_;  ///< 父部门id
-    std::vector<DeptSortItem> depts_;       ///< 部门id
+    std::vector<DeptSortItem> depts_;       ///< 部门排序项
 };

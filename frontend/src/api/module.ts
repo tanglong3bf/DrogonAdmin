@@ -1,5 +1,10 @@
 import request, { validateResponse } from '@/utils/request'
-import type { Action, ActionPriority, Module } from '@/types/module'
+import type {
+  Action,
+  ActionPriority,
+  Module,
+  ModuleSortFormDataItem
+} from '@/types/module'
 import { isModuleTree } from '@/types/guard'
 
 /**
@@ -25,17 +30,18 @@ export const newModule = (
  */
 export const updateModule = (
   module_id: number,
+  version: number,
   name?: string,
   description?: string | null
 ) => {
-  return request.patch(`/module/${module_id}`, { name, description })
+  return request.patch(`/module/${module_id}`, { name, description, version })
 }
 
 /**
  * 删除指定模块
  */
-export const deleteModule = (module_id: number) => {
-  return request.delete(`/module/${module_id}`)
+export const deleteModule = (module_id: number, version: number) => {
+  return request.delete(`/module/${module_id}`, { params: { version } })
 }
 
 /**
@@ -43,9 +49,9 @@ export const deleteModule = (module_id: number) => {
  */
 export const sortModule = (
   parent_id: number | undefined,
-  module_ids: number[]
+  modules: ModuleSortFormDataItem[]
 ) => {
-  return request.post('/module/sort', { parent_id, module_ids })
+  return request.post('/module/sort', { parent_id, modules })
 }
 
 /**
@@ -53,10 +59,12 @@ export const sortModule = (
  */
 export const assignAction = (
   module_id: number,
+  version: number,
   actions: Action[],
   priorities: ActionPriority[]
 ) => {
   return request.post(`/module/${module_id}/actions`, {
+    version,
     actions,
     priorities
   })
