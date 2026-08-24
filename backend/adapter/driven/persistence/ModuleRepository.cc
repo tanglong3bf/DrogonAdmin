@@ -378,6 +378,19 @@ Task<vector<Action>> ModuleRepository::getActionByIds(
         ranges_utils::to<vector>();
 }
 
+drogon::Task<std::size_t> ModuleRepository::countCodes(
+    const std::vector<int32_t> &actionIds,
+    const std::vector<std::string> &codes) const
+{
+    Criteria criteria{SysModule::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysAction::Cols::_action_id,
+                                    CompareOperator::NotIn,
+                                    actionIds};
+    criteria = criteria &&
+               Criteria{SysAction::Cols::_code, CompareOperator::In, codes};
+    co_return co_await actionMapper().count(criteria);
+}
+
 inline SqlGenerator *ModuleRepository::sqlGenerator()
 {
     static const auto sqlGenerator_ = app().getPlugin<SqlGenerator>();

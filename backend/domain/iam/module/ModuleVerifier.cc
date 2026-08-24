@@ -55,3 +55,14 @@ Task<> ModuleVerifier::verifyActionsBelongsToModule(
         }
     }
 }
+
+drogon::Task<> ModuleVerifier::verifyActionCodesNotDuplicated(
+    const std::vector<int32_t> &actionIds,
+    const std::vector<std::string> &codes) const
+{
+    const auto count = co_await moduleRepository_->countCodes(actionIds, codes);
+    if (count > 0)
+    {
+        throw BusinessException("功能代码冲突");
+    }
+}

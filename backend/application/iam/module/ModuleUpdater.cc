@@ -46,6 +46,21 @@ Task<> ModuleUpdater::updateActions(Module &module,
     {
         throw BusinessException{"更新期间数据发生变化，更新失败"};
     }
+    // 全部的code
+    auto codes =
+        request.actions() |
+        views::transform([](const ActionRequest &a) { return a.code(); }) |
+        ranges_utils::to<vector>();
+    // 已有id
+    auto ids = request.actions() | views::filter([](const ActionRequest &a) {
+                   return a.actionId() < INT32_MAX;
+               }) |
+               views::transform([](const ActionRequest &a) {
+                   return static_cast<int32_t>(a.actionId());
+               }) |
+               ranges_utils::to<vector>();
+    co_await moduleVerifier_->verifyActionCodesNotDuplicated(ids, codes);
+
     const vector<int32_t> actionIds =
         request.actions() | views::filter([](const ActionRequest &a) {
             return a.actionId() < INT32_MAX;
