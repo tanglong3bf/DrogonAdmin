@@ -15,7 +15,8 @@ const actions = [
       has_data_permission: false,
       module_id: 3,
       name: '浏览部门管理页面',
-      sort_num: 0
+      sort_num: 0,
+      version: 0
     },
     {
       action_id: 2,
@@ -23,7 +24,8 @@ const actions = [
       has_data_permission: true,
       module_id: 3,
       name: '查询部门树',
-      sort_num: 1
+      sort_num: 1,
+      version: 0
     },
     {
       action_id: 3,
@@ -31,7 +33,8 @@ const actions = [
       has_data_permission: true,
       module_id: 3,
       name: '新增部门',
-      sort_num: 2
+      sort_num: 2,
+      version: 0
     },
     {
       action_id: 4,
@@ -39,7 +42,8 @@ const actions = [
       has_data_permission: true,
       module_id: 3,
       name: '排序部门',
-      sort_num: 3
+      sort_num: 3,
+      version: 0
     },
     {
       action_id: 5,
@@ -47,7 +51,8 @@ const actions = [
       has_data_permission: true,
       module_id: 3,
       name: '更新部门',
-      sort_num: 4
+      sort_num: 4,
+      version: 0
     },
     {
       action_id: 6,
@@ -55,7 +60,8 @@ const actions = [
       has_data_permission: true,
       module_id: 3,
       name: '删除部门',
-      sort_num: 5
+      sort_num: 5,
+      version: 0
     }
   ],
   [
@@ -65,7 +71,8 @@ const actions = [
       has_data_permission: false,
       module_id: 4,
       name: '浏览用户管理页面',
-      sort_num: 0
+      sort_num: 0,
+      version: 0
     },
     {
       action_id: 8,
@@ -73,7 +80,8 @@ const actions = [
       has_data_permission: true,
       module_id: 4,
       name: '查询用户',
-      sort_num: 1
+      sort_num: 1,
+      version: 0
     },
     {
       action_id: 9,
@@ -81,7 +89,8 @@ const actions = [
       has_data_permission: true,
       module_id: 4,
       name: '新增用户',
-      sort_num: 2
+      sort_num: 2,
+      version: 0
     },
     {
       action_id: 10,
@@ -89,7 +98,8 @@ const actions = [
       has_data_permission: true,
       module_id: 4,
       name: '更新用户',
-      sort_num: 3
+      sort_num: 3,
+      version: 0
     },
     {
       action_id: 11,
@@ -97,7 +107,8 @@ const actions = [
       has_data_permission: true,
       module_id: 4,
       name: '删除用户',
-      sort_num: 4
+      sort_num: 4,
+      version: 0
     }
   ],
   [],
@@ -108,7 +119,8 @@ const actions = [
       has_data_permission: false,
       module_id: 6,
       name: '浏览角色管理页面',
-      sort_num: 0
+      sort_num: 0,
+      version: 0
     },
     {
       action_id: 13,
@@ -116,7 +128,8 @@ const actions = [
       has_data_permission: false,
       module_id: 6,
       name: '查询角色',
-      sort_num: 1
+      sort_num: 1,
+      version: 0
     },
     {
       action_id: 14,
@@ -124,7 +137,8 @@ const actions = [
       has_data_permission: false,
       module_id: 6,
       name: '新增角色',
-      sort_num: 2
+      sort_num: 2,
+      version: 0
     },
     {
       action_id: 15,
@@ -132,7 +146,8 @@ const actions = [
       has_data_permission: false,
       module_id: 6,
       name: '更新角色',
-      sort_num: 3
+      sort_num: 3,
+      version: 0
     },
     {
       action_id: 16,
@@ -140,7 +155,8 @@ const actions = [
       has_data_permission: false,
       module_id: 6,
       name: '删除角色',
-      sort_num: 4
+      sort_num: 4,
+      version: 0
     }
   ]
 ]
@@ -224,52 +240,59 @@ if (mockConfig.module.get_module_tree) {
                   children: [
                     {
                       actions: actions[3],
-                      action_priority: actionPriority[3],
+                      priorities: actionPriority[3],
                       module_id: 3,
                       name: '部门管理',
                       parent_id: 2,
-                      sort_num: 0
+                      sort_num: 0,
+                      version: 0
                     },
                     {
                       actions: actions[4],
-                      action_priority: actionPriority[4],
+                      priorities: actionPriority[4],
                       module_id: 4,
                       name: '用户管理',
                       parent_id: 2,
-                      sort_num: 1
+                      sort_num: 1,
+                      version: 0
                     }
                   ],
                   module_id: 2,
                   name: '系统管理',
                   parent_id: 1,
-                  sort_num: 0
+                  sort_num: 0,
+                  version: 0
                 },
                 {
                   children: [
                     {
                       actions: actions[6],
-                      action_priority: actionPriority[6],
+                      priorities: actionPriority[6],
                       module_id: 6,
                       name: '角色管理',
                       parent_id: 5,
-                      sort_num: 0
+                      sort_num: 0,
+                      version: 0
                     },
                     {
                       module_id: 7,
                       name: '权限分配',
                       parent_id: 5,
-                      sort_num: 1
+                      sort_num: 1,
+                      version: 0
                     }
                   ],
                   module_id: 5,
                   name: '权限管理',
                   parent_id: 1,
-                  sort_num: 1
+                  sort_num: 1,
+                  version: 0
                 }
               ],
               module_id: 1,
               name: '系统管理',
-              sort_num: 0
+              sort_num: 0,
+              version: 0
             }
           ]
         }
