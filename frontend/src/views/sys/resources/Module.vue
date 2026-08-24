@@ -281,6 +281,7 @@ const handleUpdateModule = async (
   original.name = module.name
   original.description =
     module.description === null ? undefined : module.description
+  original.version = original.version + 1
   dialogVisible.value = false
   return true
 }
@@ -668,14 +669,36 @@ const assignCancel = () => {
  * 提交功能分配
  */
 const assignSubmit = async () => {
-  await assignAction(
-    sortableActionForm.module_id,
-    sortableActionForm.version,
-    sortableActionForm.actions,
-    sortableActionForm.priorities
-  )
-  await getModuleData()
-  actionDialogVisible.value = false
+  actionsForm.value?.validate(async valid => {
+    if (!valid) {
+      ElMessage.error('请检查表单数据')
+      return
+    }
+    await assignAction(
+      sortableActionForm.module_id,
+      sortableActionForm.version,
+      sortableActionForm.actions,
+      sortableActionForm.priorities
+    )
+    ElMessage.success('分配成功')
+    await getModuleData()
+    actionDialogVisible.value = false
+  })
+}
+/**
+ * 检查数组中指定字段是否重复
+ */
+const validateUnique = (field: 'name' | 'code', message: string) => {
+  return (_rule: any, value: string, callback: any) => {
+    const list = sortableActionForm.actions
+    // 找出所有相同值的项（排除空值）
+    const duplicates = list.filter(item => item[field] && item[field] === value)
+    if (duplicates.length > 1) {
+      callback(new Error(message))
+    } else {
+      callback()
+    }
+  }
 }
 </script>
 
@@ -829,21 +852,50 @@ const assignSubmit = async () => {
         style="max-width: 653px"
         :model="sortableActionForm"
       >
-        <el-form-item
+        <div
           v-for="(action, index) in sortableActionForm.actions"
           :key="action.action_id"
-          :prop="'actions.' + index + '.name'"
-          :rules="{
-            required: true,
-            message: '请输入功能名称',
-            trigger: 'blur'
-          }"
+          style="display: flex; align-items: flex-start; margin-bottom: 18px"
         >
-          <el-input v-model="action.name" />
-          <el-input
-            v-model="action.code"
-            style="margin-left: 20px; width: 100px"
-          />
+          <el-form-item
+            :prop="'actions.' + index + '.name'"
+            :rules="[
+              {
+                required: true,
+                message: '请输入功能名称',
+                trigger: 'blur'
+              },
+              {
+                validator: validateUnique('name', '功能名称不能重复'),
+                trigger: 'blur'
+              }
+            ]"
+            style="margin-bottom: 0"
+          >
+            <el-input v-model="action.name" />
+          </el-form-item>
+          <el-form-item
+            :prop="'actions.' + index + '.code'"
+            :rules="[
+              {
+                required: true,
+                message: '请输入功能代码',
+                trigger: 'blur'
+              },
+              {
+                validator: validateUnique('code', '功能代码不能重复'),
+                trigger: 'blur'
+              },
+              {
+                pattern: /^[a-zA-Z0-9_:]+$/,
+                message: '不支持的符号',
+                trigger: 'blur'
+              }
+            ]"
+            style="margin-left: 20px; margin-bottom: 0"
+          >
+            <el-input v-model="action.code" style="width: 100px" />
+          </el-form-item>
           <el-switch
             v-model="action.has_data_permission"
             size="default"
@@ -873,7 +925,7 @@ const assignSubmit = async () => {
               @click="moveUpAction(action.action_id)"
             />
           </el-button-group>
-        </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="addAction">新增功能</el-button>
         </el-form-item>

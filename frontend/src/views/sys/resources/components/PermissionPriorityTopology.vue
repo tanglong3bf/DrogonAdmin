@@ -149,6 +149,8 @@ const handleMouseUp = (e: MouseEvent) => {
 
     if (action1.has_data_permission && !action2.has_data_permission) {
       ElMessage.error('非数据权限节点不可依赖于数据权限节点')
+      dragging.value = false
+      return
     }
 
     // 优先级高低
