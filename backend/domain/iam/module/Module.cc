@@ -128,6 +128,7 @@ void Module::updateActions(
     {
         if (newActionsMapping.find(a.actionId()) == newActionsMapping.end())
         {
+            isAnyUpdated = true;
             a.markDeleted();
             a.markDeletedBy(updatedBy);
         }
