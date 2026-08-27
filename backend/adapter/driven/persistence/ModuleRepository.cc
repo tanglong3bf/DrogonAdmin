@@ -22,18 +22,16 @@ Task<> ModuleRepository::save(const Module &module,
         case ChangingStatus::DELETED:
         {
             auto trans = co_await dbClient->newTransactionCoro();
-            const auto sysModule = static_cast<SysModule>(module);
 
-            const string sql = format(
-                "UPDATE sys_module SET deleted_by = {}, deleted_time = "
-                "'{}'::timestamp, version = version + 1 WHERE module_id = {} "
+            const auto result = co_await trans->execSqlCoro(
+                "UPDATE sys_module SET deleted_by = $1, deleted_time = "
+                "$2, version = version + 1 WHERE module_id = $3 "
                 "AND "
-                "version = {}",
-                sysModule.getValueOfDeletedBy(),
-                sysModule.getValueOfDeletedTime().toDbStringLocal(),
-                sysModule.getValueOfModuleId(),
-                sysModule.getValueOfVersion());
-            const auto result = co_await trans->execSqlCoro(sql);
+                "version = $4",
+                *module.deletedBy(),
+                *module.deletedTime(),
+                *module.moduleId(),
+                module.version());
             if (result.affectedRows() != 1)
             {
                 trans->rollback();
@@ -383,9 +381,16 @@ drogon::Task<std::size_t> ModuleRepository::countCodes(
     const std::vector<std::string> &codes) const
 {
     Criteria criteria{SysModule::Cols::_deleted_by, CompareOperator::IsNull};
-    criteria = criteria && Criteria{SysAction::Cols::_action_id,
-                                    CompareOperator::NotIn,
-                                    actionIds};
+    if (codes.size() == 0)
+    {
+        co_return 0;
+    }
+    if (actionIds.size() > 0)
+    {
+        criteria = criteria && Criteria{SysAction::Cols::_action_id,
+                                        CompareOperator::NotIn,
+                                        actionIds};
+    }
     criteria = criteria &&
                Criteria{SysAction::Cols::_code, CompareOperator::In, codes};
     co_return co_await actionMapper().count(criteria);

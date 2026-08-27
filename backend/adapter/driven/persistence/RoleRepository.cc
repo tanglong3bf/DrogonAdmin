@@ -156,14 +156,13 @@ Task<> RoleRepository::save(Role &role) const
                 co_await app().getDbClient()->newTransactionCoro();
 
             // 删除本体
-            const auto sql = format(
-                "UPDATE sys_role SET version = version + 1, deleted_by = {}, "
-                "deleted_time = '{}' WHERE role_id = {} AND version = {}",
+            const auto result = co_await trans->execSqlCoro(
+                "UPDATE sys_role SET version = version + 1, deleted_by = $1, "
+                "deleted_time = $2 WHERE role_id = $3 AND version = $4",
                 *role.deletedBy(),
-                role.deletedTime()->toDbStringLocal(),
+                *role.deletedTime(),
                 *role.roleId(),
                 role.version());
-            const auto result = co_await trans->execSqlCoro(sql);
             if (result.affectedRows() != 1)
             {
                 trans->rollback();

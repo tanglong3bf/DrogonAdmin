@@ -129,15 +129,13 @@ Task<> UserRepository::save(User &user) const
             const auto trans = co_await dbClient()->newTransactionCoro();
             const auto model = static_cast<SysUser>(user);
             // 本体删除(软删除)
-            string sql = format(
-                "UPDATE sys_user SET deleted_by = {}, deleted_time = "
-                "'{}'::timestamp, version = version + 1 WHERE user_id = {} AND "
-                "version = {}",
+            auto result = co_await trans->execSqlCoro(
+                "UPDATE sys_user SET deleted_by = $1, deleted_time = $2, "
+                "version = version + 1 WHERE user_id = $3 AND version = $4",
                 model.getValueOfDeletedBy(),
-                model.getValueOfDeletedTime().toDbStringLocal(),
+                model.getValueOfDeletedTime(),
                 model.getValueOfUserId(),
                 model.getValueOfVersion());
-            auto result = co_await trans->execSqlCoro(sql);
             if (result.affectedRows() != 1)
             {
                 trans->rollback();
@@ -160,17 +158,14 @@ Task<> UserRepository::updatePassword(User &user) const
 {
     const auto trans = co_await dbClient()->newTransactionCoro();
 
-    string sql = format(
-        "UPDATE sys_user SET password = '{}', version = version + 1, "
-        "updated_by = {}, updated_time = '{}' WHERE user_id = {} AND version = "
-        "{}",
-        user.password(),
+    const auto result = co_await trans->execSqlCoro(
+        "UPDATE sys_user SET password = $1, version = version + 1, updated_by "
+        "= $2, updated_time = $3 WHERE user_id = $4 AND version = $5",
+        string(user.password()),
         *user.updatedBy(),
-        user.updatedTime()->toDbStringLocal(),
+        *user.updatedTime(),
         *user.userId(),
         user.version());
-
-    const auto result = co_await trans->execSqlCoro(sql);
     if (result.affectedRows() != 1)
     {
         trans->rollback();

@@ -8,7 +8,6 @@
 #include <drogon/HttpAppFramework.h>
 #include <optional>
 #include <ranges>
-#include <format>
 
 using namespace std;
 using namespace drogon;
@@ -41,26 +40,27 @@ Task<std::optional<std::int32_t>> DeptRepository::getMaxSubDeptSortNum(
 
 Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
 {
-    const auto sysDept = static_cast<SysDept>(dept);
-
     auto mapper = deptMapper(dbClient);
 
     switch (dept.changingStatus())
     {
         case ChangingStatus::NEW:
+        {
+            const auto sysDept = static_cast<SysDept>(dept);
+
             co_await mapper.insert(sysDept);
             break;
+        }
         case ChangingStatus::DELETED:
         {
-            string sql = format(
-                "UPDATE sys_dept SET deleted_by = {}, deleted_time = "
-                "'{}'::timestamp, version = version + 1 WHERE dept_id = {} AND "
-                "version = {}",
-                sysDept.getValueOfDeletedBy(),
-                sysDept.getValueOfDeletedTime().toDbStringLocal(),
-                sysDept.getValueOfDeptId(),
-                sysDept.getValueOfVersion());
-            auto result = co_await dbClient->execSqlCoro(sql);
+            auto result = co_await dbClient->execSqlCoro(
+                "UPDATE sys_dept SET deleted_by = $1, deleted_time = "
+                "$2, version = version + 1 WHERE dept_id = $3 AND "
+                "version = $4",
+                *dept.deletedBy(),
+                *dept.deletedTime(),
+                *dept.deptId(),
+                dept.version());
             if (result.affectedRows() == 0)
             {
                 throw BusinessException{"删除期间数据发生变化，删除失败"};
@@ -69,16 +69,15 @@ Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
         }
         case ChangingStatus::UPDATED:
         {
-            string sql = format(
-                "UPDATE sys_dept SET name = '{}', updated_by={}, "
-                "updated_time='{}'::timestamp, version = version + 1 "
-                "WHERE dept_id = {} AND version = {}",
-                sysDept.getValueOfName(),
-                sysDept.getValueOfUpdatedBy(),
-                sysDept.getValueOfUpdatedTime().toDbStringLocal(),
-                sysDept.getValueOfDeptId(),
-                sysDept.getValueOfVersion());
-            auto result = co_await dbClient->execSqlCoro(sql);
+            auto result = co_await dbClient->execSqlCoro(
+                "UPDATE sys_dept SET name = $1, updated_by=$2, "
+                "updated_time=$3, version = version + 1 WHERE dept_id = $4 AND "
+                "version = $5",
+                dept.name(),
+                *dept.updatedBy(),
+                *dept.updatedTime(),
+                *dept.deptId(),
+                dept.version());
             if (result.affectedRows() == 0)
             {
                 throw BusinessException{"更新期间数据发生变化，更新失败"};

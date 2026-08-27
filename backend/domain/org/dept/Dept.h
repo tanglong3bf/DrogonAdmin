@@ -31,10 +31,7 @@ class Dept : public AuditableEntity, public ChangeableEntity
     explicit operator SysDept() const;
     /// @}
 
-    const auto &deptId() const noexcept
-    {
-        return deptId_;
-    }
+    GETTER(deptId)
     GETTER(name)
     GETTER(sortNum)
     GETTER(parentId)
