@@ -31,7 +31,7 @@ Task<vector<UserResponse>> UserCqrsRepo::getUserList(
         maxPage < request.page() ? maxPage : request.page();
     if (page != request.page())
     {
-        addWarn(attr, "查询页码超出范围，已自动调整到最后一页");
+        addWarning(attr, "查询页码超出范围，已自动调整到最后一页");
     }
     const auto sysUserList = co_await userMapper()
                                  .orderBy(SysUser::Cols::_user_id)
