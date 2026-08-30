@@ -149,15 +149,26 @@ Task<> RoleRepository::save(Role &role) const
         }
         case ChangingStatus::DELETED:
         {
+            assert(role.roleId().has_value());
+            assert(role.deletedBy().has_value());
+            assert(role.deletedTime().has_value());
             const auto trans =
                 co_await app().getDbClient()->newTransactionCoro();
+
             // 删除本体
-            co_await roleMapper(trans).updateBy({SysRole::Cols::_deleted_by,
-                                                 SysRole::Cols::_deleted_time},
-                                                {SysRole::Cols::_role_id,
-                                                 *role.roleId()},
-                                                *role.deletedBy(),
-                                                *role.deletedTime());
+            const auto result = co_await trans->execSqlCoro(
+                "UPDATE sys_role SET version = version + 1, deleted_by = $1, "
+                "deleted_time = $2 WHERE role_id = $3 AND version = $4",
+                *role.deletedBy(),
+                *role.deletedTime(),
+                *role.roleId(),
+                role.version());
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"删除期间数据发生变化，删除失败"};
+            }
+
             // 处理关联数据
             auto roleDepts = role.roleDepts();
             if (roleDepts.size() == 0)
@@ -173,17 +184,29 @@ Task<> RoleRepository::save(Role &role) const
                 json["dept_id"] = dept.deptId();
                 data.append(json);
             }
-            auto sql = sqlGenerator()->getSql("multi_delete_role_dept",
-                                              {{"data", data}});
-            co_await trans->execSqlCoro(sql);
+            const auto sql2 = sqlGenerator()->getSql("multi_delete_role_dept",
+                                                     {{"data", data}});
+            co_await trans->execSqlCoro(sql2);
             co_return;
         }
         case ChangingStatus::UPDATED:
         {
+            assert(role.roleId().has_value());
+            assert(!role.deletedBy().has_value());
+            assert(!role.deletedTime().has_value());
             const auto trans =
                 co_await app().getDbClient()->newTransactionCoro();
             SysRole sysRole = static_cast<SysRole>(role);
-            co_await roleMapper(trans).update(sysRole);
+
+            Json::Value json = sysRole.toJson();
+            string sql =
+                sqlGenerator()->getSql("update_role", {{"data", json}});
+            const auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"更新期间数据发生变化，更新失败"};
+            }
 
             // 处理关联数据
             if (role.roleDepts().size() == 0)

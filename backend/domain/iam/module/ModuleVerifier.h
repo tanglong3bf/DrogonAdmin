@@ -31,6 +31,13 @@ class ModuleVerifier : public DrAdminObject<ModuleVerifier>
         std::int32_t moduleId,
         const std::vector<std::int32_t> &actionIds) const;
 
+    /**
+     * @brief 校验功能code不重复
+     */
+    drogon::Task<> verifyActionCodesNotDuplicated(
+        const std::vector<int32_t> &actionIds,
+        const std::vector<std::string> &codes) const;
+
   private:
     ModuleRepositoryPtr moduleRepository_{
         drogon::DrClassMap::getSingleInstance<ModuleRepository>()};

@@ -68,6 +68,7 @@ class DeptRepository : public DrAdminObject<DeptRepository>
      */
     drogon::Task<> multiSave(
         const std::vector<Dept> &depts,
+        const std::vector<std::int32_t> &versions,
         const DbClientPtr & = drogon::app().getDbClient()) const;
 
   private:

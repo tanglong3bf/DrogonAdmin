@@ -24,20 +24,21 @@ class DeptService : public DrAdminObject<DeptService>
      * @brief 创建部门
      */
     drogon::Task<> createDept(const DeptCreateRequest &request,
-                              const std::int32_t createdBy) const;
+                              std::int32_t createdBy) const;
 
     /**
      * @brief 更新部门名称
      */
-    drogon::Task<> updateDept(const std::int32_t deptId,
+    drogon::Task<> updateDept(std::int32_t deptId,
                               const DeptUpdateRequest &request,
-                              const std::int32_t updatedBy) const;
+                              std::int32_t updatedBy) const;
 
     /**
      * @brief 删除指定部门
      */
-    drogon::Task<> deleteDept(const std::int32_t deptId,
-                              const std::int32_t deletedBy) const;
+    drogon::Task<> deleteDept(std::int32_t deptId,
+                              std::int32_t version,
+                              std::int32_t deletedBy) const;
 
     /**
      * @brief 排序指定部门

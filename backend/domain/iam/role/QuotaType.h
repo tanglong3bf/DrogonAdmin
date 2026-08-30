@@ -14,3 +14,5 @@ enum class QuotaType : int16_t
 };
 
 std::string toString(const QuotaType &quotaType);
+
+// vim: set filetype = cpp:

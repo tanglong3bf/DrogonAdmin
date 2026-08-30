@@ -31,6 +31,7 @@ Json::Value DeptResponse::toJson() const
     result["dept_id"] = deptId_;
     result["name"] = name_;
     result["sort_num"] = sortNum_;
+    result["version"] = version_;
     if (parentId_)
     {
         result["parent_id"] = *parentId_;
@@ -46,7 +47,8 @@ DeptResponse::DeptResponse(const Dept &dept)
     : deptId_{*dept.deptId()},
       name_{dept.name()},
       sortNum_{dept.sortNum()},
-      parentId_{dept.parentId()}
+      parentId_{dept.parentId()},
+      version_{dept.version()}
 {
 }
 

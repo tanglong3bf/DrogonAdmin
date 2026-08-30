@@ -14,9 +14,15 @@ using namespace drogon_admin;
 
 Task<> ModuleUpdater::updateModule(Module &module,
                                    const ModuleUpdateRequest &request,
-                                   const std::int32_t updatedBy)
+                                   const int32_t updatedBy)
 {
+    assert(module.moduleId() != nullopt);
+
     // 校验
+    if (module.version() != request.version())
+    {
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
     if (request.name() && request.name() != module.name())
     {
         co_await moduleVerifier_->verifyModuleNameNotDuplicated(
@@ -29,13 +35,32 @@ Task<> ModuleUpdater::updateModule(Module &module,
     co_return;
 }
 
-drogon::Task<> ModuleUpdater::updateActions(Module &module,
-                                            const ActionUpdateRequest &request,
-                                            const std::int32_t updatedBy)
+Task<> ModuleUpdater::updateActions(Module &module,
+                                    const ActionUpdateRequest &request,
+                                    const int32_t updatedBy)
 {
     assert(module.moduleId() != nullopt);
 
     // 校验
+    if (module.version() != request.version())
+    {
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
+    // 全部的code
+    auto codes =
+        request.actions() |
+        views::transform([](const ActionRequest &a) { return a.code(); }) |
+        ranges_utils::to<vector>();
+    // 已有id
+    auto ids = request.actions() | views::filter([](const ActionRequest &a) {
+                   return a.actionId() < INT32_MAX;
+               }) |
+               views::transform([](const ActionRequest &a) {
+                   return static_cast<int32_t>(a.actionId());
+               }) |
+               ranges_utils::to<vector>();
+    co_await moduleVerifier_->verifyActionCodesNotDuplicated(ids, codes);
+
     const vector<int32_t> actionIds =
         request.actions() | views::filter([](const ActionRequest &a) {
             return a.actionId() < INT32_MAX;
@@ -52,7 +77,7 @@ drogon::Task<> ModuleUpdater::updateActions(Module &module,
     }
 
     // 存储ID到Action对象的映射
-    std::unordered_map<std::int64_t, const Action *> newActionsMapping;
+    unordered_map<int64_t, const Action *> newActionsMapping;
     const auto newActions = request.actions() |
                             views::transform([&module](const ActionRequest &a) {
                                 return Action{a.actionId(),

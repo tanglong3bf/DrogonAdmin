@@ -66,6 +66,7 @@ class Role : public AuditableEntity, public ChangeableEntity
     GETTER(userQuota)
     GETTER(relationType)
     GETTER(roleDepts)
+    GETTER(version)
 
     /**
      * @brief 追加部门（仅新增，不删除已有角色）
@@ -95,5 +96,6 @@ class Role : public AuditableEntity, public ChangeableEntity
     QuotaType quotaType_;                     ///< 用户数量限制类型
     std::optional<std::int32_t> userQuota_;   ///< 具体限制数量
     RelationType relationType_;               ///< 部门关联关系
+    std::int32_t version_;                    ///< 乐观锁版本号
     std::vector<RoleDept> roleDepts_;         ///< 关联部门
 };

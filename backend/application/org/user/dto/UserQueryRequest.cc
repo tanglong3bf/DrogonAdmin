@@ -115,14 +115,14 @@ UserQueryRequest::UserQueryRequest(const string &username,
             auto pageInt = fromString<int32_t>(page);
             if (pageInt <= 0)
             {
-                addWarn(attr, "查询页码超出范围，已自动调整到第一页");
+                addWarning(attr, "查询页码超出范围，已自动调整到第一页");
                 pageInt = 1;
             }
             page_ = pageInt;
         }
         catch (std::invalid_argument e)
         {
-            addWarn(attr, "页码格式错误，已自动使用第一页");
+            addWarning(attr, "页码格式错误，已自动使用第一页");
             page_ = 1;
         }
     }
@@ -135,7 +135,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             {
                 if (pageSizeInt != 10)
                 {
-                    addWarn(attr, "不支持的分页大小，已自动调整为10");
+                    addWarning(attr, "不支持的分页大小，已自动调整为10");
                 }
                 pageSizeInt = 10;
             }
@@ -143,7 +143,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             {
                 if (pageSizeInt != 20)
                 {
-                    addWarn(attr, "不支持的分页大小，已自动调整为20");
+                    addWarning(attr, "不支持的分页大小，已自动调整为20");
                 }
                 pageSizeInt = 20;
             }
@@ -151,7 +151,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             {
                 if (pageSizeInt != 30)
                 {
-                    addWarn(attr, "不支持的分页大小，已自动调整为30");
+                    addWarning(attr, "不支持的分页大小，已自动调整为30");
                 }
                 pageSizeInt = 30;
             }
@@ -159,7 +159,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             {
                 if (pageSizeInt != 50)
                 {
-                    addWarn(attr, "不支持的分页大小，已自动调整为50");
+                    addWarning(attr, "不支持的分页大小，已自动调整为50");
                 }
                 pageSizeInt = 50;
             }
@@ -167,7 +167,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
             {
                 if (pageSizeInt != 100)
                 {
-                    addWarn(attr, "不支持的分页大小，已自动调整为100");
+                    addWarning(attr, "不支持的分页大小，已自动调整为100");
                 }
                 pageSizeInt = 100;
             }
@@ -175,7 +175,7 @@ UserQueryRequest::UserQueryRequest(const string &username,
         }
         catch (std::invalid_argument e)
         {
-            addWarn(attr, "分页大小格式错误，已自动调整为10");
+            addWarning(attr, "分页大小格式错误，已自动调整为10");
             pageSize_ = 10;
         }
     }

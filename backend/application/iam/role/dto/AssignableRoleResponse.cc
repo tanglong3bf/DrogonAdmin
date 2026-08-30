@@ -20,8 +20,9 @@ HttpResponsePtr toResponse(vector<AssignableRoleResponse> &&response)
 };  // namespace drogon
 
 AssignableRoleResponse::AssignableRoleResponse(const std::int32_t roleId,
-                                               const string &name)
-    : roleId_(roleId), name_(name)
+                                               const string &name,
+                                               const int32_t version)
+    : roleId_{roleId}, name_{name}, version_{version}
 {
 }
 
@@ -30,5 +31,6 @@ Json::Value AssignableRoleResponse::toJson() const
     Json::Value value;
     value["role_id"] = roleId_;
     value["name"] = name_;
+    value["version"] = version_;
     return value;
 }

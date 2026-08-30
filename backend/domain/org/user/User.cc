@@ -34,15 +34,16 @@ User::User(string_view username,
       avatar_{"#"},
       sex_{sex},
       deptId_{deptId},
-      status_{status}
+      status_{status},
+      version_{0}
 {
 }
 
-User::User(std::string_view username,
-           std::string_view password,
-           std::string_view nickname,
+User::User(string_view username,
+           string_view password,
+           string_view nickname,
            Sex sex,
-           std::int32_t deptId,
+           int32_t deptId,
            Status status,
            int32_t createdBy)
     : username_{std::move(username)},
@@ -52,6 +53,7 @@ User::User(std::string_view username,
       sex_{sex},
       deptId_{deptId},
       status_{status},
+      version_{0},
       AuditableEntity{AUDITABLE_INIT}
 {
 }
@@ -67,6 +69,7 @@ User::User(const SysUser &model)
       OPT_OV_INIT(PhoneNumber, phoneNumber_, PhoneNumber),
       OPT_OV_INIT(Email, email_, Email),
       ENUM_INIT(Status, status_, Status),
+      INIT(version_, Version),
       AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
@@ -98,16 +101,17 @@ User::operator SysUser() const
         model.setEmailToNull();
     }
     SET_VAL_CAST(int16_t, status_, Status);
-    SET_OPT(createdBy(), CreatedBy);
-    SET_OPT(createdTime(), CreatedTime);
-    SET_OPT(updatedBy(), UpdatedBy);
-    SET_OPT(updatedTime(), UpdatedTime);
-    SET_OPT(deletedBy(), DeletedBy);
-    SET_OPT(deletedTime(), DeletedTime);
+    SET_VAL(version_, Version);
+    SET_OPT(createdBy_, CreatedBy);
+    SET_OPT(createdTime_, CreatedTime);
+    SET_OPT(updatedBy_, UpdatedBy);
+    SET_OPT(updatedTime_, UpdatedTime);
+    SET_OPT(deletedBy_, DeletedBy);
+    SET_OPT(deletedTime_, DeletedTime);
     return model;
 }
 
-void User::setAvatar(const std::string &avatarUrl)
+void User::setAvatar(const string &avatarUrl)
 {
     avatar_ = avatarUrl;
     markUpdated();
@@ -141,7 +145,7 @@ bool User::updateBasicInfo(optional<string_view> nickname,
                            optional<Sex> sex,
                            const NullableValue<PhoneNumber> &phoneNumber,
                            const NullableValue<Email> &email,
-                           std::int32_t updatedBy)
+                           int32_t updatedBy)
 {
     bool changed = false;
 
@@ -159,7 +163,7 @@ bool User::updateBasicInfo(optional<string_view> nickname,
     return changed;
 }
 
-bool User::updateStatus(Status status, int32_t updatedBy)
+bool User::updateStatus(const Status status, const int32_t updatedBy)
 {
     if (status != status_) [[likely]]
     {
@@ -171,7 +175,7 @@ bool User::updateStatus(Status status, int32_t updatedBy)
     return false;
 }
 
-bool User::assignToDept(std::int32_t deptId, std::int32_t updatedBy)
+bool User::assignToDept(const int32_t deptId, const int32_t updatedBy)
 {
     if (deptId != deptId_) [[likely]]
     {
@@ -183,7 +187,7 @@ bool User::assignToDept(std::int32_t deptId, std::int32_t updatedBy)
     return false;
 }
 
-void User::remove(const std::int32_t deletedBy)
+void User::remove(const int32_t deletedBy)
 {
     if (changingStatus() == ChangingStatus::DELETED)
     {
@@ -197,7 +201,7 @@ void User::remove(const std::int32_t deletedBy)
     }
 }
 
-void User::appendRoles(const std::vector<int32_t> &newRoleIds,
+void User::appendRoles(const vector<int32_t> &newRoleIds,
                        const int32_t createdBy)
 {
     const auto newRoles =
@@ -246,7 +250,7 @@ void User::replaceRoles(const vector<int32_t> &roleIds, const int32_t updatedBy)
     }
 }
 
-void User::restoreRoles(const std::vector<SysUserRole> &sysUserRoles)
+void User::restoreRoles(const vector<SysUserRole> &sysUserRoles)
 {
     userRoles_ =
         sysUserRoles |

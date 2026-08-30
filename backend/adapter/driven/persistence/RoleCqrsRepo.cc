@@ -42,7 +42,7 @@ Task<vector<RoleResponse>> RoleCqrsRepo::getRoleList(
         maxPage < request.page() ? maxPage : request.page();
     if (page != request.page())
     {
-        addWarn(attr, "查询页码超出范围，已自动调整到最后一页");
+        addWarning(attr, "查询页码超出范围，已自动调整到最后一页");
     }
     params["offset"] =
         static_cast<std::int32_t>(request.pageSize() * (page - 1));
@@ -121,7 +121,9 @@ vector<AssignableRoleResponse> RoleCqrsRepo::buildAssignableList(
     for (const auto &row : dbResult)
     {
         AssignableRoleResponse assignableRoleResponse{
-            row["role_id"].as<std::int32_t>(), row["name"].as<string>()};
+            row["role_id"].as<std::int32_t>(),
+            row["name"].as<string>(),
+            row["version"].as<std::int32_t>()};
         result.push_back(assignableRoleResponse);
     }
     return result;

@@ -22,7 +22,8 @@ UserResponse::UserResponse(const User &user)
       deptId_{user.deptId()},
       phoneNumber_{user.phoneNumber()},
       email_{user.email()},
-      status_{user.status()}
+      status_{user.status()},
+      version_{user.version()}
 {
     if (user.userRoles().size() > 0)
     {
@@ -53,6 +54,7 @@ Json::Value UserResponse::toJson() const
         json["email"] = email_->value();
     }
     json["status"] = static_cast<int8_t>(status_);
+    json["version"] = version_;
     if (userRoles_.size() > 0)
     {
         json["user_roles"] = Json::Value(Json::arrayValue);

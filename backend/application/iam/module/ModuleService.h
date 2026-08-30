@@ -28,33 +28,34 @@ class ModuleService : public DrAdminObject<ModuleService>
      * @brief 创建模块
      */
     drogon::Task<> createModule(const ModuleCreateRequest &request,
-                                const std::int32_t createdBy) const;
+                                std::int32_t createdBy) const;
 
     /**
      * @brief 更新模块
      */
-    drogon::Task<> updateModule(const std::int32_t deptId,
+    drogon::Task<> updateModule(std::int32_t deptId,
                                 const ModuleUpdateRequest &request,
-                                const std::int32_t updatedBy) const;
+                                std::int32_t updatedBy) const;
 
     /**
      * @brief 删除指定模块
      */
-    drogon::Task<> deleteModule(const std::int32_t moduleId,
-                                const std::int32_t deletedBy) const;
+    drogon::Task<> deleteModule(std::int32_t moduleId,
+                                std::int32_t version,
+                                std::int32_t deletedBy) const;
 
     /**
      * @brief 排序指定模块
      */
     drogon::Task<> sortModule(const ModuleSortRequest &request,
-                              const std::int32_t updatedBy) const;
+                              std::int32_t updatedBy) const;
 
     /**
      * @brief 更新模块
      */
-    drogon::Task<> updateActions(const std::int32_t moduleId,
+    drogon::Task<> updateActions(std::int32_t moduleId,
                                  const ActionUpdateRequest &request,
-                                 const std::int32_t updatedBy) const;
+                                 std::int32_t updatedBy) const;
 
   private:
     ModuleCqrsRepoPtr moduleCqrsRepo_{

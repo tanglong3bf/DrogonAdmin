@@ -35,6 +35,7 @@ class Dept : public AuditableEntity, public ChangeableEntity
     GETTER(name)
     GETTER(sortNum)
     GETTER(parentId)
+    GETTER(version)
 
     void setParentId(const std::optional<std::int32_t> parentId);
 
@@ -58,4 +59,5 @@ class Dept : public AuditableEntity, public ChangeableEntity
     std::string name_;                      ///< 部门名称
     std::int32_t sortNum_;                  ///< 排序
     std::optional<std::int32_t> parentId_;  ///< 父部门id
+    std::int32_t version_;                  ///< 乐观锁版本号
 };

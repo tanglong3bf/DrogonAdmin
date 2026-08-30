@@ -15,15 +15,17 @@ class ModuleHandler : public DrAdminObject<ModuleHandler>
     /**
      * @brief 删除模块
      */
-    drogon::Task<> deleteModule(Module &module, const int32_t deletedBy) const;
+    drogon::Task<> deleteModule(Module &module,
+                                std::int32_t version,
+                                std::int32_t deletedBy) const;
 
     /**
      * @brief 排序模块
      */
     drogon::Task<std::vector<Module>> sortModule(
-        const std::optional<std::int32_t> &parentId,
+        std::optional<std::int32_t> parentId,
         const std::vector<int32_t> &deptIds,
-        const int32_t updatedBy) const;
+        int32_t updatedBy) const;
 
   protected:
     void validateModuleIdsInAllModules(

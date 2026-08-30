@@ -30,6 +30,7 @@ class ModuleResponse
     GETTER(description)
     GETTER(sortNum)
     GETTER(parentId)
+    GETTER(version)
     GETTER(children)
     GETTER(actions)
     GETTER(actionPriorities)
@@ -54,6 +55,7 @@ class ModuleResponse
     const std::optional<std::string> description_;          ///< 模块描述
     const std::int32_t sortNum_;                            ///< 模块排序
     const std::optional<std::int32_t> parentId_;            ///< 父模块id
+    const std::int32_t version_;                            ///< 乐观锁版本号
     ModuleResponse *parent_;                                ///< 父模块
     std::vector<ModuleResponse> children_;                  ///< 子模块列表
     std::vector<ActionResponse> actions_;                   ///< 功能列表

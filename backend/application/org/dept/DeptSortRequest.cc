@@ -1,11 +1,13 @@
 #include "DeptSortRequest.h"
 
 #include "common/util/ParamGetter.hpp"
+#include "common/util/rangesUtils.hpp"
 #include "common/exception/BusinessException.h"
 #include <drogon/HttpRequest.h>
-#include <unordered_set>
+#include <ranges>
 
 using namespace std;
+using namespace drogon_admin;
 using namespace drogon_admin::util;
 
 namespace drogon
@@ -25,12 +27,27 @@ DeptSortRequest fromRequest(const HttpRequest &req)
 
 DeptSortRequest::DeptSortRequest(const Json::Value &json)
 {
-    parentId_ = getParam<std::int32_t, false>(json, "parent_id", {1, -1});
-    deptIds_ = getParam<vector<std::int32_t>, true>(json, "dept_ids");
-    // 进一步检查是否包含重复值
-    const unordered_set<std::int32_t> idsSet{deptIds_.begin(), deptIds_.end()};
-    if (idsSet.size() != deptIds_.size())
+    parentId_ = getParam<int32_t, false>(json, "parent_id", {1, -1});
+    if (json.isMember("depts") && json["depts"].isArray())
     {
-        throw BusinessException("dept_ids参数包含重复值");
+        size_t i = 0;
+        for (const auto &jsonItem : json["depts"])
+        {
+            DeptSortItem item;
+            item.deptId = getParam<int32_t, true>(jsonItem, "dept_id");
+            item.version = getParam<int32_t, true>(jsonItem, "version");
+            depts_.emplace_back(item);
+        }
     }
+    if (depts_.size() == 0)
+    {
+        throw BusinessException("缺少必备参数：depts");
+    }
+}
+
+vector<int32_t> DeptSortRequest::deptIds() const
+{
+    return depts_ |
+           views::transform([](const auto &item) { return item.deptId; }) |
+           ranges_utils::to<vector>();
 }

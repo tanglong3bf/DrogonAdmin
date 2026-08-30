@@ -22,7 +22,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 查询页码超出范围，已自动调整到第一页
+        $.warning: 查询页码超出范围，已自动调整到第一页
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -47,7 +47,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 查询页码超出范围，已自动调整到最后一页
+        $.warning: 查询页码超出范围，已自动调整到最后一页
         $.data.page: 11
         $.data.page_size: 10
         $.data.total: 101
@@ -60,7 +60,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 页码格式错误，已自动使用第一页
+        $.warning: 页码格式错误，已自动使用第一页
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -74,7 +74,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为10
+        $.warning: 不支持的分页大小，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -87,7 +87,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为10
+        $.warning: 不支持的分页大小，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -114,7 +114,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为20
+        $.warning: 不支持的分页大小，已自动调整为20
         $.data.page: 1
         $.data.page_size: 20
         $.data.total: 101
@@ -141,7 +141,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为30
+        $.warning: 不支持的分页大小，已自动调整为30
         $.data.page: 1
         $.data.page_size: 30
         $.data.total: 101
@@ -168,7 +168,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为50
+        $.warning: 不支持的分页大小，已自动调整为50
         $.data.page: 1
         $.data.page_size: 50
         $.data.total: 101
@@ -195,7 +195,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为100
+        $.warning: 不支持的分页大小，已自动调整为100
         $.data.page: 1
         $.data.page_size: 100
         $.data.total: 101
@@ -209,7 +209,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 分页大小格式错误，已自动调整为10
+        $.warning: 分页大小格式错误，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -743,6 +743,7 @@ role_cases:
       name: 更新角色-正常
       code: update-role-normal
       description: 这是一个更新后的测试角色
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -759,13 +760,13 @@ role_cases:
         $.data.list[0].description: 这是一个更新后的测试角色
     validate_schema: role_paginated.yaml
   - name: 更新角色-所有字段重复，不做修改但成功返回
-    sql_file: role_to_update.sql
     url: http://localhost:8000/role/1
     method: PATCH
     json:
       name: 更新角色-正常
       code: update-role-normal
       description: 这是一个更新后的测试角色
+      version: 1
     params: ''
     expect:
       status_code: 204
@@ -834,6 +835,7 @@ role_cases:
     method: PATCH
     json:
       description: null
+      version: 2
     params: ''
     expect:
       status_code: 204
@@ -855,6 +857,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -867,6 +870,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -886,6 +890,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -905,6 +910,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -925,6 +931,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -937,6 +944,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -956,6 +964,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -975,6 +984,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -986,6 +996,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 0
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1003,6 +1014,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1021,6 +1033,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1042,6 +1055,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 5
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1060,6 +1074,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 0
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1077,6 +1092,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1095,6 +1111,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1113,6 +1130,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1134,6 +1152,7 @@ role_cases:
     method: PATCH
     json:
       user_quota: 5
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1153,6 +1172,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1172,6 +1192,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1190,6 +1211,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1208,6 +1230,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1227,6 +1250,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 5
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1246,6 +1270,7 @@ role_cases:
     json:
       quota_type: 2
       user_quota: 4
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1265,6 +1290,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1283,6 +1309,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1301,6 +1328,7 @@ role_cases:
     method: PATCH
     json:
       quota_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1320,6 +1348,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 5
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1339,6 +1368,7 @@ role_cases:
     json:
       quota_type: 1
       user_quota: 5
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1359,6 +1389,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1381,6 +1412,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [1, 'abc']
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1403,6 +1435,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [1, 2, 5]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1425,6 +1458,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [1, 2]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1444,6 +1478,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [1, 2]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1465,6 +1500,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1487,6 +1523,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [1, 'abc']
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1509,6 +1546,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [1, 2, 5]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1531,6 +1569,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [1, 2]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1550,6 +1589,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [1, 2]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1571,6 +1611,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1589,6 +1630,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 2
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1611,6 +1653,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [2, 4]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1630,6 +1673,7 @@ role_cases:
     json:
       relation_type: 2
       dept_ids: [2, 4]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1651,6 +1695,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1669,6 +1714,7 @@ role_cases:
     method: PATCH
     json:
       relation_type: 1
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1691,6 +1737,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [2, 4]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -1710,6 +1757,7 @@ role_cases:
     json:
       relation_type: 1
       dept_ids: [2, 4]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -1727,6 +1775,18 @@ role_cases:
         $.data.list[6].relation_type: 2
         len:$.data.list[6].depts: 2
     # }}}
+  - name: 更新角色-错误的version
+    url: http://localhost:8000/role/48
+    method: PATCH
+    json:
+      relation_type: 新的部门名称
+      version: 233
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 更新期间数据发生变化，更新失败
   # }}}
   # 删除角色 {{{
   - name: 删除角色-正常删除
@@ -1734,7 +1794,7 @@ role_cases:
     url: http://localhost:8000/role/1
     method: delete
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除角色-检查数据1-角色应该被删除
@@ -1750,7 +1810,7 @@ role_cases:
     url: http://localhost:8000/role/1
     method: delete
     json: {}
-    params: ''
+    params: version=1
     expect:
       status_code: 204
   - name: 删除角色-检查数据2-角色应该被删除
@@ -1766,7 +1826,7 @@ role_cases:
     url: http://localhost:8000/role/2
     method: delete
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 400
       assert_jsonpath:
@@ -1785,7 +1845,7 @@ role_cases:
     url: http://localhost:8000/role/3
     method: delete
     json: {}
-    params: ''
+    params: version=0
     expect:
       status_code: 204
   - name: 删除角色-检查数据4-角色应该被删除
@@ -1796,7 +1856,17 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        len:$.data.list: 1
+        len:$.data.list: 2
+  - name: 删除角色-错误的version
+    url: http://localhost:8000/role/4
+    method: delete
+    json: {}
+    params: version=233
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 删除期间数据发生变化，删除失败
   # }}}
   # 部门可用角色 {{{
   - name: 部门可用角色-不存在的部门

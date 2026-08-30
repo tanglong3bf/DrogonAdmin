@@ -27,5 +27,6 @@ struct UserResponse
     std::optional<PhoneNumber> phoneNumber_;   ///< 电话号码
     std::optional<Email> email_;               ///< 邮箱
     Status status_;                            ///< 状态
+    std::int32_t version_;                     ///< 乐观锁版本号
     std::vector<UserRoleResponse> userRoles_;  ///< 拥有的角色
 };

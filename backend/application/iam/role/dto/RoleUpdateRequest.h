@@ -20,6 +20,7 @@ struct RoleUpdateRequest
     GETTER(quotaType)
     GETTER(userQuota)
     GETTER(relationType)
+    GETTER(version)
     GETTER(deptIds)
 
   private:
@@ -29,5 +30,6 @@ struct RoleUpdateRequest
     std::optional<QuotaType> quotaType_;                          ///< 限制类型
     drogon_admin::util::NullableValue<int32_t> userQuota_;        ///< 限制数量
     std::optional<RelationType> relationType_;                    ///< 关联类型
-    std::optional<std::vector<int32_t>> deptIds_;                 ///< 关联部门
+    std::int32_t version_;                         ///< 乐观锁版本号
+    std::optional<std::vector<int32_t>> deptIds_;  ///< 关联部门
 };

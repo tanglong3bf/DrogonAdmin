@@ -72,12 +72,11 @@ target_sources(
           ${MODEL_SRC}
           ${ROLE_DOMAIN_SRC}
           ${MODULE_DOMAIN_SRC}
-	  ${MENU_DOMAIN_SRC}
+          ${MENU_DOMAIN_SRC}
           ${DEPT_DOMAIN_SRC}
           ${USER_DOMAIN_SRC}
           ${EXCEPTION_SRC}
           ${COMMON_DOMAIN_SRC}
-          ${FILTER_SRC}
           ${JWT_SRC}
           ${SQL_GENERATOR_SRC}
           ${BCRYPT_SRC})

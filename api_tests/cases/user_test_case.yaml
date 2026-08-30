@@ -60,7 +60,8 @@ user_cases:
     sql_file: user_to_update.sql
     url: http://localhost:8000/user/1
     method: PATCH
-    json: {}
+    json:
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -70,7 +71,8 @@ user_cases:
   - name: 更新用户-软删除的用户id
     url: http://localhost:8000/user/2
     method: PATCH
-    json: {}
+    json:
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -84,6 +86,7 @@ user_cases:
       nickname: 无更新测试用户
       phone_number: '18800000003'
       email: noupdate@test.com
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -108,6 +111,7 @@ user_cases:
       phone_number: '18212345678'
       email: new_admin@example.com
       status: 1
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -131,6 +135,7 @@ user_cases:
     json:
       phone_number: null
       email: null
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -142,7 +147,7 @@ user_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        len:$.data.list[2]: 7 # user_id, username, nickname, avatar, sex, dept_id, status
+        len:$.data.list[2]: 8 # user_id, username, nickname, avatar, sex, dept_id, status, version
     validate_schema: user_paginated.yaml
     # 更新部门 {{{
   - name: 更新用户-不存在的部门id
@@ -150,6 +155,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 233
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -161,6 +167,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 2
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -182,6 +189,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 3
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -200,6 +208,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -220,6 +229,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -240,6 +250,7 @@ user_cases:
     method: PATCH
     json:
       dept_id: 3
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -262,6 +273,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [233]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -273,6 +285,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [4]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -284,6 +297,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [5]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -292,6 +306,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: []
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -300,6 +315,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [1]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -311,6 +327,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [2]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -322,6 +339,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [3]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -333,6 +351,7 @@ user_cases:
     method: PATCH
     json:
       role_ids: [6]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -347,6 +366,7 @@ user_cases:
     json:
       dept_id: 3
       role_ids: [7]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -356,6 +376,7 @@ user_cases:
     json:
       dept_id: 4
       role_ids: [8]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -368,6 +389,7 @@ user_cases:
     json:
       dept_id: 3
       role_ids: [5]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -377,6 +399,7 @@ user_cases:
     json:
       dept_id: 1
       role_ids: [9]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -389,6 +412,7 @@ user_cases:
     json:
       dept_id: 3
       role_ids: [7]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -398,6 +422,7 @@ user_cases:
     json:
       dept_id: 4
       role_ids: [8]
+      version: 0
     params: ''
     expect:
       status_code: 400
@@ -410,6 +435,7 @@ user_cases:
     json:
       dept_id: 3
       role_ids: [10]
+      version: 0
     params: ''
     expect:
       status_code: 204
@@ -419,12 +445,25 @@ user_cases:
     json:
       dept_id: 1
       role_ids: [9]
+      version: 0
     params: ''
     expect:
       status_code: 400
       assert_jsonpath:
         $.code: lt 0
         $.error: 指定部门在角色的黑名单中
+  - name: 更新用户-错误的version
+    url: http://localhost:8000/user/29
+    method: PATCH
+    json:
+      nickname: 随便写写
+      version: 1
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 更新期间数据发生变化，更新失败
     # }}}
     # 新增用户 {{{
     # 正向用例 {{{
@@ -995,7 +1034,7 @@ user_cases:
     # 删除用户 {{{
   - name: 删除用户-id为1的用户不可以被删除
     sql_file: user_to_delete.sql
-    url: http://localhost:8000/user/1
+    url: http://localhost:8000/user/1?version=0
     method: DELETE
     json: {}
     params: ''
@@ -1006,33 +1045,43 @@ user_cases:
         $.error: id为1的用户不可以被删除
   - name: 删除用户-不存在的用户id
     sql_file: user_to_delete.sql
-    url: http://localhost:8000/user/233
+    url: http://localhost:8000/user/233?version=0
     method: DELETE
     json: {}
     params: ''
     expect:
       status_code: 204
   - name: 删除用户-软删除的用户id
-    url: http://localhost:8000/user/2
+    url: http://localhost:8000/user/2?version=0
     method: DELETE
     json: {}
     params: ''
     expect:
       status_code: 204
   - name: 删除用户-正常删除无角色的用户
-    url: http://localhost:8000/user/3
+    url: http://localhost:8000/user/3?version=0
     method: DELETE
     json: {}
     params: ''
     expect:
       status_code: 204
   - name: 删除用户-删除有角色的用户
-    url: http://localhost:8000/user/4
+    url: http://localhost:8000/user/4?version=0
     method: DELETE
     json: {}
     params: ''
     expect:
       status_code: 204
+  - name: 删除用户-错误的version
+    url: http://localhost:8000/user/5?version=233
+    method: DELETE
+    json: {}
+    params: ''
+    expect:
+      status_code: 400
+      assert_jsonpath:
+        $.code: lt 0
+        $.error: 删除期间数据发生变化，删除失败
     # }}}
   # }}}
 # vim: set foldmethod=marker foldlevel=0:

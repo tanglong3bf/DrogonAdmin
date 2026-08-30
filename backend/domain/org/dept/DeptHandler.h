@@ -20,12 +20,15 @@ class DeptHandler : public DrAdminObject<DeptHandler>
      */
     drogon::Task<> updateDept(Dept &dept,
                               const std::string &newName,
-                              const std::int32_t updatedBy) const;
+                              std::int32_t version,
+                              std::int32_t updatedBy) const;
 
     /**
      * @brief 删除部门
      */
-    drogon::Task<> deleteDept(Dept &dept, const std::int32_t deletedBy) const;
+    drogon::Task<> deleteDept(Dept &dept,
+                              std::int32_t version,
+                              std::int32_t deletedBy) const;
 
     /**
      * @brief 排序部门

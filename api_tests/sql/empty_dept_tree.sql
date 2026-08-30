@@ -11,6 +11,7 @@ CREATE TABLE "public"."sys_dept" (
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "sort_num" int4 NOT NULL,
   "parent_id" int4,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -22,6 +23,7 @@ CREATE TABLE "public"."sys_dept" (
 COMMENT ON COLUMN "public"."sys_dept"."name" IS '部门名称';
 COMMENT ON COLUMN "public"."sys_dept"."sort_num" IS '部门排序';
 COMMENT ON COLUMN "public"."sys_dept"."parent_id" IS '父部门id';
+COMMENT ON COLUMN "public"."sys_dept"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_dept"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_dept"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_dept"."updated_by" IS '最新一次更新者';

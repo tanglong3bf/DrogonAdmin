@@ -64,6 +64,7 @@ Task<> RoleService::updateRole(const std::int32_t roleId,
 }
 
 Task<> RoleService::deleteRole(const std::int32_t roleId,
+                               const std::int32_t version,
                                const std::int32_t deletedBy) const
 {
     auto role = co_await roleRepository_->getById(roleId);
@@ -72,7 +73,7 @@ Task<> RoleService::deleteRole(const std::int32_t roleId,
         // 没有数据，无需操作
         co_return;
     }
-    co_await roleHandler_->deleteRole(*role, deletedBy);
+    co_await roleHandler_->deleteRole(*role, version, deletedBy);
     co_await roleRepository_->save(*role);
 }
 

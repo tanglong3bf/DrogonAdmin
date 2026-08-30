@@ -27,10 +27,10 @@ class DeptController : public drogon::HttpController<DeptController>
                          "/dept/([1-9]\\d*)",
                          drogon::Delete,
                          drogon::Options);
-    ADD_METHOD_VIA_REGEX(DeptController::sortDept,
-                         "/dept/sort",
-                         drogon::Post,
-                         drogon::Options);
+    ADD_METHOD_TO(DeptController::sortDept,
+                  "/dept/sort",
+                  drogon::Post,
+                  drogon::Options);
     METHOD_LIST_END
 
     /**

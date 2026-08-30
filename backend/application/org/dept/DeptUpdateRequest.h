@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/util/Utilities.hpp"
 #include <jsoncpp/json/value.h>
 #include <string>
 
@@ -16,5 +17,8 @@ struct DeptUpdateRequest
         return name_;
     }
 
-    std::string name_;  ///< 部门名称
+    GETTER(version);
+
+    std::string name_;      ///< 部门名称
+    std::int32_t version_;  ///< 乐观锁版本号
 };

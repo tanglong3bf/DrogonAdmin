@@ -22,11 +22,11 @@ ModuleUpdateRequest fromRequest(const HttpRequest &req)
 
 ModuleUpdateRequest::ModuleUpdateRequest(const Json::Value &json)
 {
-    name_ = getParam<std::string>(json, "name", {1, -1});
-    description_ =
-        getParam<std::string, false, true>(json, "description", {1, -1});
+    name_ = getParam<string>(json, "name", {1, -1});
+    description_ = getParam<string, false, true>(json, "description", {1, -1});
     if (!name_ && description_.isAbsent())
     {
         throw BusinessException("请至少指定一个需要更新的字段");
     }
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }

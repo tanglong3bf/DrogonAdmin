@@ -17,7 +17,8 @@ Role::Role(string_view name,
     : name_{name},
       code_{code},
       quotaType_{quotaType},
-      relationType_{relationType}
+      relationType_{relationType},
+      version_{0}
 {
 }
 
@@ -30,6 +31,7 @@ Role::Role(string_view name,
       code_{code},
       quotaType_{quotaType},
       relationType_{relationType},
+      version_{0},
       AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
 {
 }
@@ -42,6 +44,7 @@ Role::Role(const SysRole &model)
       ENUM_INIT(QuotaType, quotaType_, QuotaType),
       OPT_INIT(userQuota_, UserQuota),
       ENUM_INIT(RelationType, relationType_, RelationType),
+      INIT(version_, Version),
       AuditableEntity(AUDITABLE_INIT_BY_MODEL)
 {
 }
@@ -49,12 +52,9 @@ Role::Role(const SysRole &model)
 Role::operator SysRole() const
 {
     SysRole model;
-    if (roleId_)
-    {
-        model.setRoleId(*roleId_);
-    }
-    model.setName(name_);
-    model.setCode(code_);
+    SET_OPT(roleId_, RoleId);
+    SET_VAL(name_, Name);
+    SET_VAL(code_, Code);
     if (description_)
     {
         model.setDescription(*description_);
@@ -63,7 +63,7 @@ Role::operator SysRole() const
     {
         model.setDescriptionToNull();
     }
-    model.setQuotaType(static_cast<int16_t>(quotaType_));
+    SET_VAL_CAST(int16_t, quotaType_, QuotaType);
     if (userQuota_)
     {
         model.setUserQuota(*userQuota_);
@@ -72,19 +72,14 @@ Role::operator SysRole() const
     {
         model.setUserQuotaToNull();
     }
-    model.setRelationType(static_cast<int16_t>(relationType_));
-    model.setCreatedBy(*createdBy_);
-    model.setCreatedTime(*createdTime_);
-    model.setUpdatedBy(*updatedBy_);
-    model.setUpdatedTime(*updatedTime_);
-    if (deletedBy_)
-    {
-        model.setDeletedBy(*deletedBy_);
-    }
-    if (deletedTime_)
-    {
-        model.setDeletedTime(*deletedTime_);
-    }
+    SET_VAL_CAST(int16_t, relationType_, RelationType);
+    SET_VAL(version_, Version);
+    SET_OPT(createdBy_, CreatedBy);
+    SET_OPT(createdTime_, CreatedTime);
+    SET_OPT(updatedBy_, UpdatedBy);
+    SET_OPT(updatedTime_, UpdatedTime);
+    SET_OPT(deletedBy_, DeletedBy);
+    SET_OPT(deletedTime_, DeletedTime);
     return model;
 }
 

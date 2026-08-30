@@ -1,6 +1,7 @@
 #include "domain/org/dept/DeptRepository.h"
 
 #include "SqlGenerator/src/SqlGenerator.h"
+#include "common/exception/BusinessException.h"
 #include "common/util/rangesUtils.hpp"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/orm/Criteria.h>
@@ -39,19 +40,50 @@ Task<std::optional<std::int32_t>> DeptRepository::getMaxSubDeptSortNum(
 
 Task<> DeptRepository::save(const Dept &dept, const DbClientPtr &dbClient) const
 {
-    const auto sysDept = static_cast<SysDept>(dept);
-
     auto mapper = deptMapper(dbClient);
 
     switch (dept.changingStatus())
     {
         case ChangingStatus::NEW:
+        {
+            const auto sysDept = static_cast<SysDept>(dept);
+
             co_await mapper.insert(sysDept);
             break;
-        case ChangingStatus::DELETED:  // 软删除也是更新
-        case ChangingStatus::UPDATED:
-            co_await mapper.update(sysDept);
+        }
+        case ChangingStatus::DELETED:
+        {
+            auto result = co_await dbClient->execSqlCoro(
+                "UPDATE sys_dept SET deleted_by = $1, deleted_time = "
+                "$2, version = version + 1 WHERE dept_id = $3 AND "
+                "version = $4",
+                *dept.deletedBy(),
+                *dept.deletedTime(),
+                *dept.deptId(),
+                dept.version());
+            if (result.affectedRows() == 0)
+            {
+                throw BusinessException{"删除期间数据发生变化，删除失败"};
+            }
             break;
+        }
+        case ChangingStatus::UPDATED:
+        {
+            auto result = co_await dbClient->execSqlCoro(
+                "UPDATE sys_dept SET name = $1, updated_by=$2, "
+                "updated_time=$3, version = version + 1 WHERE dept_id = $4 AND "
+                "version = $5",
+                dept.name(),
+                *dept.updatedBy(),
+                *dept.updatedTime(),
+                *dept.deptId(),
+                dept.version());
+            if (result.affectedRows() == 0)
+            {
+                throw BusinessException{"更新期间数据发生变化，更新失败"};
+            }
+            break;
+        }
         case ChangingStatus::UNCHANGED:
             break;
     }
@@ -128,8 +160,10 @@ Task<vector<Dept>> DeptRepository::getByParentId(
 }
 
 Task<> DeptRepository::multiSave(const vector<Dept> &depts,
-                                 const drogon::orm::DbClientPtr &dbClient) const
+                                 const vector<int32_t> &versions,
+                                 const orm::DbClientPtr &dbClient) const
 {
+    assert(depts.size() == versions.size());
     // 暂只考虑批量更新
     vector<SysDept> toUpdate;
     toUpdate.reserve(depts.size());
@@ -145,27 +179,30 @@ Task<> DeptRepository::multiSave(const vector<Dept> &depts,
         LOG_WARN << "multiSave被调用，但没有需要更新的数据，请检查代码逻辑";
         co_return;
     }
-    Json::Value dataList;
 
+    Json::Value dataList;
     for (const auto &dept : toUpdate)
     {
-        Json::Value item;
-        item = dept.toJson();
-        // SqlGenerator 太垃圾了
-        for (const auto &key : item.getMemberNames())
-        {
-            if (item[key].isNull())
-            {
-                item.removeMember(key);
-            }
-        }
-        dataList.append(item);
+        dataList.append(dept.toJson());
+    }
+    Json::Value versionList;
+    for (const auto &version : versions)
+    {
+        versionList.append(version);
     }
 
-    const auto sql = sqlGenerator()->getSql("multi_update_dept",
-                                            ParamList{{"data_list", dataList}});
+    const auto sql =
+        sqlGenerator()->getSql("multi_update_dept",
+                               ParamList{{"data_list", dataList},
+                                         {"version_list", versionList}});
 
-    co_await dbClient->execSqlCoro(sql);
+    auto trans = co_await dbClient->newTransactionCoro();
+    const auto result = co_await trans->execSqlCoro(sql);
+    if (result.affectedRows() < depts.size())
+    {
+        trans->rollback();
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
 }
 
 inline SqlGenerator *DeptRepository::sqlGenerator()

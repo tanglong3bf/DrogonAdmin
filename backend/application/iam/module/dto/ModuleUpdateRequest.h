@@ -12,8 +12,10 @@ struct ModuleUpdateRequest
 
     GETTER(name)
     GETTER(description)
+    GETTER(version)
 
   private:
     std::optional<std::string> name_;
     drogon_admin::util::NullableValue<std::string> description_;
+    std::int32_t version_;
 };

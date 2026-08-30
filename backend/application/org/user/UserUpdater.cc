@@ -11,9 +11,10 @@ Task<> UserUpdater::updateUser(User &user,
                                const UserUpdateRequest &request,
                                const int32_t updatedBy) const
 {
-    LOG_TRACE << "更新用户，userId=" << *user.userId()
-              << ", updatedBy=" << updatedBy;
-
+    if (user.version() != request.version())
+    {
+        throw BusinessException("更新期间数据发生变化，更新失败");
+    }
     user.updateBasicInfo(request.nickname(),
                          request.sex(),
                          request.phoneNumber(),

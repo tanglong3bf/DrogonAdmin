@@ -6,6 +6,7 @@ export interface Department {
   name: string // 部门名称
   parent_id?: number // 父部门ID
   sort_num: number // 排序（数值小的靠前）
+  version: number // 乐观锁版本号
   children?: Department[] // 子部门
   child_count?: number // 子部门数量
 }
@@ -17,13 +18,22 @@ export interface DeptFormData {
   name: string // 部门名称（可更新）
   parent_id?: number // 新增时可设置父部门，不可更新
   dept_id?: number // 更新时需指定ID
+  version?: number // 乐观锁版本号（更新时必须）
+}
+
+/**
+ * 排序部门列表项
+ */
+export interface DeptSortItem {
+  dept_id: number // 部门ID
+  name: string // 部门名称
+  version: number // 乐观锁版本号
 }
 
 /**
  * 排序部门参数
  */
-export interface DeptSortItem {
+export interface DeptSortFormDataItem {
   dept_id: number // 部门ID
-  name: string // 部门名称
-  sort_num: number // 排序（数值小的靠前）
+  version: number // 乐观锁版本号
 }

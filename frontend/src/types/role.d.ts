@@ -16,6 +16,7 @@ export interface Role {
   quota_type: QuotaType
   user_quota?: number
   relation_type: RelationType
+  version: number
   depts?: RoleDept[]
 }
 
@@ -38,10 +39,12 @@ export interface RoleFormData {
   quota_type?: QuotaType
   user_quota?: number | null
   relation_type?: RelationType
+  version?: number
   dept_ids?: number[] | null
 }
 
 export interface RoleOption {
   role_id: number
   name: string
+  version: number
 }

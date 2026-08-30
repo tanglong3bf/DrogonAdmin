@@ -9,9 +9,14 @@ using namespace drogon::orm;
 
 Task<> DeptHandler::updateDept(Dept &dept,
                                const string &newName,
+                               const int32_t version,
                                const int32_t updatedBy) const
 {
     // 验证
+    if (version != dept.version())
+    {
+        throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
     if (dept.name() == newName)
     {
         // 新旧名称相同，无需更新
@@ -24,9 +29,15 @@ Task<> DeptHandler::updateDept(Dept &dept,
     dept.updateName(newName, updatedBy);
 }
 
-Task<> DeptHandler::deleteDept(Dept &dept, const int32_t deletedBy) const
+Task<> DeptHandler::deleteDept(Dept &dept,
+                               const int32_t version,
+                               const int32_t deletedBy) const
 {
     // 校验
+    if (version != dept.version())
+    {
+        throw BusinessException{"删除期间数据发生变化，删除失败"};
+    }
     co_await deptVerifier_->verifyNoSubDept(*dept.deptId());
     co_await userVerifier_->verifyNoUserInDept(*dept.deptId());
     co_await roleVerifier_->verifyNoRolesBelongToDept(*dept.deptId());
@@ -50,6 +61,10 @@ Task<vector<Dept>> DeptHandler::sortDept(const optional<std::int32_t> &parentId,
     }
     // 验证
     validateDeptIdsInAllDepts(deptIds, allDepts);
+    if (allDepts.size() != deptIds.size())
+    {
+        throw BusinessException{"未指定全部部门"};
+    }
 
     // 部门id到allDepts索引的映射
     unordered_map<int32_t, size_t> idToIndex;
@@ -68,7 +83,6 @@ Task<vector<Dept>> DeptHandler::sortDept(const optional<std::int32_t> &parentId,
 
     size_t deptProcessedCount = 0;
 
-    // 先处理dpetIds指定的部门
     for (int32_t id : deptIds)
     {
         const auto it = idToIndex.find(id);
@@ -83,22 +97,6 @@ Task<vector<Dept>> DeptHandler::sortDept(const optional<std::int32_t> &parentId,
                 sortResult.push_back(std::move(dept));
             }
             processed[idx] = true;
-        }
-    }
-
-    // 再处理剩下的部门，保持原有顺序
-    for (size_t i = 0; i < allDepts.size(); ++i)
-    {
-        if (!processed[i])
-        {
-            const int32_t newSortNum = deptProcessedCount++;
-
-            if (newSortNum != allDepts[i].sortNum())
-            {
-                Dept dept = allDepts[i];
-                dept.updateSortNum(newSortNum, updatedBy);
-                sortResult.push_back(std::move(dept));
-            }
         }
     }
     co_return sortResult;

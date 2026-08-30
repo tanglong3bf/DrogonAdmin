@@ -33,7 +33,8 @@ ModuleResponse::ModuleResponse(const Module &module)
       name_(module.name()),
       description_(module.description()),
       sortNum_(module.sortNum()),
-      parentId_(module.parentId())
+      parentId_(module.parentId()),
+      version_(module.version())
 {
 }
 
@@ -51,6 +52,7 @@ Json::Value ModuleResponse::toJson() const
     {
         json["parent_id"] = *parentId_;
     }
+    json["version"] = version_;
     if (children_.size() > 0)
     {
         json["children"] = toJsonArray(children_);

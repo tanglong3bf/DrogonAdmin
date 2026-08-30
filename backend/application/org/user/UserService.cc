@@ -50,8 +50,9 @@ Task<> UserService::updateUser(const std::int32_t userId,
     co_await userRepository_->save(*user);
 }
 
-Task<> UserService::deleteUser(const std::int32_t userId,
-                               const int32_t deletedBy) const
+Task<> UserService::deleteUser(int32_t userId,
+                               int32_t version,
+                               int32_t deletedBy) const
 {
     if (userId == 1)
     {
@@ -60,6 +61,10 @@ Task<> UserService::deleteUser(const std::int32_t userId,
     auto user = co_await userRepository_->getById(userId, true);
     if (user != nullopt)
     {
+        if (user->version() != version)
+        {
+            throw BusinessException("删除期间数据发生变化，删除失败");
+        }
         user->remove(deletedBy);
         co_await userRepository_->save(*user);
     }

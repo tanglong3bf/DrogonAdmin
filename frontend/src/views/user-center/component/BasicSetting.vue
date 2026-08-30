@@ -134,7 +134,8 @@ const updateBasicInfo = async (formEl?: FormInstance) => {
           ? null
           : formData.phoneNumber
         : undefined,
-      email: emailChanged ? (emailIsEmpty ? null : formData.email) : undefined
+      email: emailChanged ? (emailIsEmpty ? null : formData.email) : undefined,
+      version: userInfo.version
     }
     await updateUserBasicInfo(request)
     ElMessage.success('更新成功！')

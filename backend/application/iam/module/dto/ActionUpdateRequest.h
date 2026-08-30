@@ -12,8 +12,10 @@ class ActionUpdateRequest
 
     GETTER(actions)
     GETTER(priorities)
+    GETTER(version)
 
   private:
     std::vector<ActionRequest> actions_;
     std::vector<PriorityRequest> priorities_;
+    std::int32_t version_;
 };

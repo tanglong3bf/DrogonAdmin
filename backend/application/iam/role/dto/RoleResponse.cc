@@ -32,7 +32,8 @@ RoleResponse::RoleResponse(const Role &role)
       description_{role.description()},
       userQuota_{role.userQuota()},
       quotaType_{role.quotaType()},
-      relationType_{role.relationType()}
+      relationType_{role.relationType()},
+      version_{role.version()}
 {
 }
 
@@ -52,6 +53,7 @@ Json::Value RoleResponse::toJson() const
         json["user_quota"] = *userQuota_;
     }
     json["relation_type"] = static_cast<int16_t>(relationType_);
+    json["version"] = version_;
     json["depts"] = toJsonArray(depts_);
 
     return json;

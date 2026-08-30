@@ -12,7 +12,7 @@
 #include <vector>
 
 /**
- * 用户更新请求
+ * @brief (后台)更新用户请求
  */
 struct UserUpdateRequest
 {
@@ -25,6 +25,7 @@ struct UserUpdateRequest
     GETTER(phoneNumber)
     GETTER(email)
     GETTER(status)
+    GETTER(version)
     GETTER(roleIds)
 
   private:
@@ -34,5 +35,6 @@ struct UserUpdateRequest
     drogon_admin::util::NullableValue<PhoneNumber> phoneNumber_;  ///< 电话号码
     drogon_admin::util::NullableValue<Email> email_;              ///< 邮箱
     std::optional<Status> status_;                                ///< 状态
+    std::int32_t version_;                              ///< 乐观锁版本号
     std::optional<std::vector<std::int32_t>> roleIds_;  ///< 新的角色id列表
 };

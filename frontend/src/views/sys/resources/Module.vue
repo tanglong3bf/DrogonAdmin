@@ -154,7 +154,8 @@ const module = reactive<ModuleFormData>({
   module_id: undefined,
   name: '',
   description: '',
-  parent_id: undefined
+  parent_id: undefined,
+  version: undefined
 })
 
 /**
@@ -195,6 +196,7 @@ const newModuleBtn = () => {
   module.name = ''
   module.description = undefined
   module.parent_id = undefined
+  module.version = 0
 
   dialogType.value = DialogType.ADD
   dialogVisible.value = true
@@ -271,6 +273,7 @@ const handleUpdateModule = async (
 
   await updateModule(
     module.module_id!,
+    module.version!,
     module.name,
     module.description === '' ? null : module.description
   )
@@ -278,6 +281,7 @@ const handleUpdateModule = async (
   original.name = module.name
   original.description =
     module.description === null ? undefined : module.description
+  original.version = original.version + 1
   dialogVisible.value = false
   return true
 }
@@ -346,7 +350,7 @@ const getSortSubModuleData = (
     const data = moduleData.map(item => ({
       module_id: item.module_id,
       name: item.name,
-      sort_num: item.sort_num
+      version: item.version
     }))
     return { data, visible: true }
   }
@@ -357,7 +361,7 @@ const getSortSubModuleData = (
     ? targetModule.children.map(item => ({
         module_id: item.module_id,
         name: item.name,
-        sort_num: item.sort_num
+        version: item.version
       }))
     : []
 
@@ -385,10 +389,11 @@ const sortCancel = () => {
  * 提交排序
  */
 const sortSubmit = async () => {
-  const moduleIds = sortableData.value.map(item => {
-    return item.module_id
-  })
-  await sortModule(currentParentId.value, moduleIds)
+  const modules = sortableData.value.map(item => ({
+    module_id: item.module_id,
+    version: item.version
+  }))
+  await sortModule(currentParentId.value, modules)
 
   ElMessage.success('排序成功')
   await getModuleData()
@@ -404,6 +409,7 @@ const updateModuleBtn = (row: Module) => {
   module.name = row.name
   module.description = row.description
   module.parent_id = row.parent_id
+  module.version = row.version
   dialogVisible.value = true
 }
 
@@ -422,7 +428,7 @@ const deleteModuleBtn = async (moduleId: number) => {
   }
   ElMessageBox.confirm(`请确认是否要删除 ${moduleToDelete.name} 模块`).then(
     async () => {
-      await deleteModule(moduleToDelete.module_id)
+      await deleteModule(moduleToDelete.module_id, moduleToDelete.version)
       ElMessage.success('删除成功')
       await getModuleData()
       queryParams.name = ''
@@ -440,6 +446,7 @@ const actionsForm = ref<FormInstance>()
  */
 const sortableActionForm = reactive({
   module_id: 0, // 功能所属模块
+  version: -1 as number, // 模块乐观锁版本号
   actions: [] as Action[], // 功能列表
   priorities: [] as ActionPriority[] // 功能优先级
 })
@@ -473,14 +480,15 @@ const highToLows = computed(() => {
  * 功能分配按钮
  */
 const assignActionBtn = (module_id: number) => {
-  const module: Module | undefined = findOriginal(moduleTree.value, module_id)
-  const actions = (module?.actions || []).map(item => ({ ...item }))
-  const priorities = (module?.priorities || []).map(item => ({
+  const module: Module = findOriginal(moduleTree.value, module_id)!
+  const actions = (module.actions || []).map(item => ({ ...item }))
+  const priorities = (module.priorities || []).map(item => ({
     ...item
   }))
 
   // 所有数据就绪后，一次性更新响应式数据
   sortableActionForm.module_id = module_id
+  sortableActionForm.version = module.version
   sortableActionForm.actions = actions
   sortableActionForm.priorities = priorities
 
@@ -661,13 +669,36 @@ const assignCancel = () => {
  * 提交功能分配
  */
 const assignSubmit = async () => {
-  await assignAction(
-    sortableActionForm.module_id,
-    sortableActionForm.actions,
-    sortableActionForm.priorities
-  )
-  await getModuleData()
-  actionDialogVisible.value = false
+  actionsForm.value?.validate(async valid => {
+    if (!valid) {
+      ElMessage.error('请检查表单数据')
+      return
+    }
+    await assignAction(
+      sortableActionForm.module_id,
+      sortableActionForm.version,
+      sortableActionForm.actions,
+      sortableActionForm.priorities
+    )
+    ElMessage.success('分配成功')
+    await getModuleData()
+    actionDialogVisible.value = false
+  })
+}
+/**
+ * 检查数组中指定字段是否重复
+ */
+const validateUnique = (field: 'name' | 'code', message: string) => {
+  return (_rule: any, value: string, callback: any) => {
+    const list = sortableActionForm.actions
+    // 找出所有相同值的项（排除空值）
+    const duplicates = list.filter(item => item[field] && item[field] === value)
+    if (duplicates.length > 1) {
+      callback(new Error(message))
+    } else {
+      callback()
+    }
+  }
 }
 </script>
 
@@ -821,21 +852,50 @@ const assignSubmit = async () => {
         style="max-width: 653px"
         :model="sortableActionForm"
       >
-        <el-form-item
+        <div
           v-for="(action, index) in sortableActionForm.actions"
           :key="action.action_id"
-          :prop="'actions.' + index + '.name'"
-          :rules="{
-            required: true,
-            message: '请输入功能名称',
-            trigger: 'blur'
-          }"
+          style="display: flex; align-items: flex-start; margin-bottom: 18px"
         >
-          <el-input v-model="action.name" />
-          <el-input
-            v-model="action.code"
-            style="margin-left: 20px; width: 100px"
-          />
+          <el-form-item
+            :prop="'actions.' + index + '.name'"
+            :rules="[
+              {
+                required: true,
+                message: '请输入功能名称',
+                trigger: 'blur'
+              },
+              {
+                validator: validateUnique('name', '功能名称不能重复'),
+                trigger: 'blur'
+              }
+            ]"
+            style="margin-bottom: 0"
+          >
+            <el-input v-model="action.name" />
+          </el-form-item>
+          <el-form-item
+            :prop="'actions.' + index + '.code'"
+            :rules="[
+              {
+                required: true,
+                message: '请输入功能代码',
+                trigger: 'blur'
+              },
+              {
+                validator: validateUnique('code', '功能代码不能重复'),
+                trigger: 'blur'
+              },
+              {
+                pattern: /^[a-zA-Z0-9_:]+$/,
+                message: '不支持的符号',
+                trigger: 'blur'
+              }
+            ]"
+            style="margin-left: 20px; margin-bottom: 0"
+          >
+            <el-input v-model="action.code" style="width: 100px" />
+          </el-form-item>
           <el-switch
             v-model="action.has_data_permission"
             size="default"
@@ -865,7 +925,7 @@ const assignSubmit = async () => {
               @click="moveUpAction(action.action_id)"
             />
           </el-button-group>
-        </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="addAction">新增功能</el-button>
         </el-form-item>

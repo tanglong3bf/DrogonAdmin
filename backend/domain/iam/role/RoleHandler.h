@@ -11,7 +11,9 @@ class RoleHandler : public DrAdminObject<RoleHandler>
     /**
      * @brief 删除角色
      */
-    drogon::Task<> deleteRole(Role &role, int32_t deletedBy) const;
+    drogon::Task<> deleteRole(Role &role,
+                              int32_t version,
+                              int32_t deletedBy) const;
 
   private:
     UserVerifierPtr userVerifier_{

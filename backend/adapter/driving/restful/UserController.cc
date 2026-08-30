@@ -1,10 +1,10 @@
 #include "UserController.h"
 
 #include "common/util/ApiResponse.hpp"
+#include "common/util/ParamUtils.hpp"
 
 using namespace std;
 using namespace drogon;
-using namespace drogon::utils;
 
 Task<HttpResponsePtr> UserController::list(const HttpRequestPtr req,
                                            const string username,
@@ -59,6 +59,14 @@ Task<HttpResponsePtr> UserController::deleteUser(
     const std::int32_t userId) const
 {
     const auto deletedBy = req->getAttributes()->get<int32_t>("userId");
-    co_await userService_->deleteUser(userId, deletedBy);
+
+    const auto versionStr = req->getParameter("version");
+    if (!isInteger(versionStr))
+    {
+        throw BusinessException("版本号必须为整数");
+    }
+    const int32_t version = stoi(versionStr);
+
+    co_await userService_->deleteUser(userId, version, deletedBy);
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

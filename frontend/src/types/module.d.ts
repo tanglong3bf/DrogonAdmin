@@ -27,6 +27,7 @@ export interface Module {
   description?: string // 模块描述
   sort_num: number // 模块排序
   parent_id?: number // 父级ID
+  version: number // 乐观锁版本号
   children?: Module[] // 子模块
   child_count?: number // 子模块数量
   actions?: Action[] // 功能
@@ -41,13 +42,22 @@ export interface ModuleFormData {
   name: string // 模块名称（可更新）
   description?: string | null // 模块描述
   parent_id?: number // 新增时可设置父模块，不可更新
+  version?: number // 乐观锁版本号
+}
+
+/**
+ * 排序模块列表项
+ */
+export interface ModuleSortItem {
+  module_id: number // 模块ID
+  name: string // 模块名称
+  version: number // 乐观锁版本号
 }
 
 /**
  * 排序模块参数
  */
-export interface ModuleSortItem {
+export interface ModuleSortFormDataItem {
   module_id: number // 模块ID
-  name: string // 模块名称
-  sort_num: number // 排序（数值小的靠前）
+  version: number // 乐观锁版本号
 }

@@ -30,7 +30,7 @@ class ApiResponse
         : data_{data}
     {
         message_ = attr->get<std::vector<std::string>>("message");
-        warn_ = attr->get<std::vector<std::string>>("warn");
+        warning_ = attr->get<std::vector<std::string>>("warning");
         error_ = attr->get<std::vector<std::string>>("error");
     }
 
@@ -38,7 +38,7 @@ class ApiResponse
     {
         Json::Value json;
         SET_FIELD(message);
-        SET_FIELD(warn);
+        SET_FIELD(warning);
         SET_FIELD(error);
         json["data"] = data_.toJson();
         return json;
@@ -46,7 +46,7 @@ class ApiResponse
 
   private:
     std::vector<std::string> message_;
-    std::vector<std::string> warn_;
+    std::vector<std::string> warning_;
     std::vector<std::string> error_;
     T data_;
 };

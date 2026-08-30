@@ -1,13 +1,15 @@
 #include "ActionUpdateRequest.h"
 
-#include "common/util/rangesUtils.hpp"
 #include "common/exception/BusinessException.h"
+#include "common/util/ParamGetter.hpp"
+#include "common/util/rangesUtils.hpp"
 #include <drogon/HttpRequest.h>
 #include <utility>
 #include <ranges>
 
 using namespace std;
 using namespace drogon_admin;
+using namespace drogon_admin::util;
 
 namespace drogon
 {
@@ -30,18 +32,44 @@ ActionUpdateRequest::ActionUpdateRequest(const Json::Value &json)
         json["actions"].type() == Json::arrayValue &&
         json["actions"].size() > 0)
     {
-        for (const auto &item : json["actions"])
+        for (const auto &itemInReq : json["actions"])
         {
-            actions_.emplace_back(item);
+            // 参数合法性检查
+            for (const auto &itemProcessed : actions_)
+            {
+                if (itemProcessed.actionId() ==
+                    itemInReq["action_id"].asInt64())
+                {
+                    throw BusinessException("actions中存在重复项");
+                }
+                else if (itemProcessed.code() == itemInReq["code"].asString())
+                {
+                    throw BusinessException("请求体中存在重复的code");
+                }
+                else if (itemProcessed.name() == itemInReq["name"].asString())
+                {
+                    throw BusinessException("请求体中存在重复的name");
+                }
+            }
+            actions_.emplace_back(itemInReq);
         }
     }
     if (json.isMember("priorities") &&
         json["priorities"].type() == Json::arrayValue &&
         json["priorities"].size() > 0)
     {
-        for (const auto &item : json["priorities"])
+        for (const auto &itemInReq : json["priorities"])
         {
-            priorities_.emplace_back(item);
+            // 参数合法性检查
+            for (const auto &itemProcessed : priorities_)
+            {
+                if (itemProcessed.highId() == itemInReq["high_id"].asInt64() &&
+                    itemProcessed.lowId() == itemInReq["low_id"].asInt64())
+                {
+                    throw BusinessException("priorities中存在重复项");
+                }
+            }
+            priorities_.emplace_back(itemInReq);
         }
     }
     // 参数合法性检查
@@ -73,4 +101,6 @@ ActionUpdateRequest::ActionUpdateRequest(const Json::Value &json)
             }
         }
     }
+
+    version_ = getParam<int32_t, true>(json, "version", {0, -1});
 }

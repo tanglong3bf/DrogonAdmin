@@ -65,6 +65,7 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
      */
     drogon::Task<> multiSave(
         const std::vector<Module> &modules,
+        const std::vector<std::int32_t> &versions,
         const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
@@ -72,6 +73,13 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
      */
     drogon::Task<std::vector<Action>> getActionByIds(
         const std::vector<std::int32_t> &actionIds) const;
+
+    /**
+     * @brief 根据功能code统计数量
+     */
+    drogon::Task<std::size_t> countCodes(
+        const std::vector<int32_t> &actionIds,
+        const std::vector<std::string> &codes) const;
 
   private:
     static SqlGenerator *sqlGenerator();

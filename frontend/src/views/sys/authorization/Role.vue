@@ -221,6 +221,7 @@ const submit = async (form?: FormInstance) => {
           : null
         : undefined,
       relation_type: relationTypeChanged ? role.relation_type : undefined,
+      version: role.version!,
       // 不处理 dept_ids，好麻烦
       dept_ids: role.dept_ids
     }
@@ -263,6 +264,7 @@ const updateRoleBtn = (row: Role) => {
   role.quota_type = rowCopied.quota_type
   role.user_quota = rowCopied.user_quota
   role.relation_type = rowCopied.relation_type
+  role.version = rowCopied.version
   role.dept_ids = rowCopied.dept_ids
 
   dialogType.value = DialogType.UPDATE
@@ -283,7 +285,10 @@ const deleteRoleBtn = async (role_id: number) => {
         type: 'warning'
       }
     )
-    await deleteRole(role_id)
+    const version = roleList.value.find(
+      item => item.role_id === role_id
+    )?.version
+    await deleteRole(role_id, version!)
     queryParams.page = 1
     resetQuery()
     await handleQuery()
