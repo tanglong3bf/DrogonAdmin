@@ -133,8 +133,7 @@ void User::updatePassword(string_view oldPassword, string_view newPassword)
     }
 
     const auto salt = BCrypt::GenerateSalt();
-    const auto hashedPassword =
-        BCrypt::HashPassword(static_cast<string>(newPassword), salt);
+    const auto hashedPassword = BCrypt::HashPassword(string(newPassword), salt);
 
     password_ = hashedPassword;
     markUpdatedBy(*userId_);

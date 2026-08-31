@@ -22,7 +22,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 查询页码超出范围，已自动调整到第一页
+        $.warning: 查询页码超出范围，已自动调整到第一页
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -47,7 +47,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 查询页码超出范围，已自动调整到最后一页
+        $.warning: 查询页码超出范围，已自动调整到最后一页
         $.data.page: 11
         $.data.page_size: 10
         $.data.total: 101
@@ -60,7 +60,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 页码格式错误，已自动使用第一页
+        $.warning: 页码格式错误，已自动使用第一页
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -74,7 +74,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为10
+        $.warning: 不支持的分页大小，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -87,7 +87,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为10
+        $.warning: 不支持的分页大小，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101
@@ -114,7 +114,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为20
+        $.warning: 不支持的分页大小，已自动调整为20
         $.data.page: 1
         $.data.page_size: 20
         $.data.total: 101
@@ -141,7 +141,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为30
+        $.warning: 不支持的分页大小，已自动调整为30
         $.data.page: 1
         $.data.page_size: 30
         $.data.total: 101
@@ -168,7 +168,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为50
+        $.warning: 不支持的分页大小，已自动调整为50
         $.data.page: 1
         $.data.page_size: 50
         $.data.total: 101
@@ -195,7 +195,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 不支持的分页大小，已自动调整为100
+        $.warning: 不支持的分页大小，已自动调整为100
         $.data.page: 1
         $.data.page_size: 100
         $.data.total: 101
@@ -209,7 +209,7 @@ role_cases:
     expect:
       status_code: 200
       assert_jsonpath:
-        $.warn: 分页大小格式错误，已自动调整为10
+        $.warning: 分页大小格式错误，已自动调整为10
         $.data.page: 1
         $.data.page_size: 10
         $.data.total: 101

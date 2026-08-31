@@ -93,3 +93,4 @@ auth_cases:
     extract:
       token: $.data.token
   # }}}
+# vim: set foldmethod=marker foldlevel=0:

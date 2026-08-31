@@ -13,9 +13,9 @@ Task<User> UserAssembler::fromCreateRequest(const UserCreateRequest &request,
 {
     // 验证
     co_await userVerifier_->verifyUsernameNotDuplicated(
-        static_cast<string>(request.username()));
+        string(request.username()));
     co_await userVerifier_->verifyNicknameNotDuplicated(
-        static_cast<string>(request.nickname()));
+        string(request.nickname()));
     co_await deptVerifier_->verifyDepartmentExists(request.deptId());
     if (request.roleIds())
     {
