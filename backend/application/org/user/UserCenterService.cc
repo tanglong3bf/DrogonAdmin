@@ -4,7 +4,7 @@ using namespace std;
 using namespace drogon;
 
 Task<> UserCenterService::updateBasicInfo(
-    const std::int32_t userId,
+    const int32_t userId,
     const UserInfoUpdateRequest &request) const
 {
     // userId源自于jwt，可保证有数据
@@ -25,7 +25,7 @@ Task<> UserCenterService::updateBasicInfo(
 }
 
 Task<> UserCenterService::changePassword(
-    const std::int32_t userId,
+    const int32_t userId,
     const ChangePasswordRequest &request) const
 {
     // userId源自于jwt，可保证有数据
@@ -39,12 +39,17 @@ Task<> UserCenterService::changePassword(
 }
 
 Task<UploadAvatarResponse> UserCenterService::uploadAvatar(
-    const std::int32_t userId,
-    const AvatarFileData &file) const
+    const int32_t userId,
+    const AvatarFileData &fileData) const
 {
     auto user = co_await userRepository_->getById(userId);
-    auto avatar_path = co_await avatarStorage_->saveAvatar(file);
-    user->setAvatar(avatar_path);
+    const auto avatarFileName = avatarStorage_->saveAvatar(fileData.content,
+                                                           fileData.extension,
+                                                           fileData.md5);
+    user->setAvatar(avatarFileName);
     co_await userRepository_->save(*user);
-    co_return UploadAvatarResponse{avatar_path};
+
+    const auto &config = app().getCustomConfig();
+    const string imgPrefix = config.get("img_prefix", "uploads").asString();
+    co_return UploadAvatarResponse{imgPrefix + '/' + avatarFileName};
 }

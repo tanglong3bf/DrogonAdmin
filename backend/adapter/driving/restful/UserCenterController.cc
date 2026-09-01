@@ -1,7 +1,6 @@
 #include "UserCenterController.h"
 
-#include <drogon/MultiPart.h>
-
+using namespace std;
 using namespace drogon;
 
 Task<HttpResponsePtr> UserCenterController::updateBasicInfo(
@@ -22,10 +21,11 @@ Task<HttpResponsePtr> UserCenterController::changePassword(
     co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
 
-drogon::Task<drogon::HttpResponsePtr> UserCenterController::uploadAvatar(
-    const drogon::HttpRequestPtr req) const
+Task<HttpResponsePtr> UserCenterController::uploadAvatar(
+    const HttpRequestPtr req) const
 {
     const auto userId = req->getAttributes()->get<int32_t>("userId");
+
     MultiPartParser parser;
     parser.parse(req);
     const auto &files = parser.getFilesMap();
@@ -36,13 +36,24 @@ drogon::Task<drogon::HttpResponsePtr> UserCenterController::uploadAvatar(
     }
 
     const HttpFile &avatarFile = files.at("avatar");
-    AvatarFileData fileData{.content = static_cast<std::string>(
-                                avatarFile.fileContent()),
-                            .extension =
-                                std::string(avatarFile.getFileExtension()),
-                            .md5 = avatarFile.getMd5()};
+
+    string_view content = avatarFile.fileContent();
+    string_view extension = avatarFile.getFileExtension();
+    if (content.size() > 5 * 1024 * 1024)
+    {
+        throw BusinessException("头像文件过大");
+    }
+
+    if (extension != "jpg" && extension != "jpeg" && extension != "png")
+    {
+        throw BusinessException("不支持的图片格式，请改用jpg/jpeg/png");
+    }
 
     const auto response =
-        co_await userCenterService_->uploadAvatar(userId, fileData);
+        co_await userCenterService_->uploadAvatar(userId,
+                                                  {.content = string(content),
+                                                   .extension =
+                                                       string(extension),
+                                                   .md5 = avatarFile.getMd5()});
     co_return toResponse(response);
 }

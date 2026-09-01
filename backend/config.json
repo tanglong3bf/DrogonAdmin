@@ -604,10 +604,12 @@
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
     "allowOrigin": "http:\/\/localhost:5173",
-    "login_check_white_list": ["/login"],
-    // 上传的图片在服务器的存储路径
-    // 默认值："/uploads/"
-    "img_prefix": "/uploads/",
+    "login_check_white_list": ["/login", "/uploads"],
+    // 图片存储好后，前端获取图片时需要的路径前缀，完整路径：${img_prefix}/${file_MD5}.(jpg|jpeg|png)
+    // 此配置项仅决定响应给前端的图片路径，实际存储路径由 app.upload_path 配置决定
+    // 默认值："/uploads"
+    // 不要后斜杠
+    "img_prefix": "/uploads",
     "menu_list": [
       {
         "menu_id": 1,

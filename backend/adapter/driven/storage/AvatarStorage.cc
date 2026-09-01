@@ -1,32 +1,31 @@
 #include "domain/org/user/AvatarStorage.h"
 
+#include "common/exception/BusinessException.h"
 #include <drogon/drogon.h>
 #include <fstream>
 
+using namespace std;
 using namespace drogon;
 
-Task<std::string> AvatarStorage::saveAvatar(const AvatarFileData &file) const
+string AvatarStorage::saveAvatar(string_view content,
+                                 string_view extension,
+                                 string_view md5) const
 {
-    const auto &config = drogon::app().getCustomConfig();
-    const std::string imgPrefix =
-        config.get("img_prefix", "/uploads/").asString();
+    const string fileName = format("{}.{}", md5, extension);
+    const string fullFilePath =
+        format("{}/{}", app().getUploadPath(), fileName);
 
-    const std::string fileName = file.md5 + "." + std::string(file.extension);
-    const std::string fullFilePath = app().getUploadPath() + "/" + fileName;
-
-    std::ofstream outStream(fullFilePath, std::ios::binary | std::ios::trunc);
+    ofstream outStream{fullFilePath, ios::binary | ios::trunc};
     if (!outStream.is_open())
     {
-        throw std::runtime_error("无法创建头像文件: " + fullFilePath);
+        throw BusinessException{"无法创建头像文件: " + fullFilePath};
     }
 
-    outStream.write(file.content.data(),
-                    static_cast<std::streamsize>(file.content.size()));
-    if (!outStream.good())
+    outStream.write(content.data(), static_cast<streamsize>(content.size()));
+    if (!outStream)
     {
-        throw std::runtime_error("头像文件写入失败: " + fullFilePath);
+        throw BusinessException{"头像文件写入失败: " + fullFilePath};
     }
-    outStream.close();
 
-    co_return imgPrefix + fileName;
+    return fileName;
 }

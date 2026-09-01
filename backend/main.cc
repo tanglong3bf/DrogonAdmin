@@ -107,6 +107,32 @@ int main()
                          "XdvcmxkIQ=="));
     });
 
+    // 头像文件处理
+    app().registerPreRoutingAdvice([](const HttpRequestPtr &req,
+                                      AdviceCallback &&ac,
+                                      AdviceChainCallback &&acc) {
+        // 前端请求路径：/${custom_config.img_prefix}/${MD5}.${ext}
+        auto &config = app().getCustomConfig();
+        string imgPrefix = config.get("img_prefix", "/uploads").asString();
+        regex re{"^" + imgPrefix + "/([\\dA-F]{32})\\.(jpe?g|png)$"};
+        smatch matchResult;
+        if (!regex_match(req->getPath(), matchResult, re))
+        {
+            acc();
+            return;
+        }
+
+        // MD5
+        string fileNameNoExt = matchResult[1];
+        // ext
+        string extension = matchResult[2];
+
+        // 实际文件地址：${app.upload_path}/${MD5}.${ext}
+        HttpResponsePtr resp = HttpResponse::newFileResponse(format(
+            "{}/{}.{}", app().getUploadPath(), fileNameNoExt, extension));
+        ac(resp);
+    });
+
     // 登录检查
     app().registerPreHandlingAdvice([](const HttpRequestPtr &req,
                                        AdviceCallback &&ac,
