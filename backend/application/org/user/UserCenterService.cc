@@ -46,10 +46,9 @@ Task<UploadAvatarResponse> UserCenterService::uploadAvatar(
     const auto avatarFileName = avatarStorage_->saveAvatar(fileData.content,
                                                            fileData.extension,
                                                            fileData.md5);
-    user->setAvatar(avatarFileName);
-    co_await userRepository_->save(*user);
-
     const auto &config = app().getCustomConfig();
     const string imgPrefix = config.get("img_prefix", "uploads").asString();
+    user->setAvatar(imgPrefix + '/' + avatarFileName);
+    co_await userRepository_->save(*user);
     co_return UploadAvatarResponse{imgPrefix + '/' + avatarFileName};
 }
