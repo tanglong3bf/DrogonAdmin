@@ -23,3 +23,5 @@ docker run --name drogon-admin-pgsql \
 本项目中包含以下第三方开源组件：
 
 - **BCryptCpp** - 位于 `/backend/common/util/third_party/BCryptCpp/`，基于 **ISC** 许可证开源。
+- **stb_image_write.h** - 位于 `/backend/common/util/third_party/stb/`，基于 **MIT** 许可证开源。
+- **DejaVuSansMono.ttf** - 位于 `/backend/resources/fonts/`，基于 **Bitstream Vera** 许可证开源。

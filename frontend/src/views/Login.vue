@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
 import { useCommonStore } from '@/stores/common'
 import { useAuthStore } from '@/stores/auth'
 import { login } from '@/api/auth'
-import { LoginRequest, MenuResponse } from '@/types/auth'
+import { LoginFormData, LoginRequest, MenuResponse } from '@/types/auth'
 import { SidebarMenu } from '@/types/menu'
 import { MenuType } from '@/types/enums'
+import { API_BASE_URL } from '@/config'
+import axios, { AxiosError } from 'axios'
 
 const commonStore = useCommonStore()
 const authStore = useAuthStore()
@@ -20,27 +22,55 @@ const router = useRouter()
 const formRef = ref<FormInstance>()
 
 /**
- * 登录表单类型声明
- */
-interface LoginForm {
-  username: string
-  password: string
-  rememberMe: boolean
-}
-
-/**
  * 登录表单绑定的数据
  */
-const formData = reactive<LoginForm>({
+const formData = reactive<LoginFormData>({
   username: 'admin123',
   password: '123456',
+  captchaId: '',
+  captcha: '',
   rememberMe: true
 })
 
 /**
+ * 验证码图片地址
+ */
+const captchaSrc = ref('')
+
+onMounted(async () => {
+  await refreshCaptcha()
+})
+
+const refreshCaptcha = async () => {
+  if (captchaSrc.value.startsWith('blob:')) {
+    URL.revokeObjectURL(captchaSrc.value)
+  }
+  try {
+    const res = await axios.get(`${API_BASE_URL}/captcha`, {
+      params: {
+        // 后端以此为依据删除无效的redis，同时避免浏览器缓存
+        old_captcha_id: formData.captchaId ? formData.captchaId : undefined,
+        t: formData.captchaId ? undefined : Date.now()
+      },
+      responseType: 'blob'
+    })
+    formData.captchaId = res.headers['x-captcha-id']
+
+    const blob = res.data
+    captchaSrc.value = URL.createObjectURL(blob)
+  } catch (err) {
+    if ((err as AxiosError).status === 429) {
+      ElMessage.error('系统繁忙，请稍后再试')
+      return
+    }
+    console.error('获取验证码失败', err)
+  }
+}
+
+/**
  * 参数校验
  */
-const rules = reactive<FormRules<LoginForm>>({
+const rules = reactive<FormRules<LoginFormData>>({
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 6, max: 20, message: '用户名长度6-20位', trigger: 'blur' }
@@ -48,6 +78,10 @@ const rules = reactive<FormRules<LoginForm>>({
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '密码长度6-20位', trigger: 'blur' }
+  ],
+  captcha: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { min: 4, max: 4, message: '请输入正确的验证码', trigger: 'blur' }
   ]
 })
 
@@ -61,41 +95,48 @@ const onLogin = async (formEl?: FormInstance) => {
     // TODO: rememberMe
     const request: LoginRequest = {
       username: formData.username,
-      password: formData.password
+      password: formData.password,
+      captchaId: formData.captchaId,
+      captcha: formData.captcha
     }
-    const result = await login(request)
+    try {
+      const result = await login(request)
 
-    const toSidebarMenu = (menu_list: MenuResponse[]): SidebarMenu[] => {
-      return menu_list.map((menu: MenuResponse): SidebarMenu => {
-        const sidebarMenuBase: SidebarMenu = {
-          index: menu.menu_id.toString(),
-          name: menu.name,
-          icon: menu.icon,
-          component: menu.component
-        }
-        const children =
-          menu.children && menu.children.length > 0
-            ? toSidebarMenu(menu.children)
-            : undefined
-        const sidebarMenu: SidebarMenu =
-          menu.type === MenuType.Menu
-            ? {
-                ...sidebarMenuBase,
-                children
-              }
-            : {
-                ...sidebarMenuBase,
-                path: menu.path
-              }
-        return sidebarMenu
-      })
+      const toSidebarMenu = (menu_list: MenuResponse[]): SidebarMenu[] => {
+        return menu_list.map((menu: MenuResponse): SidebarMenu => {
+          const sidebarMenuBase: SidebarMenu = {
+            index: menu.menu_id.toString(),
+            name: menu.name,
+            icon: menu.icon,
+            component: menu.component
+          }
+          const children =
+            menu.children && menu.children.length > 0
+              ? toSidebarMenu(menu.children)
+              : undefined
+          const sidebarMenu: SidebarMenu =
+            menu.type === MenuType.Menu
+              ? {
+                  ...sidebarMenuBase,
+                  children
+                }
+              : {
+                  ...sidebarMenuBase,
+                  path: menu.path
+                }
+          return sidebarMenu
+        })
+      }
+
+      authStore.setUserInfo(result.user_info)
+      authStore.setToken(result.token)
+      commonStore.setMenuList(toSidebarMenu(result.menu_list))
+      ElMessage({ message: '登录成功', type: 'success' })
+      router.push('/home')
+    } catch (err) {
+      console.error(err)
+      await refreshCaptcha()
     }
-
-    authStore.setUserInfo(result.user_info)
-    authStore.setToken(result.token)
-    commonStore.setMenuList(toSidebarMenu(result.menu_list))
-    ElMessage({ message: '登录成功', type: 'success' })
-    router.push('/home')
   }
 }
 </script>
@@ -124,6 +165,22 @@ const onLogin = async (formEl?: FormInstance) => {
               type="password"
               show-password
             />
+          </el-form-item>
+          <!-- 验证码表单项 -->
+          <el-form-item prop="captcha">
+            <div class="captcha-row">
+              <el-input
+                v-model="formData.captcha"
+                placeholder="请输入验证码"
+                size="large"
+              />
+              <img
+                class="captcha-img"
+                :src="captchaSrc"
+                alt="验证码"
+                @click="refreshCaptcha"
+              />
+            </div>
           </el-form-item>
           <el-form-item prop="rememberMe">
             <el-checkbox
@@ -165,5 +222,24 @@ const onLogin = async (formEl?: FormInstance) => {
       width: 100%;
     }
   }
+}
+.captcha-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  :deep(.el-input) {
+    flex: 1;
+  }
+}
+
+.captcha-img {
+  /*后端输出 160×60，前端缩小展示*/
+  width: 130px;
+  height: 48px;
+  object-fit: contain;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
 }
 </style>

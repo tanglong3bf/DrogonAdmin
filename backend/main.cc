@@ -41,7 +41,7 @@ int main()
         resp->addHeader("access-control-allow-methods",
                         "GET,POST,PUT,DELETE,PATCH");
         resp->addHeader("access-control-allow-headers",
-                        "Authorization,content-type");
+                        "Authorization,content-type,x-captcha-id");
         resp->addHeader("access-control-allow-origin", allowOrigin);
         return resp;
     });

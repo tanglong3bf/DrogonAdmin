@@ -87,6 +87,11 @@ class User : public AuditableEntity, public ChangeableEntity
     GETTER(version)
     GETTER(userRoles)
 
+    bool isDisabled() const
+    {
+        return status_ == Status::Disabled;
+    }
+
     /**
      * @brief 追加角色（仅新增，不删除已有角色）
      * @param newRoleIds 待新增角色ID列表
@@ -100,7 +105,8 @@ class User : public AuditableEntity, public ChangeableEntity
      * @param newRoleIds 最终需要持有的角色ID集合
      * @param updatedBy 本次更新操作人
      */
-    void replaceRoles(const std::vector<int32_t> &roleIds, std::int32_t updatedBy);
+    void replaceRoles(const std::vector<int32_t> &roleIds,
+                      std::int32_t updatedBy);
 
     // 仓储重建聚合时调用
     void restoreRoles(const std::vector<SysUserRole> &sysUserRoles);

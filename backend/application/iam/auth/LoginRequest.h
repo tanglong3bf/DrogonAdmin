@@ -23,8 +23,12 @@ class LoginRequest
 
     GETTER_STR_VIEW(username);
     GETTER_STR_VIEW(password);
+    GETTER_STR_VIEW(captchaId);
+    GETTER_STR_VIEW(captcha);
 
   private:
-    std::string username_;  ///< 用户名
-    std::string password_;  ///< 密码
+    std::string username_;   ///< 用户名
+    std::string password_;   ///< 密码
+    std::string captchaId_;  ///< 验证码id
+    std::string captcha_;    ///< 验证码
 };

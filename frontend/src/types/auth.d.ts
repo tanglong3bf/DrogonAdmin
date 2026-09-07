@@ -1,10 +1,24 @@
 import { MenuType, Sex } from './enums'
+
+/**
+ * 登录表单类型声明
+ */
+interface LoginFormData {
+  username: string
+  password: string
+  captchaId: string
+  captcha: string
+  rememberMe: boolean
+}
+
 /**
  * 登录请求体
  */
 export interface LoginRequest {
   username: string
   password: string
+  captchaId: string
+  captcha: string
 }
 
 /**

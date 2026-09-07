@@ -45,7 +45,7 @@
       //"connect_options": { "statement_timeout": "1s" }
     }
   ],
-  /*"redis_clients": [
+  "redis_clients": [
     {
       //name: Name of the client,'default' by default
       "name": "default",
@@ -62,14 +62,14 @@
       //is_fast: false by default, if it is true, the client is faster but user can't call
       //any synchronous interface of it.
       "is_fast": false,
-      //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of  
-      //connections per IO thread, otherwise it is the total number of all connections.  
+      //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of
+      //connections per IO thread, otherwise it is the total number of all connections.
       "number_of_connections": 1,
       //timeout: -1.0 by default, in seconds, the timeout for executing a command.
       //zero or negative value means no timeout.
       "timeout": -1.0
     }
-  ],*/
+  ],
   "app": {
     //number_of_threads: The number of IO threads, 1 by default, if the value is set to 0, the number of threads
     //is the number of CPU cores
@@ -599,17 +599,31 @@
     {
       // 纯头文件插件，未被使用时可能会报错，无影响
       "name": "tl::sql::RelationQuery"
+    },
+    {
+      // 限流器，默认令牌桶
+      "name": "drogon::plugin::Hodor",
+      "config": {
+        // 获取验证码
+        "urls": ["^/captcha"],
+        // 一分钟
+        "time_unit": 60,
+        // 每个ip限制10次
+        "ip_capacity": 10
+      }
     }
   ],
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
     "allowOrigin": "http:\/\/localhost:5173",
-    "login_check_white_list": ["/login", "/uploads"],
+    "login_check_white_list": ["/login", "/uploads", "/captcha"],
     // 图片存储好后，前端获取图片时需要的路径前缀，完整路径：${img_prefix}/${file_MD5}.(jpg|jpeg|png)
     // 此配置项仅决定响应给前端的图片路径，实际存储路径由 app.upload_path 配置决定
     // 默认值："/uploads"
     // 不要后斜杠
     "img_prefix": "/uploads",
+    // 验证码图片使用的字体文件，默认值：resources/fonts/DejaVuSansMono.ttf
+    "captcha_font_path": "resources/fonts/DejaVuSansMono.ttf",
     "menu_list": [
       {
         "menu_id": 1,
