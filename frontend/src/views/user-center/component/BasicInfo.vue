@@ -24,6 +24,9 @@ const isUploading = ref<boolean>(false)
  * @param uploadFile - 上传文件对象
  */
 const handleFileChange = (uploadFile: UploadFile) => {
+  if (['success', 'fail'].includes(uploadFile.status!)) {
+    return
+  }
   const file = uploadFile.raw // 获取原生File对象
   if (!file) return
 
@@ -78,7 +81,8 @@ const beforeAvatarUpload = (file: File) => {
  * 自定义手动上传逻辑
  * @param params - el-upload传入的上传参数
  */
-const handleManualUpload = async (_params: any) => {
+const handleManualUpload = async (options: any) => {
+  const { onSuccess, onError } = options
   if (!avatarFile.value) return
   isUploading.value = true
   try {
@@ -88,9 +92,10 @@ const handleManualUpload = async (_params: any) => {
       ...userInfo.value,
       avatar: filePath
     })
+    onSuccess()
   } catch (error) {
     console.error('上传请求异常：', error)
-    ElMessage.error('头像上传失败，请稍后重试！')
+    onError()
   } finally {
     isUploading.value = false
     uploadRef.value?.clearFiles()
@@ -165,7 +170,7 @@ const phoneNumber = computed(() => {
             :before-upload="beforeAvatarUpload"
             :http-request="handleManualUpload"
             @success="ElMessage.success('头像更新成功！')"
-            @error="ElMessage.success('头像上传失败！')"
+            @error="ElMessage.error('头像上传失败！')"
           >
             <img :src="avatarPreviewUrl" class="avatar" alt="头像预览" />
           </el-upload>
