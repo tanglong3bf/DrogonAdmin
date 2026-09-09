@@ -90,7 +90,7 @@ const rules = reactive<FormRules<LoginFormData>>({
  * @param formEl 登录表单实例
  */
 const onLogin = async (formEl?: FormInstance) => {
-  const isValid = formEl?.validate()
+  const isValid = await formEl?.validate()
   if (isValid) {
     // TODO: rememberMe
     const request: LoginRequest = {
