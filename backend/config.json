@@ -615,7 +615,8 @@
   ],
   //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
   "custom_config": {
-    "allowOrigin": "http:\/\/localhost:5173",
+    // 允许跨域的白名单，默认值：["http:\/\/localhost:5173"]
+    "allowOrigin": ["http:\/\/localhost:5173"],
     "login_check_white_list": ["/login", "/uploads", "/captcha"],
     // 图片存储好后，前端获取图片时需要的路径前缀，完整路径：${img_prefix}/${file_MD5}.(jpg|jpeg|png)
     // 此配置项仅决定响应给前端的图片路径，实际存储路径由 app.upload_path 配置决定

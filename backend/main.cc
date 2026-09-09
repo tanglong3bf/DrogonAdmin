@@ -1,6 +1,7 @@
 #include "common/exception/BusinessException.h"
 #include "DrogonJwtUtil/src/JwtUtil.h"
 #include <drogon/drogon.h>
+#include <unordered_set>
 
 using namespace std;
 using namespace drogon;
@@ -23,37 +24,52 @@ int main()
         // clang-format on
     });
 
-    // CORS
-    app().registerSyncAdvice([](const HttpRequestPtr &req) -> HttpResponsePtr {
-        auto config = app().getCustomConfig();
-        const bool isString =
-            config.isMember("allowOrigin") && config["allowOrigin"].isString();
-        static const string allowOrigin =
-            isString ? config["allowOrigin"].asString() : "*";
-
-        if (req->method() != Options)
+    const auto getAllowOrigin = []() -> unordered_set<string> & {
+        static auto config = app().getCustomConfig();
+        static unordered_set<string> allowOrigin;
+        for (const auto item : config["allowOrigin"])
         {
-            return nullptr;
+            allowOrigin.insert(item.asString());
         }
-        LOG_TRACE << "为" << req->getPath() << "处理OPTIONS请求";
+        return allowOrigin;
+    };
 
-        auto resp = HttpResponse::newHttpResponse();
-        resp->addHeader("access-control-allow-methods",
-                        "GET,POST,PUT,DELETE,PATCH");
-        resp->addHeader("access-control-allow-headers",
-                        "Authorization,content-type,x-captcha-id");
-        resp->addHeader("access-control-allow-origin", allowOrigin);
-        return resp;
-    });
-    app().registerPreSendingAdvice(
-        [](const HttpRequestPtr &req, const HttpResponsePtr &resp) {
-            if (resp->getHeader("access-control-allow-origin") == "")
+    // CORS
+    app().registerSyncAdvice(
+        [&getAllowOrigin](const HttpRequestPtr &req) -> HttpResponsePtr {
+            if (req->method() != Options)
             {
-                LOG_TRACE << req->getPath() << "(" << req->getMethod()
-                          << ")响应时补充响应头";
-                auto origin = req->getHeader("origin");
+                return nullptr;
+            }
+            LOG_TRACE << "为" << req->getPath() << "处理OPTIONS请求";
+
+            static const auto &allowOrigin = getAllowOrigin();
+            if (allowOrigin.count(req->getHeader("origin")) == 0)
+            {
+                return nullptr;
+            }
+
+            auto resp = HttpResponse::newHttpResponse();
+            resp->addHeader("access-control-allow-origin",
+                            req->getHeader("origin"));
+            resp->addHeader("access-control-allow-methods",
+                            "GET,POST,PUT,DELETE,PATCH");
+            resp->addHeader("access-control-allow-headers",
+                            "Authorization,content-type,x-captcha-id");
+            return resp;
+        });
+    app().registerPreSendingAdvice(
+        [&getAllowOrigin](const HttpRequestPtr &req,
+                          const HttpResponsePtr &resp) {
+            if (!resp->getHeader("access-control-allow-origin").empty())
+            {
+                return;
+            }
+            static const auto &allowOrigin = getAllowOrigin();
+            if (allowOrigin.count(req->getHeader("origin")) != 0)
+            {
                 resp->addHeader("access-control-allow-origin",
-                                origin != "" ? origin : "*");
+                                req->getHeader("origin"));
             }
         });
 
