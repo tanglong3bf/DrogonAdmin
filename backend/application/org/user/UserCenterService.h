@@ -29,7 +29,8 @@ class UserCenterService : public DrAdminObject<UserCenterService>
      */
     drogon::Task<UploadAvatarResponse> uploadAvatar(
         std::int32_t userId,
-        const AvatarFileData &fileData) const;
+        const AvatarFileData &fileData,
+        std::int32_t version) const;
 
   private:
     UserUpdaterPtr userUpdater_{

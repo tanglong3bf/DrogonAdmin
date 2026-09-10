@@ -30,11 +30,12 @@ export const changePassword = (
 /**
  * 上传用户头像
  */
-export const uploadAvatar = (file: File) => {
+export const uploadAvatar = (file: File, version: number) => {
   const formData = new FormData()
   formData.append('avatar', file)
   return validateResponse<UploadAvatarResponse>(
     request.post('/user_center/upload_avatar', formData, {
+      params: { version },
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
     isUploadAvatarResponse

@@ -46,12 +46,17 @@ Task<> UserCenterService::changePassword(
 
 Task<UploadAvatarResponse> UserCenterService::uploadAvatar(
     const int32_t userId,
-    const AvatarFileData &fileData) const
+    const AvatarFileData &fileData,
+    const int32_t version) const
 {
     auto user = co_await userRepository_->getById(userId);
     if (!user)
     {
         throw BusinessException("用户不存在");
+    }
+    if (user->version() != version)
+    {
+        throw BusinessException("更新期间数据发生变化，更新失败");
     }
     const auto avatarFileName = avatarStorage_->saveAvatar(fileData.content,
                                                            fileData.extension,

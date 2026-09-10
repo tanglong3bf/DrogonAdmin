@@ -86,10 +86,14 @@ const handleManualUpload = async (options: any) => {
   if (!avatarFile.value) return
   isUploading.value = true
   try {
-    const response = await uploadAvatar(avatarFile.value)
+    const response = await uploadAvatar(
+      avatarFile.value,
+      userInfo.value.version
+    )
     const { file_path: filePath } = response
     authStore.setUserInfo({
       ...userInfo.value,
+      version: userInfo.value.version + 1,
       avatar: filePath
     })
     onSuccess()

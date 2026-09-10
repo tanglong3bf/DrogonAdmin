@@ -26,6 +26,13 @@ Task<HttpResponsePtr> UserCenterController::uploadAvatar(
 {
     const auto userId = req->getAttributes()->get<int32_t>("userId");
 
+    const auto versionStr = req->getParameter("version");
+    if (!isInteger(versionStr))
+    {
+        throw BusinessException("版本号必须为整数");
+    }
+    const int32_t version = stoi(versionStr);
+
     MultiPartParser parser;
     parser.parse(req);
     const auto &files = parser.getFilesMap();
@@ -54,6 +61,7 @@ Task<HttpResponsePtr> UserCenterController::uploadAvatar(
                                                   {.content = string(content),
                                                    .extension =
                                                        string(extension),
-                                                   .md5 = avatarFile.getMd5()});
+                                                   .md5 = avatarFile.getMd5()},
+                                                  version);
     co_return toResponse(response);
 }
