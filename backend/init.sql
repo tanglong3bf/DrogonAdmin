@@ -87,11 +87,11 @@ CREATE TABLE "public"."sys_role" (
   "relation_type" int2 NOT NULL,
   "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
-  "created_time" timestamp(0) NOT NULL,
+  "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(0) NOT NULL,
+  "updated_time" timestamp(6) NOT NULL,
   "deleted_by" int4,
-  "deleted_time" timestamp(0)
+  "deleted_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_role"."role_id" IS '角色id';
