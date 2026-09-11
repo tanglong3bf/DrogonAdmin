@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 import { ResponseBody } from '@/types/common'
 import MockAdapter from 'axios-mock-adapter'
 import { API_BASE_URL } from '@/config'
-import { useRouter } from 'vue-router/dist/vue-router.mjs'
+import router from '@/router'
 
 const instance = axios.create({
   baseURL: API_BASE_URL,
@@ -103,7 +103,6 @@ instance.interceptors.response.use(
   },
   (error: AxiosError<ResponseBody<unknown>>) => {
     const authStore = useAuthStore()
-    const router = useRouter()
     const response = error.response
     // 404
     if (response && response.status === 404) {

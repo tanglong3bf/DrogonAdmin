@@ -128,9 +128,9 @@ CREATE TABLE "public"."sys_permission" (
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(0) NOT NULL,
+  "updated_time" timestamp(6) NOT NULL,
   "deleted_by" int4,
-  "deleted_time" timestamp(0)
+  "deleted_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_permission"."role_id" IS '角色id';

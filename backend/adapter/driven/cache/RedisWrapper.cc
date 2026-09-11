@@ -12,15 +12,17 @@ void RedisWrapper::set(string_view key,
     string command;
     if (expireTime != 0)
     {
-        command = format("SET {} {} EX {}", key, value, expireTime);
+        command = format("SET %s %s EX {}", expireTime);
     }
     else
     {
-        command = format("SET {} {}", key, value);
+        command = format("SET %s %s");
     }
     redisClient_->execCommandAsync([](const RedisResult & /*ignore*/) {},
                                    std::move(callback),
-                                   command);
+                                   command,
+                                   key,
+                                   value);
 }
 
 Task<string> RedisWrapper::get(string_view key) const

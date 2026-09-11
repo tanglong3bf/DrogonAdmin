@@ -182,8 +182,19 @@ int main()
                 acc();
                 return;
             }
+            else if (result.first == tl::jwt::Result::ExpiredToken)
+            {
+                // token过期
+                Json::Value json;
+                json["code"] = -1;
+                json["error"] = "登录已过期";
+                auto resp = HttpResponse::newHttpJsonResponse(json);
+                resp->setStatusCode(k401Unauthorized);
+                ac(resp);
+                return;
+            }
         }
-        // 格式错误或token无效
+        // 格式错误
         Json::Value json;
         json["code"] = -1;
         json["error"] = "未登录";

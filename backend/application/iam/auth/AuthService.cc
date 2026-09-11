@@ -56,8 +56,11 @@ Task<LoginResponse> AuthService::login(const LoginRequest &request) const
         co_await userRepository_->getByUsername(request.username(), true);
     if (!user)
     {
+        // 符合BCrypt格式的密文，但内容完全随机，防止提前退出
+        static std::string mask =
+            "$2a$10$hgMj5.a9cN//2CBRAbLGXe06p9q4S4jRv9ffpzOjAolmxQn6r9U6a";
         // 模拟校验密码，防止恶意攻击者通过响应时间判断出账号是否存在
-        matches(request.password(), request.password());
+        matches(request.password(), mask);
         throw BusinessException{"用户名或密码错误，登录失败"};
     }
     // 密码
