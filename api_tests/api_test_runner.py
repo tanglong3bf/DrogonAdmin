@@ -78,7 +78,7 @@ def read_yaml(yaml_path):
 
 def run_sql_file(sql_file: str):
     """
-    执行SQL初始化数据，增加异常处理+连接关闭
+    执行SQL文件
     """
     sql_path = Path(__file__).parent / "sql" / sql_file
     conn = None
@@ -99,6 +99,15 @@ def run_sql_file(sql_file: str):
             cursor.close()
         if conn:
             conn.close()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def init_db_schema():
+    """
+    整个测试会话开始前，统一创建所有表结构（只建表，不插数据）
+    之后每个用例只清空相关表的数据并插入自己需要的数据
+    """
+    run_sql_file("schema.sql")
 
 
 def fetch_captcha():
