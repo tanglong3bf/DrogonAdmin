@@ -21,8 +21,8 @@ void RedisWrapper::set(string_view key,
     redisClient_->execCommandAsync([](const RedisResult & /*ignore*/) {},
                                    std::move(callback),
                                    command,
-                                   key,
-                                   value);
+                                   key.data(),
+                                   value.data());
 }
 
 Task<string> RedisWrapper::get(string_view key) const
