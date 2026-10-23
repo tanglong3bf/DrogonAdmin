@@ -163,9 +163,12 @@ user_center_cases:
     url: http://localhost:8000/login
     method: POST
     need_token: False
+    need_captcha: True
     json:
       username: admin123
       password: '123456'
+      captchaId: ${captcha_id}
+      captcha: ${captcha_text}
       version: 0
     params: ''
     expect:
@@ -226,9 +229,12 @@ user_center_cases:
     url: http://localhost:8000/login
     method: POST
     need_token: False
+    need_captcha: True
     json:
       username: admin123
       password: '654321'
+      captchaId: ${captcha_id}
+      captcha: ${captcha_text}
     params: ''
     expect:
       status_code: 200

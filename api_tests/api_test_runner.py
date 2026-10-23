@@ -6,6 +6,7 @@ from pathlib import Path
 import psycopg2
 from psycopg2 import OperationalError
 from jsonschema import validate, ValidationError, RefResolver
+import redis
 import re
 from typing import Any, Dict
 
@@ -19,6 +20,18 @@ PG_CONFIG = {
     "dbname": "da_test_db",
     "port": 5432
 }
+
+"""
+Redis 配置
+"""
+REDIS_CONFIG = {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "db": 0
+}
+
+# 验证码接口地址
+CAPTCHA_URL = "http://localhost:8000/captcha"
 
 
 def load_schema(yaml_path):
@@ -88,6 +101,33 @@ def run_sql_file(sql_file: str):
             conn.close()
 
 
+def fetch_captcha():
+    """
+    获取图形验证码，并将结果存入全局变量池：
+    1. 请求验证码接口，携带上一次的验证码id（old_captcha_id，后端会自动删除旧验证码，首次为空）
+    2. 从响应头 x-captcha-id 中取出本次验证码的id
+    3. 根据验证码id读取redis中存储的验证码内容（key格式：captcha:{id}）
+    存入变量：captcha_id、captcha_text
+    """
+    resp = requests.get(CAPTCHA_URL, params={
+        "old_captcha_id": var_pool.get("captcha_id", "")
+    })
+    assert resp.status_code == 200, f"获取验证码失败，状态码：{resp.status_code}"
+
+    captcha_id = resp.headers.get("x-captcha-id")
+    assert captcha_id, "验证码接口响应头中缺少 x-captcha-id"
+
+    try:
+        redis_client = redis.Redis(**REDIS_CONFIG, decode_responses=True)
+        captcha_text = redis_client.get(f"captcha:{captcha_id}")
+    except Exception as e:
+        raise RuntimeError(f"读取redis中的验证码失败：{e}")
+    assert captcha_text, f"redis中不存在验证码 captcha:{captcha_id}，可能已过期"
+
+    var_pool["captcha_id"] = captcha_id
+    var_pool["captcha_text"] = captcha_text
+
+
 # 变量占位符正则：匹配 ${变量名} 格式
 _VAR_PATTERN = re.compile(r"\$\{(\w+)\}")
 
@@ -152,6 +192,10 @@ def test_dept_cases(case_item):
     # 部分接口需要提前准备数据
     if "sql_file" in case_item:
         run_sql_file(case_item["sql_file"])
+
+    # 部分接口需要图形验证码（如登录），提前获取并存入变量池
+    if case_item.get("need_captcha"):
+        fetch_captcha()
 
     # 变量替换
     url = replace_vars(case_item["url"], var_pool)
