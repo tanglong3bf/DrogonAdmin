@@ -1,88 +1,4 @@
--- 用户更新测试数据准备
-DROP TABLE IF EXISTS "public"."sys_user_role";
-DROP TABLE IF EXISTS "public"."sys_role_dept";
-DROP TABLE IF EXISTS "public"."sys_user";
-DROP TABLE IF EXISTS "public"."sys_role";
-DROP TABLE IF EXISTS "public"."sys_dept";
-DROP SEQUENCE IF EXISTS "public"."sys_user_user_id_seq";
-DROP SEQUENCE IF EXISTS "public"."sys_role_role_id_seq";
-DROP SEQUENCE IF EXISTS "public"."sys_dept_dept_id_seq";
-
--- 创建部门表
-CREATE SEQUENCE "public"."sys_dept_dept_id_seq"
-INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
-CREATE TABLE "public"."sys_dept" (
-  "dept_id" int4 NOT NULL DEFAULT nextval('sys_dept_dept_id_seq'::regclass),
-  "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "sort_num" int4 NOT NULL,
-  "parent_id" int4,
-  "version" int4 NOT NULL DEFAULT 0,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL,
-  "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(6) NOT NULL,
-  "deleted_by" int4,
-  "deleted_time" timestamp(6)
-);
-
--- 创建角色表
-CREATE SEQUENCE "public"."sys_role_role_id_seq"
-INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
-CREATE TABLE "public"."sys_role" (
-  "role_id" int4 NOT NULL DEFAULT nextval('sys_role_role_id_seq'::regclass),
-  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "code" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "description" varchar(255) COLLATE "pg_catalog"."default",
-  "quota_type" int2 NOT NULL,
-  "user_quota" int4,
-  "relation_type" int2 NOT NULL,
-  "version" int4 NOT NULL DEFAULT 0,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(0) NOT NULL,
-  "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(0) NOT NULL,
-  "deleted_by" int4,
-  "deleted_time" timestamp(0)
-);
-
--- 创建用户表
-CREATE SEQUENCE "public"."sys_user_user_id_seq"
-INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
-CREATE TABLE "public"."sys_user" (
-  "user_id" int4 NOT NULL DEFAULT nextval('sys_user_user_id_seq'::regclass),
-  "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
-  "password" char(60) COLLATE "pg_catalog"."default" NOT NULL,
-  "nickname" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "avatar" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "sex" int2 NOT NULL DEFAULT 0,
-  "dept_id" int4 NOT NULL,
-  "phone_number" char(11) COLLATE "pg_catalog"."default",
-  "email" varchar(50) COLLATE "pg_catalog"."default",
-  "status" int2 NOT NULL DEFAULT 0,
-  "version" int4 NOT NULL DEFAULT 0,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL,
-  "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(6) NOT NULL,
-  "deleted_by" int4,
-  "deleted_time" timestamp(6)
-);
-
--- 创建角色部门关联表
-CREATE TABLE "public"."sys_role_dept" (
-  "role_id" int4 NOT NULL,
-  "dept_id" int4 NOT NULL,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL
-);
-
--- 创建用户角色关联表
-CREATE TABLE "public"."sys_user_role" (
-  "user_id" int4 NOT NULL,
-  "role_id" int4 NOT NULL,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL
-);
+TRUNCATE TABLE "public"."sys_user_role", "public"."sys_role_dept", "public"."sys_user", "public"."sys_role", "public"."sys_dept" RESTART IDENTITY;
 
 -- 部门数据
 INSERT INTO "public"."sys_dept" VALUES (1, '技术部', 0, NULL, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
@@ -179,17 +95,6 @@ INSERT INTO "public"."sys_user" VALUES (27, 'user-27', '$2a$10$a/L82DicaCkCucLsK
 INSERT INTO "public"."sys_user" VALUES (28, 'user-28', '$2a$10$nSGnBWigHB3h.nUwwTlLXOXOUuTPRG5M2RuiZQFtMKx6FK6tF1c7K', '用户-28', '#', 1, 3, '18800000020', NULL, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 INSERT INTO "public"."sys_user" VALUES (29, 'user-29', '$2a$10$nSGnBWigHB3h.nUwwTlLXOXOUuTPRG5M2RuiZQFtMKx6FK6tF1c7K', '用户-29', '#', 0, 1, '18800000020', NULL, 0, 0, 1, '2026-04-01 00:00:00', 1, '2026-04-01 00:00:00', NULL, NULL);
 
--- 设置序列起始值
-ALTER SEQUENCE "public"."sys_dept_dept_id_seq" OWNED BY "public"."sys_dept"."dept_id";
 SELECT setval('"public"."sys_dept_dept_id_seq"', 4, true);
-ALTER SEQUENCE "public"."sys_role_role_id_seq" OWNED BY "public"."sys_role"."role_id";
 SELECT setval('"public"."sys_role_role_id_seq"', 10, true);
-ALTER SEQUENCE "public"."sys_user_user_id_seq" OWNED BY "public"."sys_user"."user_id";
 SELECT setval('"public"."sys_user_user_id_seq"', 28, true);
-
--- 添加主键约束
-ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");
-ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");
-ALTER TABLE "public"."sys_user" ADD CONSTRAINT "sys_user_pkey" PRIMARY KEY ("user_id");
-ALTER TABLE "public"."sys_role_dept" ADD CONSTRAINT "sys_role_dept_pkey" PRIMARY KEY ("role_id", "dept_id");
-ALTER TABLE "public"."sys_user_role" ADD CONSTRAINT "sys_user_role_pkey" PRIMARY KEY ("user_id", "role_id");

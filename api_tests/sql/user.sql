@@ -1,46 +1,4 @@
-DROP TABLE IF EXISTS "public"."sys_user";
-DROP SEQUENCE IF EXISTS "public"."sys_user_user_id_seq";
-CREATE SEQUENCE "public"."sys_user_user_id_seq" 
-INCREMENT 1
-MINVALUE  1
-MAXVALUE 2147483647
-START 1
-CACHE 1;
-CREATE TABLE "public"."sys_user" (
-  "user_id" int4 NOT NULL DEFAULT nextval('sys_user_user_id_seq'::regclass),
-  "username" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
-  "password" char(60) COLLATE "pg_catalog"."default" NOT NULL,
-  "nickname" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "avatar" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "sex" int2 NOT NULL DEFAULT 0,
-  "dept_id" int4 NOT NULL,
-  "phone_number" char(11) COLLATE "pg_catalog"."default",
-  "email" varchar(50) COLLATE "pg_catalog"."default",
-  "status" int2 NOT NULL DEFAULT 0,
-  "version" int4 NOT NULL DEFAULT 0,
-  "created_by" int4 NOT NULL,
-  "created_time" timestamp(6) NOT NULL,
-  "updated_by" int4 NOT NULL,
-  "updated_time" timestamp(6) NOT NULL,
-  "deleted_by" int4,
-  "deleted_time" timestamp(6)
-)
-;
-COMMENT ON COLUMN "public"."sys_user"."username" IS '用户名';
-COMMENT ON COLUMN "public"."sys_user"."password" IS '密码';
-COMMENT ON COLUMN "public"."sys_user"."nickname" IS '昵称';
-COMMENT ON COLUMN "public"."sys_user"."avatar" IS '头像';
-COMMENT ON COLUMN "public"."sys_user"."sex" IS '性别 0-保密 1-男 2-女';
-COMMENT ON COLUMN "public"."sys_user"."dept_id" IS '所属部门id';
-COMMENT ON COLUMN "public"."sys_user"."phone_number" IS '电话号码';
-COMMENT ON COLUMN "public"."sys_user"."email" IS '邮箱';
-COMMENT ON COLUMN "public"."sys_user"."status" IS '状态 0-正常 1-禁用';
-COMMENT ON COLUMN "public"."sys_user"."created_by" IS '创建者';
-COMMENT ON COLUMN "public"."sys_user"."created_time" IS '创建时间';
-COMMENT ON COLUMN "public"."sys_user"."updated_by" IS '最后一次更新者';
-COMMENT ON COLUMN "public"."sys_user"."updated_time" IS '最后一次更新时间';
-COMMENT ON COLUMN "public"."sys_user"."deleted_by" IS '删除者';
-COMMENT ON COLUMN "public"."sys_user"."deleted_time" IS '删除时间';
+TRUNCATE TABLE "public"."sys_user" RESTART IDENTITY;
 
 INSERT INTO "public"."sys_user" VALUES (1, 'admin-1', '$2a$10$kqq0NdN38dlbni.wyabBie6S3.VLcFAcEtFwOjpGQwGyMNHv2v0wS', '管理员-1', '#', 1, 1, '18888888888', 'hello@world.com', 0, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 INSERT INTO "public"."sys_user" VALUES (2, 'admin-2', '$2a$10$ShQJGshUe0nJkxMBrpD.5ukEUNhkhQR0h2PoRCx.hU8xhMiMJyY6a', '管理员-2', '#', 2, 1, '13666666666', 'wanan@makabaka.com', 0, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
@@ -60,7 +18,4 @@ INSERT INTO "public"."sys_user" VALUES (15, 'sun_ui', '$2a$10$4.02IteI4rp4WfrElg
 INSERT INTO "public"."sys_user" VALUES (16, 'zhou_test', '$2a$10$g9wdXifxd4/S/hmRhpEFwOzoIldbsygDFzYzR/CWSZhJxixqRufFW', '周测试-008', '#', 1, 3, '13700000088', 'zhou008.test@dept3.cn', 0, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 INSERT INTO "public"."sys_user" VALUES (17, 'guest_user', '$2a$10$ibk6elT355.ko0LL.jZbsO860UREtKI0l0mfnc/OUatQwwer2jnl.', '访客测试员', '#', 0, 8, '18800000008', 'guest@temp.test', 1, 0, 1, '2026-04-03 22:28:44', 1, '2026-04-03 22:28:44', NULL, NULL);
 
-ALTER SEQUENCE "public"."sys_user_user_id_seq"
-OWNED BY "public"."sys_user"."user_id";
 SELECT setval('"public"."sys_user_user_id_seq"', 17, true);
-ALTER TABLE "public"."sys_user" ADD CONSTRAINT "sys_user_pkey" PRIMARY KEY ("user_id");

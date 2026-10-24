@@ -35,7 +35,7 @@ Task<> DeptService::updateDept(const std::int32_t deptId,
         throw BusinessException{"指定的部门id不存在"};
     }
     co_await deptHandler_->updateDept(*dept,
-                                      static_cast<string>(request.name()),
+                                      string(request.name()),
                                       request.version(),
                                       updatedBy);
     co_await deptRepository_->save(*dept);

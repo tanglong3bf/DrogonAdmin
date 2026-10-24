@@ -6,10 +6,10 @@ import { Sex } from '@/types/enums'
 import { Icon } from '@iconify/vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router/dist/vue-router.mjs'
-import { IMG_BASE_URL } from '@/config'
 import avatarDefault from '@/assets/avatar/default.svg'
 import avatarMale from '@/assets/avatar/male.jpeg'
 import avatarFemale from '@/assets/avatar/female.jpeg'
+import { joinImageUrl } from '@/utils/url'
 
 const authStore = useAuthStore()
 const commonStore = useCommonStore()
@@ -51,7 +51,7 @@ const avatarPreviewUrl = computed(() => {
         return avatarFemale
     }
   }
-  return IMG_BASE_URL + userInfo.value.avatar
+  return joinImageUrl(userInfo.value.avatar)
 })
 </script>
 

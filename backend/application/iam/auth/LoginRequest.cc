@@ -25,4 +25,6 @@ LoginRequest::LoginRequest(const Json::Value &json)
 {
     username_ = getParam<std::string, true>(json, "username", {6, 20});
     password_ = getParam<std::string, true>(json, "password", {6, 20});
+    captchaId_ = getParam<std::string, true>(json, "captchaId");
+    captcha_ = getParam<std::string, true>(json, "captcha", {4, 4});
 }

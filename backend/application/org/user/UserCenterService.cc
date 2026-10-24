@@ -4,11 +4,14 @@ using namespace std;
 using namespace drogon;
 
 Task<> UserCenterService::updateBasicInfo(
-    const std::int32_t userId,
+    const int32_t userId,
     const UserInfoUpdateRequest &request) const
 {
-    // userId源自于jwt，可保证有数据
     auto user = co_await userRepository_->getById(userId, true);
+    if (!user)
+    {
+        throw BusinessException("用户不存在");
+    }
     if (user->version() != request.version())
     {
         throw BusinessException("更新期间数据发生变化，更新失败");
@@ -25,11 +28,14 @@ Task<> UserCenterService::updateBasicInfo(
 }
 
 Task<> UserCenterService::changePassword(
-    const std::int32_t userId,
+    const int32_t userId,
     const ChangePasswordRequest &request) const
 {
-    // userId源自于jwt，可保证有数据
     auto user = co_await userRepository_->getById(userId, true);
+    if (!user)
+    {
+        throw BusinessException("用户不存在");
+    }
     if (user->version() != request.version())
     {
         throw BusinessException("更新期间数据发生变化，更新失败");
@@ -39,12 +45,25 @@ Task<> UserCenterService::changePassword(
 }
 
 Task<UploadAvatarResponse> UserCenterService::uploadAvatar(
-    const std::int32_t userId,
-    const AvatarFileData &file) const
+    const int32_t userId,
+    const AvatarFileData &fileData,
+    const int32_t version) const
 {
     auto user = co_await userRepository_->getById(userId);
-    auto avatar_path = co_await avatarStorage_->saveAvatar(file);
-    user->setAvatar(avatar_path);
+    if (!user)
+    {
+        throw BusinessException("用户不存在");
+    }
+    if (user->version() != version)
+    {
+        throw BusinessException("更新期间数据发生变化，更新失败");
+    }
+    const auto avatarFileName = avatarStorage_->saveAvatar(fileData.content,
+                                                           fileData.extension,
+                                                           fileData.md5);
+    const auto &config = app().getCustomConfig();
+    const string imgPrefix = config.get("img_prefix", "/uploads").asString();
+    user->setAvatar(imgPrefix + '/' + avatarFileName);
     co_await userRepository_->save(*user);
-    co_return UploadAvatarResponse{avatar_path};
+    co_return UploadAvatarResponse{imgPrefix + '/' + avatarFileName};
 }

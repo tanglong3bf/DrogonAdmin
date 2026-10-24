@@ -1,6 +1,7 @@
 #include "common/exception/BusinessException.h"
 #include "DrogonJwtUtil/src/JwtUtil.h"
 #include <drogon/drogon.h>
+#include <unordered_set>
 
 using namespace std;
 using namespace drogon;
@@ -23,37 +24,52 @@ int main()
         // clang-format on
     });
 
-    // CORS
-    app().registerSyncAdvice([](const HttpRequestPtr &req) -> HttpResponsePtr {
-        auto config = app().getCustomConfig();
-        const bool isString =
-            config.isMember("allowOrigin") && config["allowOrigin"].isString();
-        static const string allowOrigin =
-            isString ? config["allowOrigin"].asString() : "*";
-
-        if (req->method() != Options)
+    const auto getAllowOrigin = []() -> unordered_set<string> & {
+        static auto config = app().getCustomConfig();
+        static unordered_set<string> allowOrigin;
+        for (const auto item : config["allowOrigin"])
         {
-            return nullptr;
+            allowOrigin.insert(item.asString());
         }
-        LOG_TRACE << "为" << req->getPath() << "处理OPTIONS请求";
+        return allowOrigin;
+    };
 
-        auto resp = HttpResponse::newHttpResponse();
-        resp->addHeader("access-control-allow-methods",
-                        "GET,POST,PUT,DELETE,PATCH");
-        resp->addHeader("access-control-allow-headers",
-                        "Authorization,content-type");
-        resp->addHeader("access-control-allow-origin", allowOrigin);
-        return resp;
-    });
-    app().registerPreSendingAdvice(
-        [](const HttpRequestPtr &req, const HttpResponsePtr &resp) {
-            if (resp->getHeader("access-control-allow-origin") == "")
+    // CORS
+    app().registerSyncAdvice(
+        [&getAllowOrigin](const HttpRequestPtr &req) -> HttpResponsePtr {
+            if (req->method() != Options)
             {
-                LOG_TRACE << req->getPath() << "(" << req->getMethod()
-                          << ")响应时补充响应头";
-                auto origin = req->getHeader("origin");
+                return nullptr;
+            }
+            LOG_TRACE << "为" << req->getPath() << "处理OPTIONS请求";
+
+            static const auto &allowOrigin = getAllowOrigin();
+            if (allowOrigin.count(req->getHeader("origin")) == 0)
+            {
+                return nullptr;
+            }
+
+            auto resp = HttpResponse::newHttpResponse();
+            resp->addHeader("access-control-allow-origin",
+                            req->getHeader("origin"));
+            resp->addHeader("access-control-allow-methods",
+                            "GET,POST,PUT,DELETE,PATCH");
+            resp->addHeader("access-control-allow-headers",
+                            "Authorization,content-type,x-captcha-id");
+            return resp;
+        });
+    app().registerPreSendingAdvice(
+        [&getAllowOrigin](const HttpRequestPtr &req,
+                          const HttpResponsePtr &resp) {
+            if (!resp->getHeader("access-control-allow-origin").empty())
+            {
+                return;
+            }
+            static const auto &allowOrigin = getAllowOrigin();
+            if (allowOrigin.count(req->getHeader("origin")) != 0)
+            {
                 resp->addHeader("access-control-allow-origin",
-                                origin != "" ? origin : "*");
+                                req->getHeader("origin"));
             }
         });
 
@@ -107,6 +123,32 @@ int main()
                          "XdvcmxkIQ=="));
     });
 
+    // 头像文件处理
+    app().registerPreRoutingAdvice([](const HttpRequestPtr &req,
+                                      AdviceCallback &&ac,
+                                      AdviceChainCallback &&acc) {
+        // 前端请求路径：/${custom_config.img_prefix}/${MD5}.${ext}
+        auto &config = app().getCustomConfig();
+        string imgPrefix = config.get("img_prefix", "/uploads").asString();
+        regex re{"^" + imgPrefix + "/([\\dA-F]{32})\\.(jpe?g|png)$"};
+        smatch matchResult;
+        if (!regex_match(req->getPath(), matchResult, re))
+        {
+            acc();
+            return;
+        }
+
+        // MD5
+        string fileNameNoExt = matchResult[1];
+        // ext
+        string extension = matchResult[2];
+
+        // 实际文件地址：${app.upload_path}/${MD5}.${ext}
+        HttpResponsePtr resp = HttpResponse::newFileResponse(format(
+            "{}/{}.{}", app().getUploadPath(), fileNameNoExt, extension));
+        ac(resp);
+    });
+
     // 登录检查
     app().registerPreHandlingAdvice([](const HttpRequestPtr &req,
                                        AdviceCallback &&ac,
@@ -140,8 +182,19 @@ int main()
                 acc();
                 return;
             }
+            else if (result.first == tl::jwt::Result::ExpiredToken)
+            {
+                // token过期
+                Json::Value json;
+                json["code"] = -1;
+                json["error"] = "登录已过期";
+                auto resp = HttpResponse::newHttpJsonResponse(json);
+                resp->setStatusCode(k401Unauthorized);
+                ac(resp);
+                return;
+            }
         }
-        // 格式错误或token无效
+        // 格式错误
         Json::Value json;
         json["code"] = -1;
         json["error"] = "未登录";

@@ -24,12 +24,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(${PROJECT_NAME} main.cc)
 
 find_package(Drogon CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
+find_package(Freetype REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon Freetype::Freetype)
 
 message(STATUS "use c++20")
 
 aux_source_directory(adapter/driven/persistence REPO_SRC)
 aux_source_directory(adapter/driven/storage STORAGE_SRC)
+aux_source_directory(adapter/driven/cache CACHE_SRC)
+aux_source_directory(adapter/driven/cache/impl CACHE_IMPL_SRC)
 aux_source_directory(adapter/driving/restful CTL_SRC)
 aux_source_directory(application/iam/auth AUTH_SERVICE_SRC)
 aux_source_directory(application/iam/role ROLE_SERVICE_SRC)
@@ -60,6 +63,8 @@ target_sources(
   PRIVATE ${SRC_DIR}
           ${REPO_SRC}
           ${STORAGE_SRC}
+          ${CACHE_SRC}
+          ${CACHE_IMPL_SRC}
           ${CTL_SRC}
           ${AUTH_SERVICE_SRC}
           ${ROLE_SERVICE_SRC}
@@ -82,3 +87,5 @@ target_sources(
           ${BCRYPT_SRC})
 
 file(COPY config.json DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY resources/fonts/DejaVuSansMono.ttf
+     DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts/)

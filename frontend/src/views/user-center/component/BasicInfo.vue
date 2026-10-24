@@ -6,10 +6,10 @@ import { ElMessage, ElUpload, UploadFile } from 'element-plus/es'
 import { uploadAvatar } from '@/api/user_center'
 import { Icon } from '@iconify/vue'
 import { Sex } from '@/types/enums'
-import { IMG_BASE_URL } from '@/config'
 import avatarDefault from '@/assets/avatar/default.svg'
 import avatarMale from '@/assets/avatar/male.jpeg'
 import avatarFemale from '@/assets/avatar/female.jpeg'
+import { joinImageUrl } from '@/utils/url'
 
 const authStore = useAuthStore()
 
@@ -27,6 +27,9 @@ const isUploading = ref<boolean>(false)
  * @param uploadFile - 上传文件对象
  */
 const handleFileChange = (uploadFile: UploadFile) => {
+  if (['success', 'fail'].includes(uploadFile.status!)) {
+    return
+  }
   const file = uploadFile.raw // 获取原生File对象
   if (!file) return
 
@@ -63,14 +66,14 @@ const beforeAvatarUpload = (file: File) => {
   // 校验文件类型
   const isImage = file.type.startsWith('image/')
   if (!isImage) {
-    ElMessage.error('只能上传图片格式文件（jpg、png、jpeg等）！')
+    ElMessage.error('只能上传图片格式文件（jpg、png、jpeg）！')
     return false
   }
 
   // 校验文件大小
-  const isLt2M = file.size / 1024 / 1024 < 2
-  if (!isLt2M) {
-    ElMessage.error('头像图片大小不能超过2MB！')
+  const isLt5M = file.size / 1024 / 1024 < 5
+  if (!isLt5M) {
+    ElMessage.error('头像图片大小不能超过5MB！')
     return false
   }
 
@@ -81,19 +84,25 @@ const beforeAvatarUpload = (file: File) => {
  * 自定义手动上传逻辑
  * @param params - el-upload传入的上传参数
  */
-const handleManualUpload = async (_params: any) => {
+const handleManualUpload = async (options: any) => {
+  const { onSuccess, onError } = options
   if (!avatarFile.value) return
   isUploading.value = true
   try {
-    const response = await uploadAvatar(avatarFile.value)
+    const response = await uploadAvatar(
+      avatarFile.value,
+      userInfo.value.version
+    )
     const { file_path: filePath } = response
     authStore.setUserInfo({
       ...userInfo.value,
+      version: userInfo.value.version + 1,
       avatar: filePath
     })
+    onSuccess()
   } catch (error) {
     console.error('上传请求异常：', error)
-    ElMessage.error('头像上传失败，请稍后重试！')
+    onError()
   } finally {
     isUploading.value = false
     uploadRef.value?.clearFiles()
@@ -111,7 +120,6 @@ const handleConfirmUpload = () => {
     return
   }
   uploadRef.value?.submit()
-  ElMessage.success('头像更新成功！')
 }
 
 /**
@@ -137,7 +145,7 @@ const avatarPreviewUrl = computed(() => {
         return avatarFemale
     }
   }
-  return IMG_BASE_URL + userInfo.value.avatar
+  return joinImageUrl(userInfo.value.avatar)
 })
 
 const email = computed(() => {
@@ -162,13 +170,14 @@ const phoneNumber = computed(() => {
         <div class="avatar-upload-container">
           <!-- 头像上传组件：关闭自动上传，自定义上传逻辑 -->
           <el-upload
-            class="avatar-uploader"
+            ref="uploadRef"
             :auto-upload="false"
             :show-file-list="false"
             :on-change="handleFileChange"
             :before-upload="beforeAvatarUpload"
             :http-request="handleManualUpload"
-            ref="uploadRef"
+            @success="ElMessage.success('头像更新成功！')"
+            @error="ElMessage.error('头像上传失败！')"
           >
             <img :src="avatarPreviewUrl" class="avatar" alt="头像预览" />
           </el-upload>

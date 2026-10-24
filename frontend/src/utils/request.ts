@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import { ResponseBody } from '@/types/common'
 import MockAdapter from 'axios-mock-adapter'
 import { API_BASE_URL } from '@/config'
+import router from '@/router'
 
 const instance = axios.create({
   baseURL: API_BASE_URL,
@@ -142,6 +143,7 @@ instance.interceptors.response.use(
       // 401表示token无效或已过期，清除token
       if (response.status === 401) {
         authStore.setToken(undefined)
+        router.replace('/login')
       }
     } else {
       // 无响应

@@ -12,15 +12,14 @@ Task<Dept> DeptAssembler::fromCreateRequest(DeptCreateRequest request,
     {
         co_await deptVerifier_->verifyDepartmentExists(*request.parentId());
     }
-    co_await deptVerifier_->verifyDeptNameNotDuplicated(static_cast<string>(
-                                                            request.name()),
+    co_await deptVerifier_->verifyDeptNameNotDuplicated(string(request.name()),
                                                         request.parentId());
 
     // 准备必备参数
     const auto maxSortNum =
         co_await deptRepository_->getMaxSubDeptSortNum(request.parentId());
 
-    Dept dept{static_cast<string>(request.name()),
+    Dept dept{string(request.name()),
               maxSortNum ? *maxSortNum + 1 : 0,
               createdBy};
 

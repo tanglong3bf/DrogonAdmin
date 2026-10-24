@@ -12,7 +12,7 @@ Task<Module> ModuleAssembler::fromCreateRequest(ModuleCreateRequest request,
     {
         co_await moduleVerifier_->verifyModuleExists(*request.parentId());
     }
-    co_await moduleVerifier_->verifyModuleNameNotDuplicated(static_cast<string>(
+    co_await moduleVerifier_->verifyModuleNameNotDuplicated(string(
                                                                 request.name()),
                                                             request.parentId());
 
@@ -20,7 +20,7 @@ Task<Module> ModuleAssembler::fromCreateRequest(ModuleCreateRequest request,
     const auto maxSortNum =
         co_await moduleRepository_->getMaxSubModuleSortNum(request.parentId());
 
-    Module module{static_cast<string>(request.name()),
+    Module module{string(request.name()),
                   maxSortNum ? *maxSortNum + 1 : 0,
                   createdBy};
 
