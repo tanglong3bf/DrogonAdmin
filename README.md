@@ -6,9 +6,19 @@
 
 ### 后端
 
+运行`drogon_ctl --version`，请确保包含以下依赖：
+
+```bash
+Libraries:
+  postgresql: yes  (pipeline mode: yes)
+  hiredis: yes
+  yaml-cpp: yes
+```
+
 数据库：
 
 ```bash
+# 我这里挂载了数据卷，可自行修改为其他路径
 docker run --name drogon-admin-pgsql \
       -e POSTGRES_USER=admin \
       -e POSTGRES_PASSWORD=123456 \
@@ -16,6 +26,12 @@ docker run --name drogon-admin-pgsql \
       -p 5432:5432 \
       -v ~/docker/drogonAdminPgsqlData:/var/lib/postgresql \
       -d postgres:18.1
+```
+
+redis：
+
+```bash
+docker run -d --name drogon-admin-redis -p 6379:6379 redis:8.6.1
 ```
 
 其余内容待补充
