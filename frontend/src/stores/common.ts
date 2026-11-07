@@ -1,22 +1,26 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { PageItem } from '@/types/common'
-import { SidebarMenu } from '@/types/menu'
+import { Menu } from '@/types/menu'
 
 export const useCommonStore = defineStore(
   'common',
   () => {
-    const menuList = ref<SidebarMenu[]>([])
+    const menuList = ref<Menu[]>([])
 
     /**
      * 设置侧边栏菜单
      * @param newMenuList
      */
-    const setMenuList = (newMenuList: SidebarMenu[]) => {
+    const setMenuList = (newMenuList: Menu[]) => {
       menuList.value = [
         {
-          path: '/home',
+          sort_num: 1,
+          version: 0,
+          menu_id: 0,
           index: '0',
+          type: 1,
+          path: '/home',
           icon: 'ion:home-sharp',
           name: '首页',
           component: '/Home'

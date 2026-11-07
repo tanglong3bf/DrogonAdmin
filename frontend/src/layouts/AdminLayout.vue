@@ -4,7 +4,7 @@ import Header from './components/Header.vue'
 import Aside from './components/Aside.vue'
 import { RouteRecordRaw, useRouter } from 'vue-router/dist/vue-router.mjs'
 import { useCommonStore } from '@/stores/common'
-import { SidebarMenu } from '@/types/menu'
+import { Menu } from '@/types/menu'
 
 const menuExpand = ref(true)
 
@@ -15,7 +15,7 @@ onMounted(() => {
   const commonStore = useCommonStore()
 
   // 生成路由配置
-  const generateRoutes = (menuList: SidebarMenu[]): RouteRecordRaw[] => {
+  const generateRoutes = (menuList: Menu[]): RouteRecordRaw[] => {
     return menuList.flatMap(menu => {
       let currentRoute: RouteRecordRaw[] = []
       if (menu.path && menu.component) {
