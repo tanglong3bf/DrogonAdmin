@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import type { SidebarMenu } from '@/types/menu'
+import type { Menu } from '@/types/menu'
 
-defineProps<{ list: SidebarMenu[] }>()
+defineProps<{ list: Menu[] }>()
 </script>
 
 <template>

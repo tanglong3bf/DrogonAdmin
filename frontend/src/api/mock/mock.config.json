@@ -35,5 +35,12 @@
     "sort_module": true,
     "assign_actions": true,
     "get_action_priority": true
+  },
+  "menu": {
+    "get_menu_tree": true,
+    "new_menu": true,
+    "update_menu": true,
+    "delete_menu": true,
+    "sort_menu": true
   }
 }

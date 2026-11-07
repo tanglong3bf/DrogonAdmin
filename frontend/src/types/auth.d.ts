@@ -57,6 +57,8 @@ export interface UserInfo {
  */
 export interface MenuResponse {
   menu_id: number
+  sort_num: number
+  version: number
   icon?: string
   name: string
   type: MenuType

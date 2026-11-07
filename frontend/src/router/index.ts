@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useCommonStore } from '@/stores/common'
 import { useAuthStore } from '@/stores/auth'
-import { SidebarMenu } from '@/types/menu'
+import { Menu } from '@/types/menu'
 import { PageItem } from '@/types/common'
 
 const routes: RouteRecordRaw[] = [
@@ -67,7 +67,7 @@ router.beforeEach(to => {
    * @param toPath
    * @returns
    */
-  const calActivePath = (items: SidebarMenu[], toPath: string): PageItem[] => {
+  const calActivePath = (items: Menu[], toPath: string): PageItem[] => {
     // 处理特殊页面
     if (toPath === '/login') {
       return [{ name: '登录页', path: '/login' }]
@@ -78,7 +78,7 @@ router.beforeEach(to => {
       ]
     }
     // 获取节点的路径，无路径，递归查询第一个子节点
-    const getEffectivePath = (item: SidebarMenu): string | undefined => {
+    const getEffectivePath = (item: Menu): string | undefined => {
       if (item.path) return item.path
       if (item.children && item.children.length > 0) {
         return getEffectivePath(item.children[0])
