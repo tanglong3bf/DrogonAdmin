@@ -34,11 +34,15 @@ export function isLoginResponse(data: unknown): data is LoginResponse {
   return (
     isObject(data) &&
     isNotEmptyStringField(data, 'token') &&
-    isArrayField(data, 'menu_list', isMenuResponse)
+    isArrayField(data, 'menu_list', isMenu)
   )
 }
 
 export function isMenuResponse(data: unknown): data is MenuResponse {
+  return isObject(data) && isArrayField(data, 'data', isMenu)
+}
+
+export function isMenu(data: unknown): data is MenuResponse {
   const isCommonFieldsValid =
     isObject(data) &&
     isNumberField(data, 'sort_num') &&
@@ -60,7 +64,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
       return (
         !isContainKey(menuData, 'path') &&
         !isContainKey(menuData, 'component') &&
-        isArrayOrUndefinedField(menuData, 'children', isMenuResponse)
+        isArrayOrUndefinedField(menuData, 'children', isMenu)
       )
     case MenuType.Page:
       return (
@@ -189,7 +193,6 @@ export function isMenuNode(data: unknown): data is Menu {
   const isCommonFieldsValid =
     isObject(data) &&
     isNumberField(data, 'menu_id') &&
-    isNotEmptyStringField(data, 'index') &&
     isStringField(data, 'name') &&
     isStringOrUndefinedField(data, 'icon') &&
     isNumberField(data, 'sort_num') &&

@@ -566,7 +566,7 @@ const deleteMenuBtn = async (menuId: number) => {
     </el-row>
     <!-- 表格 -->
     <el-table :data="menuShow" row-key="menu_id" default-expand-all>
-      <el-table-column prop="name" label="菜单名称" min-width="80px">
+      <el-table-column prop="name" label="菜单名称" min-width="120px">
         <template v-slot="{ row }">
           <el-icon v-if="row.icon"><Icon :icon="row.icon" /></el-icon>
           {{ row.name }}
