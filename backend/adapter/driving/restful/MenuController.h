@@ -39,7 +39,8 @@ class MenuController : public drogon::HttpController<MenuController>
      * @brief 新增一个菜单项
      */
     drogon::Task<drogon::HttpResponsePtr> newMenu(
-        const drogon::HttpRequestPtr req) const;
+        const drogon::HttpRequestPtr req,
+        const MenuCreateRequest request) const;
 
     /**
      * @brief 更新指定菜单项

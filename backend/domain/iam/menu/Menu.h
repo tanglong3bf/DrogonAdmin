@@ -7,9 +7,9 @@
 
 enum class MenuType : int16_t
 {
-    Menu,    ///< 菜单
-    Page,    ///< 页面
-    OutLink  ///< 外链
+    Directory,  ///< 菜单
+    Page,       ///< 页面
+    OutLink     ///< 外链
 };
 
 class Menu : public AuditableEntity, public ChangeableEntity
@@ -20,9 +20,15 @@ class Menu : public AuditableEntity, public ChangeableEntity
     /**
      * @brief 准备必备参数的构造
      */
-    Menu(const std::string &name,
+    Menu(std::string_view name, std::int32_t sortNum, MenuType type);
+
+    /**
+     * @brief 准备必备参数以及创建者id的构造
+     */
+    Menu(std::string_view name,
          const std::int32_t sortNum,
-         const MenuType type);
+         const MenuType type,
+         const std::int32_t createdBy);
 
     /// @group 和model类互转
     /// @{
@@ -43,6 +49,22 @@ class Menu : public AuditableEntity, public ChangeableEntity
     GETTER(children)
 
     void setParentId(const std::optional<std::int32_t> parentId);
+
+    /**
+     * @brief 设置可选字段
+     *
+     * @param icon       图标
+     * @param path       访问路径（Menu类型留空）
+     * @param component  组件路径（仅Page类型有值）
+     */
+    void constructOptionalFields(const std::optional<std::string> &icon,
+                                 const std::optional<std::string> &path,
+                                 const std::optional<std::string> &component);
+
+    [[nodiscard]] bool isDirectory() const
+    {
+        return type_ == MenuType::Directory;
+    }
 
     /**
      * @brief 软删除

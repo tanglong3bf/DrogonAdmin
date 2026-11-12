@@ -4,8 +4,20 @@ using namespace std;
 using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
 
-Menu::Menu(const string &name, const int32_t sortNum, const MenuType type)
+Menu::Menu(string_view name, const int32_t sortNum, const MenuType type)
     : name_{name}, version_{0}, sortNum_{sortNum}, type_{type}
+{
+}
+
+Menu::Menu(string_view name,
+           const int32_t sortNum,
+           const MenuType type,
+           const int32_t createdBy)
+    : name_{name},
+      version_{0},
+      sortNum_{sortNum},
+      type_{type},
+      AuditableEntity{AUDITABLE_INIT}
 {
 }
 
@@ -52,6 +64,15 @@ void Menu::setParentId(const std::optional<std::int32_t> parentId)
     {
         parentId_ = parentId;
     }
+}
+
+void Menu::constructOptionalFields(const std::optional<std::string> &icon,
+                                   const std::optional<std::string> &path,
+                                   const std::optional<std::string> &component)
+{
+    icon_ = icon;
+    path_ = path;
+    component_ = component;
 }
 
 void Menu::remove(const std::int32_t deletedBy)

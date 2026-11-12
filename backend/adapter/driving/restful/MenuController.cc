@@ -1,8 +1,8 @@
 #include "MenuController.h"
 
-#include <drogon/utils/Utilities.h>
-
 #include "common/exception/BusinessException.h"
+#include <drogon/utils/Utilities.h>
+#include <drogon/HttpTypes.h>
 
 using namespace drogon;
 
@@ -13,9 +13,13 @@ Task<HttpResponsePtr> MenuController::getMenuTree(
     co_return toResponse(tree);
 }
 
-Task<HttpResponsePtr> MenuController::newMenu(const HttpRequestPtr req) const
+Task<HttpResponsePtr> MenuController::newMenu(
+    const HttpRequestPtr req,
+    const MenuCreateRequest request) const
 {
-    throw BusinessException("接口未实现");
+    const auto createdBy = req->getAttributes()->get<int32_t>("userId");
+    co_await menuService_->createMenu(request, createdBy);
+    co_return HttpResponse::newHttpResponse(k201Created, CT_NONE);
 }
 
 Task<HttpResponsePtr> MenuController::updateMenu(

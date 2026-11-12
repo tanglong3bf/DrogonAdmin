@@ -7,6 +7,18 @@
 class MenuVerifier : public DrAdminObject<MenuVerifier>
 {
   public:
+    /**
+     * @brief 校验指定菜单是否存在（未删除）
+     */
+    drogon::Task<> verifyMenuIsDirectory(const std::int32_t menuId) const;
+
+    /**
+     * @brief 校验同级下菜单名称是否重复
+     */
+    drogon::Task<> verifyMenuNameNotDuplicated(
+        const std::string &name,
+        const std::optional<std::int32_t> &parentId) const;
+
     drogon::Task<> verifyActionNotUsed(
         const std::vector<std::int32_t> &actionIds) const;
 

@@ -329,14 +329,6 @@
             "inner_join": "INNER JOIN dept_ancestor d ON d.dept_id = s.parent_id AND s.deleted_by IS NULL",
             "order": "ORDER BY \"level\", parent_id, sort_num, dept_id"
           },
-          // 获取菜单树
-          "get_menu_tree": {
-            "main": "WITH RECURSIVE menu_ancestor AS ( @current() UNION @sub() ) SELECT * FROM menu_ancestor @order()",
-            "current": "SELECT *, 0 AS \"level\" FROM sys_menu WHERE parent_id IS NULL AND deleted_by IS NULL",
-            "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_menu s @inner_join()",
-            "inner_join": "INNER JOIN menu_ancestor d ON d.menu_id = s.parent_id AND s.deleted_by IS NULL",
-            "order": "ORDER BY \"level\", parent_id, sort_num, menu_id"
-          },
           // 指定父部门id，获取最大的sort_num
           "get_max_sub_dept_sort_num": {
             "main": "SELECT MAX(sort_num) FROM sys_dept @condition(parent_id)",
@@ -600,6 +592,19 @@
           "multi_delete_priority": {
             "main": "DELETE FROM sys_action_priority WHERE (high_id, low_id) IN ( VALUES @values(data) )",
             "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id} @endfor)"
+          },
+          // 获取菜单树
+          "get_menu_tree": {
+            "main": "WITH RECURSIVE menu_ancestor AS ( @current() UNION @sub() ) SELECT * FROM menu_ancestor @order()",
+            "current": "SELECT *, 0 AS \"level\" FROM sys_menu WHERE parent_id IS NULL AND deleted_by IS NULL",
+            "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_menu s @inner_join()",
+            "inner_join": "INNER JOIN menu_ancestor d ON d.menu_id = s.parent_id AND s.deleted_by IS NULL",
+            "order": "ORDER BY \"level\", parent_id, sort_num, menu_id"
+          },
+          // 指定父菜单id，获取最大的sort_num
+          "get_max_sub_menu_sort_num": {
+            "main": "SELECT MAX(sort_num) FROM sys_menu @condition(parent_id)",
+            "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
           }
         }
       }
@@ -640,7 +645,7 @@
         "version": 0,
         "icon": "ion:settings-sharp",
         "name": "系统管理",
-        "type": 0, // menu
+        "type": 0, // directory
         "children": [
           {
             "menu_id": 2,
@@ -648,7 +653,7 @@
             "version": 0,
             "icon": "ion:settings-sharp",
             "name": "组织架构",
-            "type": 0, // menu
+            "type": 0, // directory
             "children": [
               {
                 "menu_id": 5,
@@ -678,7 +683,7 @@
             "version": 0,
             "icon": "ion:settings-sharp",
             "name": "权限管理",
-            "type": 0, //menu
+            "type": 0, //directory
             "children": [
               {
                 "menu_id": 7,
@@ -708,7 +713,7 @@
             "version": 0,
             "icon": "ion:settings-sharp",
             "name": "资源管理",
-            "type": 0, // menu
+            "type": 0, // directory
             "children": [
               {
                 "menu_id": 9,

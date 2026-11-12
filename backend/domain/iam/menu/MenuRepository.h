@@ -1,8 +1,9 @@
 #pragma once
 
-#include "SqlGenerator/src/SqlGenerator.h"
-#include "common/framework/DrAdminObject.hpp"
+#include "Menu.h"
 #include "domain/models/SysMenu.h"
+#include "common/framework/DrAdminObject.hpp"
+#include "SqlGenerator/src/SqlGenerator.h"
 #include <drogon/HttpAppFramework.h>
 #include <drogon/utils/coroutine.h>
 
@@ -14,6 +15,30 @@ class MenuRepository : public DrAdminObject<MenuRepository>
     using DbClientPtr = drogon::orm::DbClientPtr;
 
   public:
+    /**
+     * @brief 保存菜单实体（新建、更新、删除）
+     */
+    drogon::Task<> save(Menu &menu) const;
+
+    /**
+     * @brief 获取指定父菜单下最大的 sort_num
+     */
+    drogon::Task<std::optional<std::int32_t>> getMaxSubMenuSortNum(
+        const std::optional<std::int32_t> parentId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
+
+    /**
+     * @brief 根据 id 获取菜单（未删除的）
+     */
+    drogon::Task<std::optional<Menu>> getById(const std::int32_t menuId) const;
+
+    /**
+     * @brief 统计指定父菜单下同名子菜单数量
+     */
+    drogon::Task<std::size_t> countNameByParentId(
+        const std::string &name,
+        const std::optional<std::int32_t> &parentId) const;
+
     drogon::Task<std::size_t> countByActionIds(
         const std::vector<std::int32_t> &actionIds) const;
 
