@@ -25,9 +25,13 @@ class MenuVerifier : public DrAdminObject<MenuVerifier>
     /**
      * @brief 校验目标父菜单不是当前菜单自身或其子孙节点
      */
-    drogon::Task<> verifyParentNotSelfOrDescendant(
-        std::int32_t menuId,
-        std::int32_t parentId) const;
+    drogon::Task<> verifyParentNotSelfOrDescendant(std::int32_t menuId,
+                                                   std::int32_t parentId) const;
+
+    /**
+     * @brief 校验菜单下没有子菜单
+     */
+    drogon::Task<> verifyNoSubMenu(std::int32_t menuId) const;
 
   private:
     MenuRepositoryPtr menuRepository_{

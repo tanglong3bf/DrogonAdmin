@@ -33,6 +33,21 @@ Task<> MenuService::updateMenu(const std::int32_t menuId,
     co_await menuRepository_->save(*menu);
 }
 
+Task<> MenuService::deleteMenu(const std::int32_t menuId,
+                               const std::int32_t version,
+                               const std::int32_t deletedBy) const
+{
+    auto menu = co_await menuRepository_->getById(menuId);
+    if (!menu)
+    {
+        // 没有数据，无需操作
+        co_return;
+    }
+
+    co_await menuHandler_->deleteMenu(*menu, version, deletedBy);
+    co_await menuRepository_->save(*menu);
+}
+
 Task<> MenuService::sortMenu(const MenuSortRequest &request,
                              const int32_t updatedBy) const
 {

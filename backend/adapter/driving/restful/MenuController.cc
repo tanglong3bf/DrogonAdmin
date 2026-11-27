@@ -33,10 +33,20 @@ Task<HttpResponsePtr> MenuController::updateMenu(
 }
 
 Task<HttpResponsePtr> MenuController::deleteMenu(
-    const HttpRequestPtr /*req*/,
-    const std::int32_t /*menuId*/) const
+    const HttpRequestPtr req,
+    const std::int32_t menuId) const
 {
-    throw BusinessException("接口未实现");
+    const auto deletedBy = req->getAttributes()->get<int32_t>("userId");
+
+    const auto versionStr = req->getParameter("version");
+    if (!isInteger(versionStr))
+    {
+        throw BusinessException("版本号必须为整数");
+    }
+    const int32_t version = std::stoi(versionStr);
+
+    co_await menuService_->deleteMenu(menuId, version, deletedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
 
 Task<HttpResponsePtr> MenuController::sortMenu(

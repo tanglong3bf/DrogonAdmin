@@ -62,6 +62,20 @@ Task<vector<Menu>> MenuHandler::sortMenu(const optional<std::int32_t> &parentId,
     co_return sortResult;
 }
 
+Task<> MenuHandler::deleteMenu(Menu &menu,
+                               const int32_t version,
+                               const int32_t deletedBy) const
+{
+    // 校验
+    if (version != menu.version())
+    {
+        throw BusinessException{"删除期间数据发生变化，删除失败"};
+    }
+    co_await menuVerifier_->verifyNoSubMenu(*menu.menuId());
+
+    menu.remove(deletedBy);
+}
+
 void MenuHandler::validateMenuIdsInAllMenus(const vector<int32_t> &menuIds,
                                             const vector<Menu> &allMenus) const
 {

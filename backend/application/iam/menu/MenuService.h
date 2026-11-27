@@ -39,6 +39,13 @@ class MenuService : public DrAdminObject<MenuService>
                               const std::int32_t updatedBy) const;
 
     /**
+     * @brief 删除菜单项
+     */
+    drogon::Task<> deleteMenu(const std::int32_t menuId,
+                              const std::int32_t version,
+                              const std::int32_t deletedBy) const;
+
+    /**
      * @brief 排序菜单
      */
     drogon::Task<> sortMenu(const MenuSortRequest &request,

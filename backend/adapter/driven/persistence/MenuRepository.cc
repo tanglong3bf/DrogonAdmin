@@ -62,6 +62,22 @@ Task<> MenuRepository::save(Menu &menu) const
             co_await menuMapper(trans).insert(sysMenu);
             break;
         }
+        case ChangingStatus::DELETED:
+        {
+            const auto result =
+                co_await drogon::app().getDbClient()->execSqlCoro(
+                    "UPDATE sys_menu SET deleted_by = $1, deleted_time = $2, "
+                    "version = version + 1 WHERE menu_id = $3 AND version = $4",
+                    *menu.deletedBy(),
+                    *menu.deletedTime(),
+                    *menu.menuId(),
+                    menu.version());
+            if (result.affectedRows() == 0)
+            {
+                throw BusinessException{"删除期间数据发生变化，删除失败"};
+            }
+            break;
+        }
         case ChangingStatus::UPDATED:
         {
             const auto trans =
@@ -111,6 +127,13 @@ Task<std::size_t> MenuRepository::countByActionIds(
     criteria =
         criteria &&
         Criteria{SysMenu::Cols::_action_id, CompareOperator::In, actionIds};
+    co_return co_await menuMapper().count(criteria);
+}
+
+Task<size_t> MenuRepository::countSubMenu(const int32_t menuId) const
+{
+    Criteria criteria{SysMenu::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysMenu::Cols::_parent_id, menuId};
     co_return co_await menuMapper().count(criteria);
 }
 

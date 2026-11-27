@@ -50,3 +50,12 @@ Task<> MenuVerifier::verifyParentNotSelfOrDescendant(
         throw BusinessException("不能将菜单移动到自身或其子菜单下");
     }
 }
+
+Task<> MenuVerifier::verifyNoSubMenu(const int32_t menuId) const
+{
+    const auto count = co_await menuRepository_->countSubMenu(menuId);
+    if (count > 0)
+    {
+        throw BusinessException("存在子菜单，无法删除");
+    }
+}

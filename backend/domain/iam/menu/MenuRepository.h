@@ -57,6 +57,11 @@ class MenuRepository : public DrAdminObject<MenuRepository>
         const std::vector<std::int32_t> &actionIds) const;
 
     /**
+     * @brief 统计指定菜单的子菜单数量
+     */
+    drogon::Task<std::size_t> countSubMenu(std::int32_t menuId) const;
+
+    /**
      * @brief 判断 menuId 是否为目标菜单自身或其祖先
      */
     drogon::Task<bool> isAncestorOrSelf(
