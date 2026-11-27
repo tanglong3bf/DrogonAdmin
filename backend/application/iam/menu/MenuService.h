@@ -3,9 +3,12 @@
 #include "MenuAssembler.h"
 #include "MenuCqrsRepo.h"
 #include "MenuCreateRequest.h"
+#include "MenuUpdateRequest.h"
+#include "MenuUpdater.h"
 #include "domain/iam/menu/MenuRepository.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/utils/coroutine.h>
+#include <memory>
 
 /**
  * @brief 菜单服务
@@ -26,11 +29,20 @@ class MenuService : public DrAdminObject<MenuService>
     drogon::Task<> createMenu(const MenuCreateRequest &request,
                               const std::int32_t createdBy) const;
 
+    /**
+     * @brief 更新菜单项
+     */
+    drogon::Task<> updateMenu(const std::int32_t menuId,
+                              const MenuUpdateRequest &request,
+                              const std::int32_t updatedBy) const;
+
   private:
     MenuCqrsRepoPtr menuCqrsRepo_{
         drogon::DrClassMap::getSingleInstance<MenuCqrsRepo>()};
     MenuAssemblerPtr menuAssembler_{
         drogon::DrClassMap::getSingleInstance<MenuAssembler>()};
+    MenuUpdaterPtr menuUpdater_{
+        drogon::DrClassMap::getSingleInstance<MenuUpdater>()};
     MenuRepositoryPtr menuRepository_{
         drogon::DrClassMap::getSingleInstance<MenuRepository>()};
 };

@@ -41,7 +41,7 @@ Task<> ModuleRepository::save(const Module &module,
             if (module.actions().size() > 0)
             {
                 Json::Value data{Json::arrayValue};
-                for (const auto action : module.actions())
+                for (const auto &action : module.actions())
                 {
                     data.append(static_cast<SysAction>(action).toJson());
                 }
@@ -110,7 +110,7 @@ Task<> ModuleRepository::save(const Module &module,
                 if (newActions.size() > 0)
                 {
                     Json::Value data{Json::arrayValue};
-                    for (const auto action : newActions)
+                    for (const auto &action : newActions)
                     {
                         data.append(action.toJson());
                     }
@@ -128,11 +128,11 @@ Task<> ModuleRepository::save(const Module &module,
                 if (updatedActions.size() > 0 || deletedActions.size() > 0)
                 {
                     Json::Value data{Json::arrayValue};
-                    for (const auto action : updatedActions)
+                    for (const auto &action : updatedActions)
                     {
                         data.append(action.toJson());
                     }
-                    for (const auto action : deletedActions)
+                    for (const auto &action : deletedActions)
                     {
                         data.append(action.toJson());
                     }
@@ -197,7 +197,7 @@ Task<> ModuleRepository::save(const Module &module,
                 if (newPriorities.size() > 0)
                 {
                     Json::Value data{Json::arrayValue};
-                    for (const auto priority : newPriorities)
+                    for (const auto &priority : newPriorities)
                     {
                         data.append(priority.toJson());
                     }
@@ -209,7 +209,7 @@ Task<> ModuleRepository::save(const Module &module,
                 if (deletedPriorities.size() > 0)
                 {
                     Json::Value data{Json::arrayValue};
-                    for (const auto priority : deletedPriorities)
+                    for (const auto &priority : deletedPriorities)
                     {
                         Json::Value item;
                         item["high_id"] = priority.getValueOfHighId();
@@ -358,6 +358,23 @@ Task<> ModuleRepository::multiSave(const vector<Module> &modules,
     {
         trans->rollback();
         throw BusinessException{"更新期间数据发生变化，更新失败"};
+    }
+}
+
+Task<optional<Action>> ModuleRepository::getActionById(
+    const int32_t actionId) const
+{
+    Criteria criteria{SysAction::Cols::_deleted_by, CompareOperator::IsNull};
+    criteria = criteria && Criteria{SysAction::Cols::_action_id, actionId};
+
+    try
+    {
+        const auto sysAction = co_await actionMapper().findOne(criteria);
+        co_return Action{sysAction};
+    }
+    catch (const orm::UnexpectedRows & /*ignore*/)
+    {
+        co_return nullopt;
     }
 }
 

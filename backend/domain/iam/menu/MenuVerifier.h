@@ -22,6 +22,13 @@ class MenuVerifier : public DrAdminObject<MenuVerifier>
     drogon::Task<> verifyActionNotUsed(
         const std::vector<std::int32_t> &actionIds) const;
 
+    /**
+     * @brief 校验目标父菜单不是当前菜单自身或其子孙节点
+     */
+    drogon::Task<> verifyParentNotSelfOrDescendant(
+        std::int32_t menuId,
+        std::int32_t parentId) const;
+
   private:
     MenuRepositoryPtr menuRepository_{
         drogon::DrClassMap::getSingleInstance<MenuRepository>()};

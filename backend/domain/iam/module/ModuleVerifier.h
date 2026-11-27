@@ -25,6 +25,11 @@ class ModuleVerifier : public DrAdminObject<ModuleVerifier>
         const std::optional<int32_t> parentId) const;
 
     /**
+     * @brief 校验功能存在
+     */
+    drogon::Task<> verifyActionExists(std::int32_t actionId) const;
+
+    /**
      * @brief 校验功能属于模块
      */
     drogon::Task<> verifyActionsBelongsToModule(

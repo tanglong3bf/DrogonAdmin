@@ -11,7 +11,8 @@ import type {
   Menu,
   MenuFormData,
   MenuSortFormDataItem,
-  MenuSortItem
+  MenuSortItem,
+  UpdateMenuData
 } from '@/types/menu'
 import {
   getMenuTree,
@@ -211,6 +212,9 @@ const menuForm = reactive<MenuFormData>({
   version: undefined
 })
 
+/** 外链类型的协议前缀 */
+const outLinkProto = ref<'http' | 'https'>('https')
+
 /**
  * 菜单表单实例
  */
@@ -247,6 +251,7 @@ const newMenuBtn = () => {
   menuForm.menu_id = undefined
   menuForm.version = undefined
   menuForm.parent_id = undefined
+  outLinkProto.value = 'https'
 
   dialogType.value = DialogType.ADD
   dialogVisible.value = true
@@ -300,16 +305,20 @@ const handleAddMenu = async (data: MenuFormData): Promise<boolean> => {
       ElMessage.error('外链类型必须有访问路径')
       return false
     }
+  }
+
+  // 外链类型自动拼协议前缀
+  let finalPath: string | undefined = data.path
+  if (data.type === MenuType.OutLink && data.path) {
     if (!data.path.startsWith('http://') && !data.path.startsWith('https://')) {
-      ElMessage.error('外链类型路径必须是完整URL')
-      return false
+      finalPath = `${outLinkProto.value}://${data.path}`
     }
   }
 
   await newMenu({
     name: data.name,
     type: data.type,
-    path: data.type !== MenuType.Menu ? data.path : undefined,
+    path: data.type !== MenuType.Menu ? finalPath : undefined,
     icon: data.icon,
     component: data.type === MenuType.Page ? data.component : undefined,
     parent_id: data.parent_id
@@ -319,6 +328,16 @@ const handleAddMenu = async (data: MenuFormData): Promise<boolean> => {
   await getMenuData()
   resetQuery()
   return true
+}
+
+/**
+ * 比较两个可选字符串，判断是否需要更新
+ * 表单里未填写时 data 是 ''，后端返回的可能是 undefined / null
+ * 统一归一化后再比对
+ */
+const normalizeStr = (v?: string): string | null => {
+  const s = v?.trim()
+  return s ? s : null
 }
 
 /**
@@ -336,29 +355,73 @@ const handleUpdateMenu = async (
     return false
   }
 
-  // 菜单类型不可修改
-  if (data.type !== original.type) {
-    ElMessage.error('菜单类型不可修改')
-    return false
+  const body = {
+    version: original.version,
+    name: undefined as string | undefined,
+    type: undefined as MenuType | undefined,
+    parent_id: undefined as number | null | undefined,
+    path: undefined as string | null | undefined,
+    component: undefined as string | null | undefined,
+    icon: undefined as string | null | undefined
   }
 
+  // name
+  if (data.name !== original.name) {
+    body.name = data.name
+  }
+
+  // type
+  if (data.type !== original.type) {
+    body.type = data.type
+  }
+
+  // parent_id：表单 undefined 表示没选（顶级），original 也是 undefined 表示顶级
+  // 归一化后 undefined/null 都当成"顶级"
+  const origParentId = original.parent_id ?? undefined
+  const newParentId = data.parent_id ?? undefined
+  if (newParentId !== origParentId) {
+    body.parent_id = newParentId ?? null
+  }
+
+  // path / component / icon：表单里空串表示没填
+  // 外链类型自动拼协议前缀后再参与比对
+  let finalPath = normalizeStr(data.path)
+  if (data.type === MenuType.OutLink && finalPath) {
+    if (!finalPath.startsWith('http://') && !finalPath.startsWith('https://')) {
+      finalPath = `${outLinkProto.value}://${finalPath}`
+    }
+  }
+
+  const origPath = normalizeStr(original.path)
+  const origComponent = normalizeStr(original.component)
+  const origIcon = normalizeStr(original.icon)
+  const newComponent = normalizeStr(data.component)
+  const newIcon = normalizeStr(data.icon)
+
+  if (finalPath !== origPath) {
+    body.path = finalPath ?? null
+  }
+  if (newComponent !== origComponent) {
+    body.component = newComponent ?? null
+  }
+  if (newIcon !== origIcon) {
+    body.icon = newIcon ?? null
+  }
+
+  // 没任何字段变化
   if (
-    data.name === original.name &&
-    data.icon === original.icon &&
-    data.path === original.path &&
-    data.component === original.component
+    body.name === undefined &&
+    body.type === undefined &&
+    body.parent_id === undefined &&
+    body.path === undefined &&
+    body.component === undefined &&
+    body.icon === undefined
   ) {
     ElMessage.warning('数据未发生变化，无需更新')
     return false
   }
 
-  await updateMenu(original.menu_id!, {
-    version: original.version,
-    name: data.name,
-    icon: data.icon || null,
-    path: data.path || null,
-    component: data.component || null
-  })
+  await updateMenu(original.menu_id!, body as UpdateMenuData)
   ElMessage.success('更新成功')
   dialogVisible.value = false
   await getMenuData()
@@ -494,9 +557,24 @@ const updateMenuBtn = (row: Menu) => {
   menuForm.type = row.type
   menuForm.child_count = row.child_count
   menuForm.name = row.name
-  menuForm.path = row.path || ''
   menuForm.icon = row.icon || ''
   menuForm.component = row.component || ''
+
+  // 外链类型：拆出协议前缀
+  if (row.type === MenuType.OutLink && row.path) {
+    const match = row.path.match(/^(https?):\/\/(.+)$/)
+    if (match) {
+      outLinkProto.value = match[1] as 'http' | 'https'
+      menuForm.path = match[2]
+    } else {
+      outLinkProto.value = 'https'
+      menuForm.path = row.path
+    }
+  } else {
+    menuForm.path = row.path || ''
+    outLinkProto.value = 'https'
+  }
+
   rules.value = getRules()
   dialogVisible.value = true
 }
@@ -613,7 +691,7 @@ const deleteMenuBtn = async (menuId: number) => {
   <el-dialog
     :title="dialogType ? '更新菜单' : '新增菜单'"
     v-model="dialogVisible"
-    width="500px"
+    width="760px"
   >
     <el-form
       ref="menuFormRef"
@@ -621,66 +699,79 @@ const deleteMenuBtn = async (menuId: number) => {
       :model="menuForm"
       label-width="80px"
     >
-      <el-form-item label="所属菜单" prop="parent_id">
-        <el-cascader
-          v-model="menuForm.parent_id"
-          :options="cascaderData"
-          clearable
-          placeholder="请选择父菜单，可为空"
-          :props="{
-            checkStrictly: true,
-            emitPath: false,
-            value: 'menu_id',
-            label: 'name',
-            children: 'children'
-          }"
-        />
-      </el-form-item>
-      <el-form-item label="菜单类型" prop="type">
-        <el-radio-group v-model="menuForm.type">
-          <el-radio :value="MenuType.Menu">目录</el-radio>
-          <el-radio :value="MenuType.Page" :disabled="lockTypeOnDirectory">
-            页面
-          </el-radio>
-          <el-radio :value="MenuType.OutLink" :disabled="lockTypeOnDirectory"
-            >外链</el-radio
-          >
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="菜单名称" prop="name">
-        <el-input v-model="menuForm.name" placeholder="请输入菜单名称" />
-      </el-form-item>
-      <el-form-item
-        v-if="dialogType === DialogType.ADD"
-        label="图标"
-        prop="icon"
-      >
-        <el-input v-model="menuForm.icon" placeholder="请输入图标名称" />
-      </el-form-item>
-      <el-form-item
-        v-if="menuForm.type !== MenuType.Menu"
-        label="访问路径"
-        prop="path"
-      >
-        <el-input
-          v-model="menuForm.path"
-          :placeholder="
-            menuForm.type === MenuType.OutLink
-              ? '请输入完整URL地址'
-              : '请输入访问路径'
-          "
-        />
-      </el-form-item>
-      <el-form-item
-        v-if="menuForm.type === MenuType.Page"
-        label="组件路径"
-        prop="component"
-      >
-        <el-input
-          v-model="menuForm.component"
-          placeholder="请输入组件路径，如 /sys/resources/Menu"
-        />
-      </el-form-item>
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="所属菜单" prop="parent_id">
+            <el-cascader
+              v-model="menuForm.parent_id"
+              :options="cascaderData"
+              clearable
+              placeholder="请选择父菜单，可为空"
+              :props="{
+                checkStrictly: true,
+                emitPath: false,
+                value: 'menu_id',
+                label: 'name',
+                children: 'children'
+              }"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="菜单类型" prop="type">
+            <el-radio-group v-model="menuForm.type">
+              <el-radio :value="MenuType.Menu">目录</el-radio>
+              <el-radio :value="MenuType.Page" :disabled="lockTypeOnDirectory">
+                页面
+              </el-radio>
+              <el-radio
+                :value="MenuType.OutLink"
+                :disabled="lockTypeOnDirectory"
+                >外链</el-radio
+              >
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="菜单名称" prop="name">
+            <el-input v-model="menuForm.name" placeholder="请输入菜单名称" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="图标" prop="icon">
+            <el-input v-model="menuForm.icon" placeholder="请输入图标名称" />
+          </el-form-item>
+        </el-col>
+        <el-col v-if="menuForm.type !== MenuType.Menu" :span="24">
+          <el-form-item label="访问路径" prop="path">
+            <el-input
+              v-if="menuForm.type === MenuType.OutLink"
+              v-model="menuForm.path"
+              placeholder="请输入域名或路径，如 example.com/page"
+            >
+              <template #prepend>
+                <el-select v-model="outLinkProto" style="width: 110px">
+                  <el-option value="http" label="http://" />
+                  <el-option value="https" label="https://" />
+                </el-select>
+              </template>
+            </el-input>
+            <el-input
+              v-else
+              v-model="menuForm.path"
+              placeholder="请输入访问路径"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col v-if="menuForm.type === MenuType.Page" :span="24">
+          <el-form-item label="组件路径" prop="component">
+            <el-input
+              v-model="menuForm.component"
+              placeholder="请输入组件路径，如 /sys/resources/Menu"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
     <template #footer>
       <el-button @click="cancel()">取 消</el-button>
@@ -710,8 +801,22 @@ const deleteMenuBtn = async (menuId: number) => {
   margin-bottom: 20px;
 }
 
-:deep(.el-input) {
+:deep(.query .el-input) {
   width: 186px;
+}
+
+:deep(.el-dialog .el-form-item) {
+  width: 100%;
+}
+
+:deep(.el-dialog .el-form-item .el-input),
+:deep(.el-dialog .el-form-item .el-cascader) {
+  width: 100%;
+}
+
+:deep(.el-dialog .el-form-item .el-radio-group) {
+  width: auto;
+  flex-wrap: nowrap;
 }
 
 .el-table {

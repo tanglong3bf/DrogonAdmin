@@ -3,9 +3,10 @@
 using namespace std;
 using namespace trantor;
 using namespace drogon_model::drogon_admin_db;
+using namespace drogon_admin::util;
 
 Menu::Menu(string_view name, const int32_t sortNum, const MenuType type)
-    : name_{name}, version_{0}, sortNum_{sortNum}, type_{type}
+    : name_{name}, sortNum_{sortNum}, type_{type}, version_{0}
 {
 }
 
@@ -14,16 +15,15 @@ Menu::Menu(string_view name,
            const MenuType type,
            const int32_t createdBy)
     : name_{name},
-      version_{0},
       sortNum_{sortNum},
       type_{type},
+      version_{0},
       AuditableEntity{AUDITABLE_INIT}
 {
 }
 
 Menu::Menu(const SysMenu &model)
     : OPT_INIT(menuId_, MenuId),
-      INIT(version_, Version),
       OPT_OV_INIT(int32_t, actionId_, ActionId),
       OPT_INIT(parentId_, ParentId),
       OPT_INIT(path_, Path),
@@ -32,6 +32,7 @@ Menu::Menu(const SysMenu &model)
       INIT(sortNum_, SortNum),
       OPT_INIT(component_, Component),
       ENUM_INIT(MenuType, type_, Type),
+      INIT(version_, Version),
       AuditableEntity{AUDITABLE_INIT_BY_MODEL}
 {
 }
@@ -40,7 +41,6 @@ Menu::operator SysMenu() const
 {
     SysMenu model;
     SET_OPT(menuId_, MenuId);
-    SET_VAL(version_, Version);
     SET_OPT(actionId_, ActionId);
     SET_OPT(parentId_, ParentId);
     SET_OPT(path_, Path);
@@ -49,6 +49,7 @@ Menu::operator SysMenu() const
     SET_VAL(sortNum_, SortNum);
     SET_OPT(component_, Component);
     SET_VAL_CAST(short, type_, Type);
+    SET_VAL(version_, Version);
     SET_OPT(createdBy(), CreatedBy);
     SET_OPT(createdTime(), CreatedTime);
     SET_OPT(updatedBy(), UpdatedBy);
@@ -58,7 +59,7 @@ Menu::operator SysMenu() const
     return model;
 }
 
-void Menu::setParentId(const std::optional<std::int32_t> parentId)
+void Menu::setParentId(const optional<int32_t> parentId)
 {
     if (parentId)
     {
@@ -66,16 +67,163 @@ void Menu::setParentId(const std::optional<std::int32_t> parentId)
     }
 }
 
-void Menu::constructOptionalFields(const std::optional<std::string> &icon,
-                                   const std::optional<std::string> &path,
-                                   const std::optional<std::string> &component)
+void Menu::setSortNum(const int32_t sortNum)
+{
+    sortNum_ = sortNum;
+}
+
+void Menu::constructOptionalFields(const optional<string> &icon,
+                                   const optional<string> &path,
+                                   const optional<string> &component)
 {
     icon_ = icon;
     path_ = path;
     component_ = component;
 }
 
-void Menu::remove(const std::int32_t deletedBy)
+void Menu::updateBasicInfo(const optional<string> name,
+                           const NullableValue<int32_t> &parentId,
+                           const int32_t sortNum,
+                           const NullableValue<string> &icon,
+                           const NullableValue<int32_t> &actionId,
+                           const int32_t updatedBy)
+{
+    bool isUpdated = false;
+    if (name && name_ != *name)
+    {
+        name_ = *name;
+        isUpdated = true;
+    }
+    if (parentId && parentId_ != *parentId)
+    {
+        parentId_ = *parentId;
+        isUpdated = true;
+    }
+    else if (parentId.isNull() && parentId_ != std::nullopt)
+    {
+        parentId_ = std::nullopt;
+        isUpdated = true;
+    }
+    if (sortNum_ != sortNum)
+    {
+        sortNum_ = sortNum;
+        isUpdated = true;
+    }
+    if (icon && icon_ != *icon)
+    {
+        icon_ = *icon;
+        isUpdated = true;
+    }
+    else if (icon.isNull() && icon_ != std::nullopt)
+    {
+        icon_ = std::nullopt;
+        isUpdated = true;
+    }
+    if (actionId && actionId_ != *actionId)
+    {
+        actionId_ = *actionId;
+        isUpdated = true;
+    }
+    else if (actionId.isNull() && actionId_ != std::nullopt)
+    {
+        actionId_ = std::nullopt;
+        isUpdated = true;
+    }
+    if (isUpdated)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+}
+
+void Menu::updateTypeAndAccess(const optional<MenuType> type,
+                               const NullableValue<string> &path,
+                               const NullableValue<string> &component,
+                               const int32_t updatedBy)
+{
+    // 未传类型时沿用当前类型，path、component 未传时沿用当前值
+    const MenuType newType = type.value_or(type_);
+
+    LOG_DEBUG << (type ? static_cast<int16_t>(*type) : -1);
+    LOG_DEBUG << static_cast<int16_t>(type_);
+    LOG_DEBUG << static_cast<int16_t>(newType);
+
+    optional<string> newPath = path_;
+    if (!path.isAbsent())
+    {
+        newPath = path.hasValue() ? optional<string>{path.value()} : nullopt;
+    }
+    LOG_DEBUG << (path ? *path : path.isAbsent() ? "(undefined)" : "(null)");
+    LOG_DEBUG << (path_ ? *path_ : string("(null)"));
+    LOG_DEBUG << (newPath ? *newPath : string("(null)"));
+
+    optional<string> newComponent = component_;
+    if (!component.isAbsent())
+    {
+        newComponent = component.hasValue()
+                           ? optional<string>{component.value()}
+                           : nullopt;
+    }
+    LOG_DEBUG << (component              ? *component
+                  : component.isAbsent() ? "(undefined)"
+                                         : "(null)");
+    LOG_DEBUG << (component_ ? *component_ : string("(null)"));
+    LOG_DEBUG << (newComponent ? *newComponent : string("(null)"));
+
+    switch (newType)
+    {
+        case MenuType::Directory:
+            // 目录类型不需要访问路径和组件
+            newPath = nullopt;
+            newComponent = nullopt;
+            break;
+
+        case MenuType::Page:
+            // 页面类型必须有访问路径和组件
+            if (!newPath)
+            {
+                throw BusinessException{"页面类型的菜单必须设置访问路径"};
+            }
+            if (!newComponent)
+            {
+                throw BusinessException{"页面类型的菜单必须设置组件"};
+            }
+            break;
+
+        case MenuType::OutLink:
+            // 外链类型必须有访问路径，不需要组件
+            if (!newPath)
+            {
+                throw BusinessException{"外链类型的菜单必须设置访问路径"};
+            }
+            newComponent = nullopt;
+            break;
+    }
+
+    bool isUpdated = false;
+    if (type && type_ != *type)
+    {
+        type_ = *type;
+        isUpdated = true;
+    }
+    if (newPath != path_)
+    {
+        path_ = newPath;
+        isUpdated = true;
+    }
+    if (newComponent != component_)
+    {
+        component_ = newComponent;
+        isUpdated = true;
+    }
+    if (isUpdated)
+    {
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+}
+
+void Menu::remove(const int32_t deletedBy)
 {
     markDeletedBy(deletedBy);
     markDeleted();

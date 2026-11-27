@@ -24,9 +24,12 @@ Task<HttpResponsePtr> MenuController::newMenu(
 
 Task<HttpResponsePtr> MenuController::updateMenu(
     const HttpRequestPtr req,
-    const std::int32_t menuId) const
+    const std::int32_t menuId,
+    const MenuUpdateRequest request) const
 {
-    throw BusinessException("接口未实现");
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
+    co_await menuService_->updateMenu(menuId, request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }
 
 Task<HttpResponsePtr> MenuController::deleteMenu(

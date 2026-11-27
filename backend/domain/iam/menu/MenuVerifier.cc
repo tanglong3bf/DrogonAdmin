@@ -40,3 +40,13 @@ Task<> MenuVerifier::verifyActionNotUsed(
         throw BusinessException("功能已被使用");
     }
 }
+
+Task<> MenuVerifier::verifyParentNotSelfOrDescendant(
+    const int32_t menuId,
+    const int32_t parentId) const
+{
+    if (co_await menuRepository_->isAncestorOrSelf(menuId, parentId))
+    {
+        throw BusinessException("不能将菜单移动到自身或其子菜单下");
+    }
+}

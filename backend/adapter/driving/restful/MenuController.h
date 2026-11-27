@@ -1,6 +1,7 @@
 #pragma once
 
 #include "application/iam/menu/MenuService.h"
+#include "application/iam/menu/MenuUpdateRequest.h"
 #include <drogon/HttpController.h>
 
 class MenuController : public drogon::HttpController<MenuController>
@@ -47,7 +48,8 @@ class MenuController : public drogon::HttpController<MenuController>
      */
     drogon::Task<drogon::HttpResponsePtr> updateMenu(
         const drogon::HttpRequestPtr req,
-        const std::int32_t menuId) const;
+        const std::int32_t menuId,
+        const MenuUpdateRequest request) const;
 
     /**
      * @brief 删除指定菜单项

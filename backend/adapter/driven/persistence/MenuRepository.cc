@@ -1,5 +1,6 @@
 #include "domain/iam/menu/MenuRepository.h"
 
+#include "common/exception/BusinessException.h"
 #include "common/framework/domain/ChangeableEntity.h"
 #include <drogon/orm/CoroMapper.h>
 #include <drogon/orm/Criteria.h>
@@ -58,6 +59,22 @@ Task<> MenuRepository::save(Menu &menu) const
             co_await menuMapper(trans).insert(sysMenu);
             break;
         }
+        case ChangingStatus::UPDATED:
+        {
+            const auto trans =
+                co_await drogon::app().getDbClient()->newTransactionCoro();
+            const auto sysMenu = static_cast<SysMenu>(menu);
+            Json::Value json = sysMenu.toJson();
+            string sql =
+                sqlGenerator()->getSql("update_menu", {{"data", json}});
+            const auto result = co_await trans->execSqlCoro(sql);
+            if (result.affectedRows() != 1)
+            {
+                trans->rollback();
+                throw BusinessException{"更新期间数据发生变化，更新失败"};
+            }
+            break;
+        }
         default:
             break;
     }
@@ -92,6 +109,18 @@ Task<std::size_t> MenuRepository::countByActionIds(
         criteria &&
         Criteria{SysMenu::Cols::_action_id, CompareOperator::In, actionIds};
     co_return co_await menuMapper().count(criteria);
+}
+
+Task<bool> MenuRepository::isAncestorOrSelf(
+    const int32_t menuId,
+    const int32_t parentId,
+    const DbClientPtr &dbClient) const
+{
+    const auto sql = sqlGenerator()->getSql(
+        "count_menu_ancestor",
+        {{"menu_id", menuId}, {"parent_id", parentId}});
+    const auto dbResult = co_await dbClient->execSqlCoro(sql);
+    co_return dbResult[0][0].as<std::int64_t>() > 0;
 }
 
 inline SqlGenerator *MenuRepository::sqlGenerator()

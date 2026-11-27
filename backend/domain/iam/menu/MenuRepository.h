@@ -42,6 +42,14 @@ class MenuRepository : public DrAdminObject<MenuRepository>
     drogon::Task<std::size_t> countByActionIds(
         const std::vector<std::int32_t> &actionIds) const;
 
+    /**
+     * @brief 判断 menuId 是否为目标菜单自身或其祖先
+     */
+    drogon::Task<bool> isAncestorOrSelf(
+        std::int32_t menuId,
+        std::int32_t parentId,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
+
   private:
     static SqlGenerator *sqlGenerator();
     static SysMenuMapper menuMapper(
