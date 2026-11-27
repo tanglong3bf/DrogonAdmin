@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(PROJ_VER_MAJOR 0)
-set(PROJ_VER_MINOR 5)
-set(PROJ_VER_PATCH 3)
+set(PROJ_VER_MINOR 6)
+set(PROJ_VER_PATCH 0)
 set(PROJECT_VERSION "${PROJ_VER_MAJOR}.${PROJ_VER_MINOR}.${PROJ_VER_PATCH}")
 
 project(
