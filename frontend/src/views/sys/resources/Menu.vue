@@ -25,6 +25,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import dgCard from '@/components/dg-card.vue'
 import { MenuType } from '@/types/enums'
 import { Icon } from '@iconify/vue'
+import IconPicker from './components/IconPicker.vue'
 
 /**
  * 从后端返回的真实数据
@@ -739,7 +740,7 @@ const deleteMenuBtn = async (menuId: number) => {
         </el-col>
         <el-col :span="12">
           <el-form-item label="图标" prop="icon">
-            <el-input v-model="menuForm.icon" placeholder="请输入图标名称" />
+            <IconPicker v-model="menuForm.icon" />
           </el-form-item>
         </el-col>
         <el-col v-if="menuForm.type !== MenuType.Menu" :span="24">

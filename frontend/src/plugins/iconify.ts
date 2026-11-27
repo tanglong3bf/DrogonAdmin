@@ -21,7 +21,7 @@ import tdesign from '@iconify-json/tdesign/icons.json'
  * 菜单图标来自后端数据、名称在运行时才确定，无法被 vite-plugin-purge-icons 静态提取，
  * 因此必须显式注册集合，让这些前缀从本地解析。
  */
-const collections: IconifyJSON[] = [
+export const iconCollections: IconifyJSON[] = [
   fa6Solid as IconifyJSON,
   ep as IconifyJSON,
   fluentMdl2 as IconifyJSON,
@@ -36,6 +36,6 @@ const collections: IconifyJSON[] = [
   tdesign as IconifyJSON
 ]
 
-for (const collection of collections) {
+for (const collection of iconCollections) {
   addCollection(collection)
 }
