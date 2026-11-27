@@ -27,6 +27,7 @@ import dgCard from '@/components/dg-card.vue'
 import { MenuType } from '@/types/enums'
 import { Icon } from '@iconify/vue'
 import IconPicker from './components/IconPicker.vue'
+import { useCommonStore } from '@/stores/common'
 
 /**
  * 从后端返回的真实数据
@@ -48,10 +49,13 @@ const addChildCount = (node: Menu): void => {
   }
 }
 
+const commonStore = useCommonStore()
+
 const getMenuData = async () => {
   menuTree.value = await getMenuTree()
   menuTree.value.forEach(node => addChildCount(node))
   menuShow.value = menuTree.value
+  commonStore.setMenuList(menuTree.value)
 }
 
 onMounted(async () => {

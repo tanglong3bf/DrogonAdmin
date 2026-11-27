@@ -9,6 +9,18 @@ export const useCommonStore = defineStore(
     const menuList = ref<Menu[]>([])
 
     /**
+     * 归一化菜单树，补齐 el-menu 需要的唯一 index
+     */
+    const normalizeMenuList = (menus: Menu[]): Menu[] =>
+      menus.map(menu => ({
+        ...menu,
+        index: String(menu.menu_id),
+        children: menu.children?.length
+          ? normalizeMenuList(menu.children)
+          : undefined
+      }))
+
+    /**
      * 设置侧边栏菜单
      * @param newMenuList
      */
@@ -25,7 +37,7 @@ export const useCommonStore = defineStore(
           name: '首页',
           component: '/Home'
         },
-        ...newMenuList
+        ...normalizeMenuList(newMenuList)
       ]
     }
 
