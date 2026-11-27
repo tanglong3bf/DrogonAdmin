@@ -49,11 +49,6 @@ onMounted(async () => {
 })
 
 /**
- * 查询表单（并不请求接口，前端过滤展示数据）
- */
-const queryForm = ref<FormInstance>()
-
-/**
  * 查询表单参数
  */
 const queryParams = reactive<{ name: string }>({
@@ -418,12 +413,7 @@ const deleteDeptBtn = async (deptId: number) => {
 <template>
   <!-- 过滤数据表单 -->
   <dg-card>
-    <el-form
-      :model="queryParams"
-      ref="queryForm"
-      :inline="true"
-      label-width="68px"
-    >
+    <el-form :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="部门名称">
         <el-input v-model="queryParams.name" placeholder="部门名称" clearable />
       </el-form-item>

@@ -6,6 +6,7 @@ import {
   FormInstance,
   FormRules
 } from 'element-plus/es'
+import type { CascaderOption } from 'element-plus/es/components/cascader-panel'
 import { computed, onMounted, reactive, ref } from 'vue'
 import type {
   Menu,
@@ -57,8 +58,8 @@ onMounted(async () => {
   await getMenuData()
 })
 
-const cascaderData = computed(() => {
-  const markDisabled = (nodes: Menu[]): Menu[] =>
+const cascaderData = computed<CascaderOption[]>(() => {
+  const markDisabled = (nodes: Menu[]): CascaderOption[] =>
     nodes.map(node => {
       const selfMatch = node.menu_id === menuForm.menu_id
       const children = node.children
@@ -85,11 +86,6 @@ const lockTypeOnDirectory = computed(
     menuForm.type === MenuType.Menu &&
     (menuForm.child_count ?? 0) > 0
 )
-
-/**
- * 查询表单（并不请求接口，前端过滤展示数据）
- */
-const queryForm = ref<FormInstance>()
 
 /**
  * 查询表单参数
@@ -607,12 +603,7 @@ const deleteMenuBtn = async (menuId: number) => {
 <template>
   <!-- 过滤数据表单 -->
   <dg-card>
-    <el-form
-      :model="queryParams"
-      ref="queryForm"
-      :inline="true"
-      label-width="68px"
-    >
+    <el-form :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="菜单名称">
         <el-input v-model="queryParams.name" placeholder="菜单名称" clearable />
       </el-form-item>
