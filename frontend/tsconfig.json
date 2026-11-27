@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "module": "esnext",
     "target": "es2022",
+    "noEmit": true,
     "paths": {
       "*": ["node_modules/*"],
       "@/*": ["./src/*"]
