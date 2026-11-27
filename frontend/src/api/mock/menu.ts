@@ -75,7 +75,7 @@ if (mockConfig.menu.get_menu_tree) {
                       menu_id: 7,
                       index: '7',
                       path: '/sys/authorization/role',
-                      icon: 'fa7-solid:user-cog',
+                      icon: 'fa6-solid:user-gear',
                       name: '角色管理',
                       component: '/sys/authorization/Role',
                       type: 1, // page
