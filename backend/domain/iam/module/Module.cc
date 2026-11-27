@@ -17,22 +17,22 @@ Module::Module(std::string_view name, const std::int32_t sortNum)
 Module::Module(std::string_view name,
                const std::int32_t sortNum,
                const std::int32_t createdBy)
-    : name_{name},
+    : AuditableEntity(AUDITABLE_INIT),
+      name_{name},
       sortNum_{sortNum},
-      version_{0},
-      AuditableEntity(AUDITABLE_INIT)
+      version_{0}
 {
     markNew();
 }
 
 Module::Module(const SysModule &model)
-    : OPT_INIT(moduleId_, ModuleId),
+    : AuditableEntity(AUDITABLE_INIT_BY_MODEL),
+      OPT_INIT(moduleId_, ModuleId),
       INIT(name_, Name),
       OPT_INIT(description_, Description),
       INIT(sortNum_, SortNum),
       OPT_INIT(parentId_, ParentId),
-      INIT(version_, Version),
-      AuditableEntity(AUDITABLE_INIT_BY_MODEL)
+      INIT(version_, Version)
 {
 }
 

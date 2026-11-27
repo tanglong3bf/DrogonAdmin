@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-static std::string trim(const std::string &s)
+inline std::string trim(const std::string &s)
 {
     size_t start = 0;
     while (start < s.size() &&
@@ -24,7 +24,7 @@ static std::string trim(const std::string &s)
 /**
  * @brief 转义字符串，仅处理字符串已有内容，不会额外添加%%
  */
-static std::string escapeSqlLike(const std::string &input)
+inline std::string escapeSqlLike(const std::string &input)
 {
     std::string out;
 
@@ -55,7 +55,7 @@ static std::string escapeSqlLike(const std::string &input)
     return out;
 }
 
-static std::size_t utf8Length(const std::string &s)
+inline std::size_t utf8Length(const std::string &s)
 {
     std::size_t count = 0;
     std::size_t i = 0;
@@ -146,7 +146,7 @@ static std::size_t utf8Length(const std::string &s)
  * @li 2: 读到了非零数字，后续可以读取更多的数字
  * @li 3: 读到前导0，不允许后续再有任何字符
  */
-static bool isInteger(const std::string_view &str)
+inline bool isInteger(const std::string_view &str)
 {
     uint8_t status = 0;
 

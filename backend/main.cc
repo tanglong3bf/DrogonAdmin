@@ -27,7 +27,7 @@ int main()
     const auto getAllowOrigin = []() -> unordered_set<string> & {
         static auto config = app().getCustomConfig();
         static unordered_set<string> allowOrigin;
-        for (const auto item : config["allowOrigin"])
+        for (const auto &item : config["allowOrigin"])
         {
             allowOrigin.insert(item.asString());
         }

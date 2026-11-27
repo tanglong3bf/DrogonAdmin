@@ -37,7 +37,7 @@ RoleQueryRequest::RoleQueryRequest(const std::string &name,
                 throw BusinessException("部门id范围错误");
             }
         }
-        catch (std::invalid_argument e)
+        catch (const std::invalid_argument &)
         {
             throw BusinessException("部门id格式错误");
         }
@@ -54,7 +54,7 @@ RoleQueryRequest::RoleQueryRequest(const std::string &name,
             }
             page_ = pageInt;
         }
-        catch (std::invalid_argument e)
+        catch (const std::invalid_argument &)
         {
             addWarning(attr, "页码格式错误，已自动使用第一页");
             page_ = 1;
@@ -107,7 +107,7 @@ RoleQueryRequest::RoleQueryRequest(const std::string &name,
             }
             pageSize_ = pageSizeInt;
         }
-        catch (std::invalid_argument e)
+        catch (const std::invalid_argument &)
         {
             addWarning(attr, "分页大小格式错误，已自动调整为10");
             pageSize_ = 10;

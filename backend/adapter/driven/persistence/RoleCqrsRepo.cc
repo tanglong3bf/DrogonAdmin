@@ -104,7 +104,7 @@ std::vector<RoleResponse> RoleCqrsRepo::buildRoleResponseList(
 {
     return roleList | views::transform([this](const auto &role) {
                RoleResponse roleResponse{role};
-               for (const auto dept : role.roleDepts())
+               for (const auto &dept : role.roleDepts())
                {
                    roleResponse.addRoleDept(
                        static_cast<RoleDeptResponse>(dept));

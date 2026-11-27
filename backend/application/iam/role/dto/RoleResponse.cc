@@ -30,8 +30,8 @@ RoleResponse::RoleResponse(const Role &role)
       name_{role.name()},
       code_{role.code()},
       description_{role.description()},
-      userQuota_{role.userQuota()},
       quotaType_{role.quotaType()},
+      userQuota_{role.userQuota()},
       relationType_{role.relationType()},
       version_{role.version()}
 {

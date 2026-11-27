@@ -30,7 +30,6 @@ DeptSortRequest::DeptSortRequest(const Json::Value &json)
     parentId_ = getParam<int32_t, false>(json, "parent_id", {1, -1});
     if (json.isMember("depts") && json["depts"].isArray())
     {
-        size_t i = 0;
         for (const auto &jsonItem : json["depts"])
         {
             DeptSortItem item;
