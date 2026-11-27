@@ -3,6 +3,7 @@
 #include "LoginRequest.h"
 #include "LoginResponse.h"
 #include "CaptchaResponse.h"
+#include "application/iam/menu/MenuCqrsRepo.h"
 #include "domain/cache/AuthCacheRepo.h"
 #include "domain/org/user/UserRepository.h"
 #include "common/framework/DrAdminObject.hpp"
@@ -51,6 +52,8 @@ class AuthService : public DrAdminObject<AuthService>
         drogon::DrClassMap::getSingleInstance<UserRepository>()};
     AuthCacheRepoPtr authCacheRepo_{
         drogon::DrClassMap::getSingleInstance<AuthCacheRepoBase>()};
+    MenuCqrsRepoPtr menuCqrsRepo_{
+        drogon::DrClassMap::getSingleInstance<MenuCqrsRepo>()};
 };
 
 using AuthServicePtr = std::shared_ptr<AuthService>;

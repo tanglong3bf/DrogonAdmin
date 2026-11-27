@@ -59,7 +59,7 @@ Task<HttpResponsePtr> RoleController::deleteRole(
 }
 
 Task<HttpResponsePtr> RoleController::getAssignableRoles(
-    const HttpRequestPtr req,
+    const HttpRequestPtr /* req */,
     const std::int32_t deptId) const
 {
     co_return toResponse(co_await roleService_->getAssignableRoles(deptId));

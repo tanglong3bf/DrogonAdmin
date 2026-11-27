@@ -35,6 +35,15 @@ Task<> ModuleVerifier::verifyModuleNameNotDuplicated(
     }
 }
 
+Task<> ModuleVerifier::verifyActionExists(const int32_t actionId) const
+{
+    const auto action = co_await moduleRepository_->getActionById(actionId);
+    if (!action)
+    {
+        throw BusinessException("指定的功能id不存在");
+    }
+}
+
 Task<> ModuleVerifier::verifyActionsBelongsToModule(
     const std::int32_t moduleId,
     const vector<std::int32_t> &actionIds) const

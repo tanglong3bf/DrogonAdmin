@@ -27,25 +27,25 @@ Role::Role(string_view name,
            const QuotaType quotaType,
            const RelationType relationType,
            const int32_t createdBy)
-    : name_{name},
+    : AuditableEntity{createdBy, Date::now(), createdBy, Date::now()},
+      name_{name},
       code_{code},
       quotaType_{quotaType},
       relationType_{relationType},
-      version_{0},
-      AuditableEntity{createdBy, Date::now(), createdBy, Date::now()}
+      version_{0}
 {
 }
 
 Role::Role(const SysRole &model)
-    : INIT(roleId_, RoleId),
+    : AuditableEntity(AUDITABLE_INIT_BY_MODEL),
+      INIT(roleId_, RoleId),
       INIT(name_, Name),
       INIT(code_, Code),
       OPT_INIT(description_, Description),
       ENUM_INIT(QuotaType, quotaType_, QuotaType),
       OPT_INIT(userQuota_, UserQuota),
       ENUM_INIT(RelationType, relationType_, RelationType),
-      INIT(version_, Version),
-      AuditableEntity(AUDITABLE_INIT_BY_MODEL)
+      INIT(version_, Version)
 {
 }
 

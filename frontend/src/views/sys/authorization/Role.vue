@@ -21,11 +21,6 @@ import { DialogType, QuotaType, RelationType } from '@/types/enums'
 const roleList = ref<Role[]>([])
 
 /**
- * 查询表单
- */
-const queryForm = ref<FormInstance>()
-
-/**
  * 查询表单参数
  */
 const queryParams = reactive<RoleQueryParams & Pagination>({
@@ -299,12 +294,7 @@ const deleteRoleBtn = async (role_id: number) => {
 <template>
   <!-- 过滤数据表单 -->
   <dg-card>
-    <el-form
-      :model="queryParams"
-      ref="queryForm"
-      :inline="true"
-      label-width="68px"
-    >
+    <el-form :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="角色名字">
         <el-input
           v-model="queryParams.name"

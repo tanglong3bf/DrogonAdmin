@@ -69,6 +69,12 @@ class ModuleRepository : public DrAdminObject<ModuleRepository>
         const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
+     * @brief 根据id获取功能（未删除的）
+     */
+    drogon::Task<std::optional<Action>> getActionById(
+        const std::int32_t actionId) const;
+
+    /**
      * @brief 根据id批量获取功能
      */
     drogon::Task<std::vector<Action>> getActionByIds(

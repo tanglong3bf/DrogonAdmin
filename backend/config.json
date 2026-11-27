@@ -592,6 +592,64 @@
           "multi_delete_priority": {
             "main": "DELETE FROM sys_action_priority WHERE (high_id, low_id) IN ( VALUES @values(data) )",
             "values": "(@for(item in data, separator='), (') ${item.high_id}, ${item.low_id} @endfor)"
+          },
+          // 获取菜单树
+          "get_menu_tree": {
+            "main": "WITH RECURSIVE menu_ancestor AS ( @current() UNION @sub() ) SELECT * FROM menu_ancestor @order()",
+            "current": "SELECT *, 0 AS \"level\" FROM sys_menu WHERE parent_id IS NULL AND deleted_by IS NULL",
+            "sub": "SELECT s.*, d.\"level\" + 1 AS \"level\" FROM sys_menu s @inner_join()",
+            "inner_join": "INNER JOIN menu_ancestor d ON d.menu_id = s.parent_id AND s.deleted_by IS NULL",
+            "order": "ORDER BY \"level\", parent_id, sort_num, menu_id"
+          },
+          // 指定父菜单id，获取最大的sort_num
+          "get_max_sub_menu_sort_num": {
+            "main": "SELECT MAX(sort_num) FROM sys_menu @condition(parent_id)",
+            "condition": "WHERE deleted_by IS NULL AND parent_id @if(parent_id) = ${parent_id} @else IS NULL @endif"
+          },
+          // 判断指定菜单是否为目标菜单自身或其祖先
+          "count_menu_ancestor": {
+            "main": "WITH RECURSIVE menu_ancestor AS ( @current(parent_id) UNION @sub() ) SELECT COUNT(*) FROM menu_ancestor WHERE menu_id = ${menu_id}",
+            "current": "SELECT menu_id, parent_id FROM sys_menu WHERE menu_id = ${parent_id} AND deleted_by IS NULL",
+            "sub": "SELECT s.menu_id, s.parent_id FROM sys_menu s @inner_join()",
+            "inner_join": "INNER JOIN menu_ancestor d ON s.menu_id = d.parent_id AND s.deleted_by IS NULL"
+          },
+          // 更新菜单数据
+          "update_menu": {
+            "main": "UPDATE sys_menu SET name = '${data.name}', type = ${data.type}, parent_id = @int_value(value=data.parent_id), path = @string_value(value=data.path), icon = @string_value(value=data.icon), component = @string_value(value=data.component), sort_num = ${data.sort_num}, action_id = @int_value(value=data.action_id), version = version + 1, updated_by = ${data.updated_by}, updated_time = '${data.updated_time}'::timestamp WHERE menu_id = ${data.menu_id} AND version = ${data.version}",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif"
+          },
+          // 批量更新菜单数据
+          "multi_update_menu": {
+            "main": {
+              "sql": "UPDATE sys_menu d SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE d.menu_id = s.menu_id AND d.version = s.version",
+              "params": {
+                "fields_list": [
+                  "menu_id",
+                  "action_id",
+                  "parent_id",
+                  "path",
+                  "icon",
+                  "name",
+                  "sort_num",
+                  "component",
+                  "type",
+                  "version",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') @if(field == 'version') ${field}=d.version+1 @else ${field}=s.${field} @endif @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.menu_id}, @int_value(value = item.action_id), @int_value(value = item.parent_id), @string_value(value = item.path), @string_value(value = item.icon), '${item.name}', ${item.sort_num}, @string_value(value = item.component), ${item.type}, ${item.version}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           }
         }
       }
@@ -624,95 +682,7 @@
     // 不要后斜杠
     "img_prefix": "/uploads",
     // 验证码图片使用的字体文件，默认值：resources/fonts/DejaVuSansMono.ttf
-    "captcha_font_path": "resources/fonts/DejaVuSansMono.ttf",
-    "menu_list": [
-      {
-        "menu_id": 1,
-        "icon": "ion:settings-sharp",
-        "name": "系统管理",
-        "type": 0, // menu
-        "children": [
-          {
-            "menu_id": 2,
-            "icon": "ion:settings-sharp",
-            "name": "组织架构",
-            "type": 0, // menu
-            "children": [
-              {
-                "menu_id": 5,
-                "path": "/sys/org/dept",
-                "icon": "mingcute:department-fill",
-                "name": "部门管理",
-                "component": "/sys/org/Dept",
-                "type": 1 // page
-              },
-              {
-                "menu_id": 6,
-                "path": "/sys/org/user",
-                "icon": "ri:user-fill",
-                "name": "用户管理",
-                "component": "/sys/org/User",
-                "type": 1 // page
-              }
-            ]
-          },
-          {
-            "menu_id": 3,
-            "icon": "ion:settings-sharp",
-            "name": "权限管理",
-            "type": 0, //menu
-            "children": [
-              {
-                "menu_id": 7,
-                "path": "/sys/authorization/role",
-                "icon": "fa7-solid:user-cog",
-                "name": "角色管理",
-                "component": "/sys/authorization/Role",
-                "type": 1 // page
-              },
-              {
-                "menu_id": 8,
-                "path": "/sys/authorization/permission",
-                "icon": "ix:user-key",
-                "name": "权限分配",
-                "component": "/sys/authorization/Permission",
-                "type": 1 // page
-              }
-            ]
-          },
-          {
-            "menu_id": 4,
-            "icon": "ion:settings-sharp",
-            "name": "资源管理",
-            "type": 0, // menu
-            "children": [
-              {
-                "menu_id": 9,
-                "path": "/sys/resources/module",
-                "icon": "tdesign:module-filled",
-                "name": "模块管理",
-                "component": "/sys/resources/Module",
-                "type": 1 // page
-              },
-              {
-                "menu_id": 10,
-                "path": "/sys/resources/menu",
-                "icon": "fluent-mdl2:context-menu",
-                "name": "菜单管理",
-                "component": "/sys/resources/Menu",
-                "type": 1 // page
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "menu_id": 11,
-        "path": "https://github.com/tanglong3bf/DrogonAdmin",
-        "icon": "octicon:mark-github-24",
-        "name": "源码地址",
-        "type": 2 // out_link
-      }
-    ]
+    "captcha_font_path": "resources/fonts/DejaVuSansMono.ttf"
   }
 }
+// vim: set filetype=jsonc:

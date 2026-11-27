@@ -5,6 +5,7 @@ import type { Role, RoleDept } from './role'
 import { PaginatedResponse } from './common'
 import { MenuType } from './enums'
 import { ActionPriority, Module } from './module'
+import { Menu } from './menu'
 
 const isObject = (data: unknown) => typeof data === 'object' && data !== null
 const isArray = (data: unknown, callback: any) =>
@@ -33,13 +34,19 @@ export function isLoginResponse(data: unknown): data is LoginResponse {
   return (
     isObject(data) &&
     isNotEmptyStringField(data, 'token') &&
-    isArrayField(data, 'menu_list', isMenuResponse)
+    isArrayField(data, 'menu_list', isMenu)
   )
 }
 
 export function isMenuResponse(data: unknown): data is MenuResponse {
+  return isObject(data) && isArrayField(data, 'data', isMenu)
+}
+
+export function isMenu(data: unknown): data is MenuResponse {
   const isCommonFieldsValid =
     isObject(data) &&
+    isNumberField(data, 'sort_num') &&
+    isNumberField(data, 'version') &&
     isNumberField(data, 'menu_id') &&
     isStringOrUndefinedField(data, 'icon') &&
     isStringField(data, 'name') &&
@@ -57,7 +64,7 @@ export function isMenuResponse(data: unknown): data is MenuResponse {
       return (
         !isContainKey(menuData, 'path') &&
         !isContainKey(menuData, 'component') &&
-        isArrayOrUndefinedField(menuData, 'children', isMenuResponse)
+        isArrayOrUndefinedField(menuData, 'children', isMenu)
       )
     case MenuType.Page:
       return (
@@ -180,4 +187,52 @@ export function isActionPriority(data: unknown): data is ActionPriority {
     isNumberField(data, 'high_id') &&
     isNumberField(data, 'low_id')
   )
+}
+
+export function isMenuNode(data: unknown): data is Menu {
+  const isCommonFieldsValid =
+    isObject(data) &&
+    isNumberField(data, 'menu_id') &&
+    isStringField(data, 'name') &&
+    isStringOrUndefinedField(data, 'icon') &&
+    isNumberField(data, 'sort_num') &&
+    isNumberField(data, 'version') &&
+    isNumberOrUndefinedField(data, 'parent_id') &&
+    [0, 1, 2].includes((data as any).type)
+
+  if (!isCommonFieldsValid) {
+    return false
+  }
+
+  const menuData = data as Menu
+  const { type } = menuData
+
+  switch (type) {
+    case MenuType.Menu:
+      return (
+        !isContainKey(menuData, 'path') &&
+        !isContainKey(menuData, 'component') &&
+        isArrayOrUndefinedField(menuData, 'children', isMenuNode)
+      )
+    case MenuType.Page:
+      return (
+        isNotEmptyStringField(menuData, 'path') &&
+        !menuData.path!.startsWith('http://') &&
+        !menuData.path!.startsWith('https://') &&
+        isNotEmptyStringField(menuData, 'component') &&
+        !isContainKey(menuData, 'children')
+      )
+    case MenuType.OutLink:
+      return (
+        isNotEmptyStringField(menuData, 'path') &&
+        (menuData.path!.startsWith('http://') ||
+          menuData.path!.startsWith('https://')) &&
+        !isContainKey(menuData, 'component') &&
+        !isContainKey(menuData, 'children')
+      )
+  }
+}
+
+export function isMenuTree(data: unknown): data is Menu[] {
+  return isArray(data, isMenuNode)
 }

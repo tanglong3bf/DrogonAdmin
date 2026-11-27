@@ -1,15 +1,15 @@
 #pragma once
 
-#define GETTER(field)                  \
-    const auto &field() const noexcept \
-    {                                  \
-        return field##_;               \
+#define GETTER(field)                                \
+    [[nodiscard]] const auto &field() const noexcept \
+    {                                                \
+        return field##_;                             \
     }
 
-#define GETTER_STR_VIEW(field)                    \
-    const std::string_view field() const noexcept \
-    {                                             \
-        return field##_;                          \
+#define GETTER_STR_VIEW(field)                                  \
+    [[nodiscard]] const std::string_view field() const noexcept \
+    {                                                           \
+        return field##_;                                        \
     }
 
 #define ENTITY_SET(field, ...)           \

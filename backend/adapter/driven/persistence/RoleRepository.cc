@@ -278,7 +278,7 @@ Task<optional<Role>> RoleRepository::getById(const std::int32_t roleId) const
 
 drogon::Task<std::vector<Role>> RoleRepository::getByIds(
     const std::vector<std::int32_t> &roleIds,
-    const bool withRelation) const
+    const bool /* withRelation */) const
 {
     if (roleIds.empty())
     {

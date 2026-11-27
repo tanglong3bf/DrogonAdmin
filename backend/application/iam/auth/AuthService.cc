@@ -94,7 +94,10 @@ Task<LoginResponse> AuthService::login(const LoginRequest &request) const
     Json::Value jwtData;
     jwtData["user_id"] = *user->userId();
     const auto token = jwtUtil->encode(jwtData);
-    co_return LoginResponse{token, UserResponse{*user}};
+
+    // 暂时返回全部菜单，后续按用户权限过滤
+    auto menuList = co_await menuCqrsRepo_->getMenuTree();
+    co_return LoginResponse{token, UserResponse{*user}, std::move(menuList)};
 }
 
 static int randomInt(int min, int max)

@@ -1,7 +1,5 @@
 #include "LoginResponse.h"
 
-#include <drogon/HttpAppFramework.h>
-
 using namespace drogon;
 
 namespace drogon
@@ -19,9 +17,7 @@ Json::Value LoginResponse::toJson() const
 {
     Json::Value json;
     json["token"] = token_;
-    // TODO: 可访问目录后续改为AuthService查询并传入
-    const auto config = app().getCustomConfig();
-    json["menu_list"] = config["menu_list"];
+    json["menu_list"] = toJsonArray(menuList_);
     json["user_info"] = user_.toJson();
     return json;
 }

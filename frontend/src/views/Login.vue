@@ -7,7 +7,7 @@ import { useCommonStore } from '@/stores/common'
 import { useAuthStore } from '@/stores/auth'
 import { login } from '@/api/auth'
 import { LoginFormData, LoginRequest, MenuResponse } from '@/types/auth'
-import { SidebarMenu } from '@/types/menu'
+import { Menu } from '@/types/menu'
 import { MenuType } from '@/types/enums'
 import { API_BASE_URL } from '@/config'
 import axios, { AxiosError } from 'axios'
@@ -102,9 +102,13 @@ const onLogin = async (formEl?: FormInstance) => {
     try {
       const result = await login(request)
 
-      const toSidebarMenu = (menu_list: MenuResponse[]): SidebarMenu[] => {
-        return menu_list.map((menu: MenuResponse): SidebarMenu => {
-          const sidebarMenuBase: SidebarMenu = {
+      const toSidebarMenu = (menu_list: MenuResponse[]): Menu[] => {
+        return menu_list.map((menu: MenuResponse): Menu => {
+          const sidebarMenuBase: Menu = {
+            sort_num: menu.sort_num,
+            version: menu.version,
+            menu_id: menu.menu_id,
+            type: menu.type,
             index: menu.menu_id.toString(),
             name: menu.name,
             icon: menu.icon,
@@ -114,7 +118,7 @@ const onLogin = async (formEl?: FormInstance) => {
             menu.children && menu.children.length > 0
               ? toSidebarMenu(menu.children)
               : undefined
-          const sidebarMenu: SidebarMenu =
+          const sidebarMenu: Menu =
             menu.type === MenuType.Menu
               ? {
                   ...sidebarMenuBase,

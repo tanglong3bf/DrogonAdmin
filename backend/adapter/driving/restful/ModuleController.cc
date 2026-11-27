@@ -3,7 +3,7 @@
 using namespace drogon;
 
 Task<HttpResponsePtr> ModuleController::getModuleTree(
-    const HttpRequestPtr req) const
+    const HttpRequestPtr /*req*/) const
 {
     const auto tree = co_await moduleService_->getModuleTree();
     co_return toResponse(tree);

@@ -274,6 +274,7 @@ CREATE TABLE "public"."sys_menu" (
   "sort_num" int4 NOT NULL,
   "component" varchar(50) COLLATE "pg_catalog"."default",
   "type" int2 NOT NULL,
+  "version" int4 NOT NULL DEFAULT 0,
   "created_by" int4 NOT NULL,
   "created_time" timestamp(6) NOT NULL,
   "updated_by" int4 NOT NULL,
@@ -291,6 +292,7 @@ COMMENT ON COLUMN "public"."sys_menu"."name" IS '菜单名称';
 COMMENT ON COLUMN "public"."sys_menu"."sort_num" IS '菜单排序';
 COMMENT ON COLUMN "public"."sys_menu"."component" IS '组件';
 COMMENT ON COLUMN "public"."sys_menu"."type" IS '菜单类型';
+COMMENT ON COLUMN "public"."sys_menu"."version" IS '乐观锁版本号';
 COMMENT ON COLUMN "public"."sys_menu"."created_by" IS '创建者';
 COMMENT ON COLUMN "public"."sys_menu"."created_time" IS '创建时间';
 COMMENT ON COLUMN "public"."sys_menu"."updated_by" IS '最新一次更新者';
@@ -363,6 +365,19 @@ INSERT INTO public.sys_action_priority VALUES (13, 14, 6, 1, '2026-07-22 15:32:5
 INSERT INTO public.sys_action_priority VALUES (13, 15, 6, 1, '2026-07-22 15:32:58.000000');
 INSERT INTO public.sys_action_priority VALUES (15, 16, 6, 1, '2026-07-22 15:32:58.000000');
 
+--- 菜单表数据
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (1, null, null, null, 'ion:settings-sharp', '系统管理', 0, null, 0, 0, 1, '2026-11-10 14:28:53.000000', 1, '2026-11-10 11:57:29.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (2, null, 1, null, 'ion:settings-sharp', '组织架构', 0, null, 0, 0, 1, '2026-11-10 14:28:54.000000', 1, '2026-11-10 14:28:58.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (3, null, 1, null, 'ion:settings-sharp', '权限管理', 1, null, 0, 0, 1, '2026-11-10 14:30:05.000000', 1, '2026-11-10 14:30:07.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (4, null, 1, null, 'ion:settings-sharp', '资源管理', 2, null, 0, 0, 1, '2026-11-10 14:31:03.000000', 1, '2026-11-10 14:31:08.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (5, null, 2, '/sys/org/dept', 'mingcute:department-fill', '部门管理', 0, '/sys/org/Dept', 1, 0, 1, '2026-11-10 14:32:14.000000', 1, '2026-11-10 14:32:15.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (6, null, 2, '/sys/org/user', 'ri:user-fill', '用户管理', 1, '/sys/org/User', 1, 0, 1, '2026-11-10 14:34:56.000000', 1, '2026-11-10 14:34:57.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (7, null, 3, '/sys/authorization/role', 'fa6-solid:user-gear', '角色管理', 0, '/sys/authorization/Role', 1, 0, 1, '2026-11-10 14:36:32.000000', 1, '2026-11-10 14:36:35.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (8, null, 3, '/sys/authorization/permission', 'ix:user-key', '权限分配', 1, '/sys/authorization/Permission', 1, 0, 1, '2026-11-10 14:38:39.000000', 1, '2026-11-10 14:38:41.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (9, null, 4, '/sys/resources/module', 'tdesign:module-filled', '模块管理', 0, '/sys/resources/Module', 1, 0, 1, '2026-11-10 15:19:49.000000', 1, '2026-11-10 15:19:52.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (10, null, 4, '/sys/resources/menu', 'fluent-mdl2:context-menu', '菜单管理', 1, '/sys/resources/Menu', 1, 0, 1, '2026-11-10 15:20:39.000000', 1, '2026-11-10 15:20:41.000000', null, null);
+INSERT INTO public.sys_menu (menu_id, action_id, parent_id, path, icon, name, sort_num, component, type, version, created_by, created_time, updated_by, updated_time, deleted_by, deleted_time) VALUES (11, null, null, 'https://github.com/tanglong3bf/DrogonAdmin', 'octicon:mark-github-24', '源码地址', 1, null, 2, 0, 1, '2026-11-11 16:00:39.000000', 1, '2026-11-11 16:00:41.000000', null, null);
+
 ALTER SEQUENCE "public"."sys_dept_dept_id_seq"
 OWNED BY "public"."sys_dept"."dept_id";
 SELECT setval('"public"."sys_dept_dept_id_seq"', 8, true);
@@ -380,7 +395,7 @@ OWNED BY "public"."sys_action"."action_id";
 SELECT setval('"public"."sys_action_action_id_seq"', 16, true);
 ALTER SEQUENCE "public"."sys_menu_menu_id_seq"
 OWNED BY "public"."sys_menu"."menu_id";
-SELECT setval('"public"."sys_menu_menu_id_seq"', 1, false);
+SELECT setval('"public"."sys_menu_menu_id_seq"', 11, true);
 
 ALTER TABLE "public"."sys_dept" ADD CONSTRAINT "sys_dept_pkey" PRIMARY KEY ("dept_id");
 ALTER TABLE "public"."sys_role" ADD CONSTRAINT "sys_role_pkey" PRIMARY KEY ("role_id");

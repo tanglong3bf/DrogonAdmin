@@ -3,7 +3,7 @@ import { Random } from 'mockjs'
 import type { ResponseBody } from '@/types/common'
 import type { LoginResponse } from '@/types/auth'
 import mockConfig from './mock.config.json'
-import { AxiosRequestConfig } from 'axios'
+import type { AxiosRequestConfig } from 'axios'
 
 /**
  * 登录接口mock
@@ -37,7 +37,8 @@ if (mockConfig.auth.login) {
                 roles_id: [1],
                 phone_number: '13388886666',
                 email: 'admin123@dr-admin.com',
-                status: 'normal'
+                status: 'normal',
+                version: 0
               },
               menu_list: [
                 {
@@ -45,12 +46,16 @@ if (mockConfig.auth.login) {
                   icon: 'ion:settings-sharp',
                   name: '系统管理',
                   type: 0,
+                  sort_num: 0,
+                  version: 0,
                   children: [
                     {
                       menu_id: 2,
                       icon: 'ion:settings-sharp',
                       name: '组织架构',
                       type: 0,
+                      sort_num: 0,
+                      version: 0,
                       children: [
                         {
                           menu_id: 5,
@@ -58,7 +63,9 @@ if (mockConfig.auth.login) {
                           icon: 'mingcute:department-fill',
                           name: '部门管理',
                           component: '/sys/org/Dept',
-                          type: 1
+                          type: 1,
+                          sort_num: 0,
+                          version: 0
                         },
                         {
                           menu_id: 6,
@@ -66,7 +73,9 @@ if (mockConfig.auth.login) {
                           icon: 'ri:user-fill',
                           name: '用户管理',
                           component: '/sys/org/User',
-                          type: 1
+                          type: 1,
+                          sort_num: 1,
+                          version: 0
                         }
                       ]
                     },
@@ -75,14 +84,18 @@ if (mockConfig.auth.login) {
                       icon: 'ion:settings-sharp',
                       name: '权限管理',
                       type: 0,
+                      sort_num: 1,
+                      version: 0,
                       children: [
                         {
                           menu_id: 7,
                           path: '/sys/authorization/role',
-                          icon: 'fa7-solid:user-cog',
+                          icon: 'fa6-solid:user-gear',
                           name: '角色管理',
                           component: '/sys/authorization/Role',
-                          type: 1
+                          type: 1,
+                          sort_num: 0,
+                          version: 0
                         },
                         {
                           menu_id: 8,
@@ -90,7 +103,9 @@ if (mockConfig.auth.login) {
                           icon: 'ix:user-key',
                           name: '权限分配',
                           component: '/sys/authorization/Permission',
-                          type: 1
+                          type: 1,
+                          sort_num: 1,
+                          version: 0
                         }
                       ]
                     },
@@ -99,6 +114,8 @@ if (mockConfig.auth.login) {
                       icon: 'ion:settings-sharp',
                       name: '资源管理',
                       type: 0,
+                      sort_num: 2,
+                      version: 0,
                       children: [
                         {
                           menu_id: 9,
@@ -106,7 +123,9 @@ if (mockConfig.auth.login) {
                           icon: 'tdesign:module-filled',
                           name: '模块管理',
                           component: '/sys/resources/Module',
-                          type: 1
+                          type: 1,
+                          sort_num: 0,
+                          version: 0
                         },
                         {
                           menu_id: 10,
@@ -114,7 +133,9 @@ if (mockConfig.auth.login) {
                           icon: 'fluent-mdl2:context-menu',
                           name: '菜单管理',
                           component: '/sys/resources/Menu',
-                          type: 1
+                          type: 1,
+                          sort_num: 1,
+                          version: 0
                         }
                       ]
                     }
@@ -125,7 +146,9 @@ if (mockConfig.auth.login) {
                   path: 'https://github.com/tanglong3bf/DrogonAdmin',
                   icon: 'octicon:mark-github-24',
                   name: '源码地址',
-                  type: 2
+                  type: 2,
+                  sort_num: 1,
+                  version: 0
                 }
               ]
             }

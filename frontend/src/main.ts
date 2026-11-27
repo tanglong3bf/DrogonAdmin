@@ -7,6 +7,9 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router'
 
+// 注册本地图标集合，避免运行时访问远程图标服务
+import './plugins/iconify'
+
 // 引入element-plus的图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
