@@ -7,7 +7,7 @@
 using namespace drogon;
 
 Task<HttpResponsePtr> MenuController::getMenuTree(
-    const HttpRequestPtr req) const
+    const HttpRequestPtr /*req*/) const
 {
     const auto tree = co_await menuService_->getMenuTree();
     co_return toResponse(tree);
@@ -33,13 +33,17 @@ Task<HttpResponsePtr> MenuController::updateMenu(
 }
 
 Task<HttpResponsePtr> MenuController::deleteMenu(
-    const HttpRequestPtr req,
-    const std::int32_t menuId) const
+    const HttpRequestPtr /*req*/,
+    const std::int32_t /*menuId*/) const
 {
     throw BusinessException("接口未实现");
 }
 
-Task<HttpResponsePtr> MenuController::sortMenu(const HttpRequestPtr req) const
+Task<HttpResponsePtr> MenuController::sortMenu(
+    const HttpRequestPtr req,
+    const MenuSortRequest request) const
 {
-    throw BusinessException("接口未实现");
+    const auto updatedBy = req->getAttributes()->get<int32_t>("userId");
+    co_await menuService_->sortMenu(request, updatedBy);
+    co_return HttpResponse::newHttpResponse(k204NoContent, CT_NONE);
 }

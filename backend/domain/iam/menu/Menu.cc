@@ -14,16 +14,17 @@ Menu::Menu(string_view name,
            const int32_t sortNum,
            const MenuType type,
            const int32_t createdBy)
-    : name_{name},
+    : AuditableEntity{AUDITABLE_INIT},
+      name_{name},
       sortNum_{sortNum},
       type_{type},
-      version_{0},
-      AuditableEntity{AUDITABLE_INIT}
+      version_{0}
 {
 }
 
 Menu::Menu(const SysMenu &model)
-    : OPT_INIT(menuId_, MenuId),
+    : AuditableEntity{AUDITABLE_INIT_BY_MODEL},
+      OPT_INIT(menuId_, MenuId),
       OPT_OV_INIT(int32_t, actionId_, ActionId),
       OPT_INIT(parentId_, ParentId),
       OPT_INIT(path_, Path),
@@ -32,8 +33,7 @@ Menu::Menu(const SysMenu &model)
       INIT(sortNum_, SortNum),
       OPT_INIT(component_, Component),
       ENUM_INIT(MenuType, type_, Type),
-      INIT(version_, Version),
-      AuditableEntity{AUDITABLE_INIT_BY_MODEL}
+      INIT(version_, Version)
 {
 }
 
@@ -144,18 +144,11 @@ void Menu::updateTypeAndAccess(const optional<MenuType> type,
     // 未传类型时沿用当前类型，path、component 未传时沿用当前值
     const MenuType newType = type.value_or(type_);
 
-    LOG_DEBUG << (type ? static_cast<int16_t>(*type) : -1);
-    LOG_DEBUG << static_cast<int16_t>(type_);
-    LOG_DEBUG << static_cast<int16_t>(newType);
-
     optional<string> newPath = path_;
     if (!path.isAbsent())
     {
         newPath = path.hasValue() ? optional<string>{path.value()} : nullopt;
     }
-    LOG_DEBUG << (path ? *path : path.isAbsent() ? "(undefined)" : "(null)");
-    LOG_DEBUG << (path_ ? *path_ : string("(null)"));
-    LOG_DEBUG << (newPath ? *newPath : string("(null)"));
 
     optional<string> newComponent = component_;
     if (!component.isAbsent())
@@ -164,11 +157,6 @@ void Menu::updateTypeAndAccess(const optional<MenuType> type,
                            ? optional<string>{component.value()}
                            : nullopt;
     }
-    LOG_DEBUG << (component              ? *component
-                  : component.isAbsent() ? "(undefined)"
-                                         : "(null)");
-    LOG_DEBUG << (component_ ? *component_ : string("(null)"));
-    LOG_DEBUG << (newComponent ? *newComponent : string("(null)"));
 
     switch (newType)
     {

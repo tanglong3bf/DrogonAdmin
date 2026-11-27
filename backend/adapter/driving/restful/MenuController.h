@@ -1,6 +1,7 @@
 #pragma once
 
 #include "application/iam/menu/MenuService.h"
+#include "application/iam/menu/MenuSortRequest.h"
 #include "application/iam/menu/MenuUpdateRequest.h"
 #include <drogon/HttpController.h>
 
@@ -62,7 +63,8 @@ class MenuController : public drogon::HttpController<MenuController>
      * @brief 排序菜单
      */
     drogon::Task<drogon::HttpResponsePtr> sortMenu(
-        const drogon::HttpRequestPtr req) const;
+        const drogon::HttpRequestPtr req,
+        const MenuSortRequest request) const;
 
   private:
     MenuServicePtr menuService_{

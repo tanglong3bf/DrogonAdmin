@@ -28,9 +28,23 @@ class MenuRepository : public DrAdminObject<MenuRepository>
         const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
-     * @brief 根据 id 获取菜单（未删除的）
+     * @brief 根据 id 获取菜单
      */
     drogon::Task<std::optional<Menu>> getById(const std::int32_t menuId) const;
+
+    /**
+     * @brief 获取指定父菜单下的所有子菜单
+     */
+    drogon::Task<std::vector<Menu>> getByParentId(
+        const std::optional<std::int32_t> &parentId) const;
+
+    /**
+     * @brief 批量存储菜单
+     */
+    drogon::Task<> multiSave(
+        const std::vector<Menu> &menus,
+        const std::vector<std::int32_t> &versions,
+        const DbClientPtr & = drogon::app().getDbClient()) const;
 
     /**
      * @brief 统计指定父菜单下同名子菜单数量

@@ -3,8 +3,10 @@
 #include "MenuAssembler.h"
 #include "MenuCqrsRepo.h"
 #include "MenuCreateRequest.h"
+#include "MenuSortRequest.h"
 #include "MenuUpdateRequest.h"
 #include "MenuUpdater.h"
+#include "domain/iam/menu/MenuHandler.h"
 #include "domain/iam/menu/MenuRepository.h"
 #include "common/framework/DrAdminObject.hpp"
 #include <drogon/utils/coroutine.h>
@@ -36,6 +38,12 @@ class MenuService : public DrAdminObject<MenuService>
                               const MenuUpdateRequest &request,
                               const std::int32_t updatedBy) const;
 
+    /**
+     * @brief 排序菜单
+     */
+    drogon::Task<> sortMenu(const MenuSortRequest &request,
+                            const std::int32_t updatedBy) const;
+
   private:
     MenuCqrsRepoPtr menuCqrsRepo_{
         drogon::DrClassMap::getSingleInstance<MenuCqrsRepo>()};
@@ -43,6 +51,8 @@ class MenuService : public DrAdminObject<MenuService>
         drogon::DrClassMap::getSingleInstance<MenuAssembler>()};
     MenuUpdaterPtr menuUpdater_{
         drogon::DrClassMap::getSingleInstance<MenuUpdater>()};
+    MenuHandlerPtr menuHandler_{
+        drogon::DrClassMap::getSingleInstance<MenuHandler>()};
     MenuRepositoryPtr menuRepository_{
         drogon::DrClassMap::getSingleInstance<MenuRepository>()};
 };

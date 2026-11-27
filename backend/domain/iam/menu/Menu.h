@@ -53,6 +53,16 @@ class Menu : public AuditableEntity, public ChangeableEntity
     void setSortNum(std::int32_t sortNum);
 
     /**
+     * @brief 更新排序号
+     */
+    void updateSortNum(std::int32_t sortNum, std::int32_t updatedBy)
+    {
+        sortNum_ = sortNum;
+        markUpdatedBy(updatedBy);
+        markUpdated();
+    }
+
+    /**
      * @brief 设置可选字段
      *
      * @param icon       图标

@@ -618,6 +618,38 @@
             "main": "UPDATE sys_menu SET name = '${data.name}', type = ${data.type}, parent_id = @int_value(value=data.parent_id), path = @string_value(value=data.path), icon = @string_value(value=data.icon), component = @string_value(value=data.component), sort_num = ${data.sort_num}, action_id = @int_value(value=data.action_id), version = version + 1, updated_by = ${data.updated_by}, updated_time = '${data.updated_time}'::timestamp WHERE menu_id = ${data.menu_id} AND version = ${data.version}",
             "string_value": "@if(value) '${value}' @else NULL @endif",
             "int_value": "@if(value) ${value} @else NULL::Integer @endif"
+          },
+          // 批量更新菜单数据
+          "multi_update_menu": {
+            "main": {
+              "sql": "UPDATE sys_menu d SET @sets(fields_list) FROM ( VALUES @values(data_list, fields_list) ) AS s @fields(fields_list) WHERE d.menu_id = s.menu_id AND d.version = s.version",
+              "params": {
+                "fields_list": [
+                  "menu_id",
+                  "action_id",
+                  "parent_id",
+                  "path",
+                  "icon",
+                  "name",
+                  "sort_num",
+                  "component",
+                  "type",
+                  "version",
+                  "created_by",
+                  "created_time",
+                  "updated_by",
+                  "updated_time",
+                  "deleted_by",
+                  "deleted_time"
+                ]
+              }
+            },
+            "sets": "@for(field in fields_list, separator=',') @if(field == 'version') ${field}=d.version+1 @else ${field}=s.${field} @endif @endfor",
+            "values": "(@for(item in data_list, separator='), (') ${item.menu_id}, @int_value(value = item.action_id), @int_value(value = item.parent_id), @string_value(value = item.path), @string_value(value = item.icon), '${item.name}', ${item.sort_num}, @string_value(value = item.component), ${item.type}, ${item.version}, ${item.created_by}, '${item.created_time}'::timestamp, ${item.updated_by}, '${item.updated_time}'::timestamp, @int_value(value = item.deleted_by), @timestamp_value(value = item.deleted_time) @endfor)",
+            "int_value": "@if(value) ${value} @else NULL::Integer @endif",
+            "string_value": "@if(value) '${value}' @else NULL @endif",
+            "timestamp_value": "@if(value) '${value}'::timestamp @else NULL::timestamp @endif",
+            "fields": "(@for(item in fields_list, separator=',') ${item} @endfor)"
           }
         }
       }
